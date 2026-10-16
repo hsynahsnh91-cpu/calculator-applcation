@@ -8,8 +8,8 @@ transforming...
 rendering chunks...
 [plugin vite:singlefile] 
 
-[plugin vite:singlefile] Inlining: index-ugaa0d7U.js
-[plugin vite:singlefile] Inlining: style-BBIPISrP.css
+[plugin vite:singlefile] Inlining: index-Hste5-mQ.js
+[plugin vite:singlefile] Inlining: style-DM9Fusq5.css
 computing gzip size...
-dist/index.html  17,100.94 kB │ gzip: 6,993.70 kB
-✓ built in 14.50s
+dist/index.html  17,105.26 kB │ gzip: 6,994.68 kB
+✓ built in 14.27s

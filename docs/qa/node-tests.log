@@ -693,6 +693,26 @@ PASS school M61: ساروس لا تعمم
 PASS school M62: جملة غير خطية
 PASS school M63: معادلة ناقصة
 PASS school M64: التعاريف ليست نتائج
+PASS school M65: اسمان في طلب واحد
+PASS school M66: أثر قبل المحدد
+PASS school M67: منقول ومعكوس لمصفوفتين
+PASS school M68: رمزا المحدد والأثر بمصفوفتين
+PASS school M69: النشر حسب العمود الأخير
+PASS school M70: النشر حسب السطر الأخير
+PASS school M71: رفض العمود السابع
+PASS school M72: لا تخمين للعمود الأوسط
+PASS school M73: مصفوفة وحدة
+PASS school M74: رفض وصف واحدية خاطئ
+PASS school M75: المثلثية العلوية
+PASS school M76: رفض العلوية لمثلثية سفلية
+PASS school M77: جملة aligned وكسر في البداية
+PASS school M78: جملة cases بمجاهيل عربية
+PASS school M79: الحذف الغاوسي
+PASS school M80: معامل k كسري صريح
+PASS school M81: فعل اضرب وجذر حقيقي
+PASS school M82: معامل k ناقص
+PASS school M83: بداية cases غير مكتملة
+PASS school M84: تعريفان مختلفان للمعامل k
 PASS independent exact determinant/inverse/row reduction, order 1
 PASS independent exact determinant/inverse/row reduction, order 2
 PASS independent exact determinant/inverse/row reduction, order 3
@@ -753,5 +773,22 @@ PASS identities and explicitly zero coefficient columns retain the free unknown
 PASS inline givens before a bridge verb are not mistaken for a setup-only declaration
 PASS a derived coefficient matrix never overwrites the user's previous A
 PASS CX=B uses and labels C without renaming it to a different existing A
+PASS compound unary demands bind the actual operand and preserve the requested order
+PASS a repeated operation on two named matrices is not deduplicated
+PASS one numbered compound demand keeps its source label for both operands
+PASS a failed determinant does not block a separate explicit trace joined by waw
+PASS splitting matrix requests never cuts an arithmetic expression or a nested matrix
+PASS the chosen last cofactor row/column is reflected in real steps
+PASS an unsupported cofactor index asks rather than silently choosing row one
+PASS unit and upper/lower adjective aliases verify the actual elements, including false claims
+PASS LaTeX cases/aligned equations retain exact fractions and actual Cramer deltas
+PASS Gaussian elimination wording cannot steal a Gaussian probability distribution
+PASS an explicitly named k is exact, persisted and reusable without changing its matrix
+PASS zero and radical k values multiply every element and never become a determinant alias
+PASS a factor assertion is not harvested as a given and malformed factors do not run code
+PASS a given exact factor survives the matrix/vector bridge and its return
+PASS an unrelated coordinate tuple cannot overwrite a previous named matrix when saving k
+PASS preserving the command اضرب does not break spoken multiplication
+PASS complete LaTeX systems render as one mathematical block instead of two hidden fallback messages
 
-Matrices regression: 124 passed, 0 failed
+Matrices regression: 161 passed, 0 failed

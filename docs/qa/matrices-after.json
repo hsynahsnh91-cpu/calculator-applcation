@@ -1,10 +1,10 @@
 {
   "corpus": {
-    "total": 64,
-    "completeExpected": 55,
-    "clarificationExpected": 9
+    "total": 84,
+    "completeExpected": 70,
+    "clarificationExpected": 14
   },
-  "passed": 124,
+  "passed": 161,
   "failed": 0,
   "results": [
     {
@@ -264,6 +264,86 @@
       "pass": true
     },
     {
+      "name": "school M65: اسمان في طلب واحد",
+      "pass": true
+    },
+    {
+      "name": "school M66: أثر قبل المحدد",
+      "pass": true
+    },
+    {
+      "name": "school M67: منقول ومعكوس لمصفوفتين",
+      "pass": true
+    },
+    {
+      "name": "school M68: رمزا المحدد والأثر بمصفوفتين",
+      "pass": true
+    },
+    {
+      "name": "school M69: النشر حسب العمود الأخير",
+      "pass": true
+    },
+    {
+      "name": "school M70: النشر حسب السطر الأخير",
+      "pass": true
+    },
+    {
+      "name": "school M71: رفض العمود السابع",
+      "pass": true
+    },
+    {
+      "name": "school M72: لا تخمين للعمود الأوسط",
+      "pass": true
+    },
+    {
+      "name": "school M73: مصفوفة وحدة",
+      "pass": true
+    },
+    {
+      "name": "school M74: رفض وصف واحدية خاطئ",
+      "pass": true
+    },
+    {
+      "name": "school M75: المثلثية العلوية",
+      "pass": true
+    },
+    {
+      "name": "school M76: رفض العلوية لمثلثية سفلية",
+      "pass": true
+    },
+    {
+      "name": "school M77: جملة aligned وكسر في البداية",
+      "pass": true
+    },
+    {
+      "name": "school M78: جملة cases بمجاهيل عربية",
+      "pass": true
+    },
+    {
+      "name": "school M79: الحذف الغاوسي",
+      "pass": true
+    },
+    {
+      "name": "school M80: معامل k كسري صريح",
+      "pass": true
+    },
+    {
+      "name": "school M81: فعل اضرب وجذر حقيقي",
+      "pass": true
+    },
+    {
+      "name": "school M82: معامل k ناقص",
+      "pass": true
+    },
+    {
+      "name": "school M83: بداية cases غير مكتملة",
+      "pass": true
+    },
+    {
+      "name": "school M84: تعريفان مختلفان للمعامل k",
+      "pass": true
+    },
+    {
       "name": "independent exact determinant/inverse/row reduction, order 1",
       "pass": true
     },
@@ -501,6 +581,74 @@
     },
     {
       "name": "CX=B uses and labels C without renaming it to a different existing A",
+      "pass": true
+    },
+    {
+      "name": "compound unary demands bind the actual operand and preserve the requested order",
+      "pass": true
+    },
+    {
+      "name": "a repeated operation on two named matrices is not deduplicated",
+      "pass": true
+    },
+    {
+      "name": "one numbered compound demand keeps its source label for both operands",
+      "pass": true
+    },
+    {
+      "name": "a failed determinant does not block a separate explicit trace joined by waw",
+      "pass": true
+    },
+    {
+      "name": "splitting matrix requests never cuts an arithmetic expression or a nested matrix",
+      "pass": true
+    },
+    {
+      "name": "the chosen last cofactor row/column is reflected in real steps",
+      "pass": true
+    },
+    {
+      "name": "an unsupported cofactor index asks rather than silently choosing row one",
+      "pass": true
+    },
+    {
+      "name": "unit and upper/lower adjective aliases verify the actual elements, including false claims",
+      "pass": true
+    },
+    {
+      "name": "LaTeX cases/aligned equations retain exact fractions and actual Cramer deltas",
+      "pass": true
+    },
+    {
+      "name": "Gaussian elimination wording cannot steal a Gaussian probability distribution",
+      "pass": true
+    },
+    {
+      "name": "an explicitly named k is exact, persisted and reusable without changing its matrix",
+      "pass": true
+    },
+    {
+      "name": "zero and radical k values multiply every element and never become a determinant alias",
+      "pass": true
+    },
+    {
+      "name": "a factor assertion is not harvested as a given and malformed factors do not run code",
+      "pass": true
+    },
+    {
+      "name": "a given exact factor survives the matrix/vector bridge and its return",
+      "pass": true
+    },
+    {
+      "name": "an unrelated coordinate tuple cannot overwrite a previous named matrix when saving k",
+      "pass": true
+    },
+    {
+      "name": "preserving the command اضرب does not break spoken multiplication",
+      "pass": true
+    },
+    {
+      "name": "complete LaTeX systems render as one mathematical block instead of two hidden fallback messages",
       "pass": true
     }
   ]

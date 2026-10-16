@@ -474,6 +474,26 @@
       "pass": true
     },
     {
+      "name": "one matrix sentence binds A's determinant and B's trace in the written order",
+      "pass": true
+    },
+    {
+      "name": "Arabic LaTeX cases reach the actual Cramer Worker with all three deltas",
+      "pass": true
+    },
+    {
+      "name": "a last-column demand uses column three and an invalid column never falls back to row one",
+      "pass": true
+    },
+    {
+      "name": "the exact named factor k reopens in the board and editing it still needs an explicit solve",
+      "pass": true
+    },
+    {
+      "name": "a rectangular determinant failure leaves an independent B trace visible as a partial success",
+      "pass": true
+    },
+    {
       "name": "no external HTTP requests or uncaught browser errors",
       "pass": true
     }

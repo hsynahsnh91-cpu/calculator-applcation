@@ -113,7 +113,8 @@ function readGroup(text: string, start: number): [string, number] | null {
 export function decodeLatex(source: string): string {
   let out = "";
   const implicitFactor = () =>
-    /[A-Za-z0-9_)\]}]$/.test(out) && !/\\begin\{[pbvV]?matrix\}\s*$/.test(out);
+    /[A-Za-z0-9_)\]}]$/.test(out) &&
+    !/\\begin\{(?:[pbvV]?matrix|cases|aligned)\}\s*$/.test(out);
   const text = source
     .replace(/\^\{\\circ\}|\^\\circ(?![a-zA-Z])|\\degree(?![a-zA-Z])/g, "°")
     .replace(/\\(?:left|right|displaystyle|limits)\b/g, "")
@@ -253,7 +254,7 @@ export function normalizePrompt(source: string): string {
     .replace(/([xyz0-9)])\s*اس\s*(-?\d+)/g, "$1^$2")
     .replace(/زائد/g, "+")
     .replace(/ناقص/g, "-")
-    .replace(/بضرب|ضرب/g, "*")
+    .replace(/(^|[^\p{L}\p{N}_])(?:بضرب|ضرب)(?=$|[^\p{L}\p{N}_])/gu, "$1*")
     .replace(/(?:تقسيم|مقسوم علي)/g, "/")
     .replace(/(?:سالب)\s*(?=\d)/g, "-")
     .replace(/(?:موجب)\s*(?=\d)/g, "+")

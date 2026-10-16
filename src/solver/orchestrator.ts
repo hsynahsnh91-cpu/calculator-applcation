@@ -4,7 +4,10 @@ import {
   schoolUnimplemented,
   partInfo,
 } from "./schoolRuntime";
-import { matrixDefinitionOnly } from "./extractors/matrices";
+import {
+  matrixDefinitionOnly,
+  splitMatrixDemands,
+} from "./extractors/matrices";
 import { schoolIntent } from "./schoolDocument";
 import type { SchoolPart } from "./schoolTypes";
 import { parsePrompt } from "./parser";
@@ -81,9 +84,21 @@ export async function solvePrompt(
       setup: false,
       depends: /استنتج|النتيجة السابقة|الطلب السابق/.test(text),
     }));
+  const orderedParts = parts.flatMap((part) => {
+    const demands = part.setup ? [part.text] : splitMatrixDemands(part.text);
+    return demands.length === 1
+      ? [part]
+      : demands.map((text, i) => ({
+          ...part,
+          text,
+          title: text.slice(0, 1000),
+          intent: schoolIntent(text),
+          depends: i === 0 ? part.depends : false,
+        }));
+  });
   let previousFailed = false,
     demands = 0;
-  for (const [partIndex, part] of parts.entries()) {
+  for (const [partIndex, part] of orderedParts.entries()) {
     if (!part.setup && ++demands > 12) break;
     let request = part.text;
     const info = partInfo(part);
@@ -243,7 +258,7 @@ export async function solvePrompt(
         ? ["جد مشتقة الدالة", "ارسم المنحنى", "أوجد الدالة الأصلية للدالة"]
         : [],
     });
-  if (parts.filter((p) => !p.setup).length > 12)
+  if (orderedParts.filter((p) => !p.setup).length > 12)
     unsolved.push({
       request: "الطلبات المتبقية",
       message: "قُرئت أول 12 فقرة. أرسل بقية الطلبات في رسالة جديدة.",

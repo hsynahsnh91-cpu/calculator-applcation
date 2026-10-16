@@ -9,27 +9,27 @@
     "geometry": 140,
     "curriculum": 83,
     "schoolSafety": 38,
-    "passed": 720,
+    "passed": 757,
     "failed": 0,
-    "matrices": 124
+    "matrices": 161
   },
   "browser": {
     "http": {
-      "passed": 119,
+      "passed": 124,
       "failed": 0,
       "externalRequests": 0,
       "uncaughtErrors": 0
     },
     "file": {
-      "passed": 119,
+      "passed": 124,
       "failed": 0,
       "externalRequests": 0,
       "uncaughtErrors": 0
     }
   },
   "build": {
-    "htmlBytes": 17100942,
-    "sha256": "b6afdc5d9bbf1e3a721c6d8243c0aaad0340534f483611989af5ba629775c9c8",
+    "htmlBytes": 17105255,
+    "sha256": "02bf7ee665677fdd1ac73b837993943ddbe99352ab4b27e9065f38a158bf8ca6",
     "separateRuntimeFiles": 0,
     "embeddedLicenseNotices": 48
   },
@@ -51,8 +51,10 @@
     "School proofs are bounded: affine closed-form induction, selected geometric criteria, and polynomial IVT/monotonicity. Not a general proof or full function-study engine.",
     "School corpus includes 18 expected clarifications and one partial success; passing these tests does not imply support for their unsupported mathematical topics.",
     "Matrix input: dimensions 1–6, up to 12 named matrices, 500 characters/cell. Matrix expressions: 300 characters, 120 tokens, nesting 20, powers −1…12. Exact rational/simple-radical arithmetic is bounded, not a general symbolic matrix algebra system.",
-    "Matrix school-style methods do not certify that these topics occur in an unverified official ministry textbook edition. The 64-case matrix corpus expects 9 clarifications.",
-    "All tool categories and reference details start collapsed. Examples/editing do not solve; a probability preview has its own explicit calculation action and is invalidated when its inputs change."
+    "Matrix school-style methods do not certify that these topics occur in an unverified official ministry textbook edition. The 84-case matrix corpus expects 14 clarifications.",
+    "All tool categories and reference details start collapsed. Examples/editing do not solve; a probability preview has its own explicit calculation action and is invalidated when its inputs change.",
+    "A named real factor k requires an explicit bounded exact numeric value; free symbolic-parameter matrices are not a newly supported general algebra system.",
+    "Only independent explicitly named unary matrix demands are split at conjunctions. Ambiguous compound proof/assignment demands require separate complete statements instead of guessed dependencies."
   ],
   "environment": {
     "node": "22.22.3",
@@ -65,7 +67,7 @@
     "geometryPassed": 27,
     "curriculumExamplesPassed": 11,
     "failed": 0,
-    "matrixExamplesPassed": 17
+    "matrixExamplesPassed": 23
   },
   "schoolBaseline": {
     "questions": 83,
@@ -82,10 +84,10 @@
     "failed": 0
   },
   "matrixCorpus": {
-    "questions": 64,
-    "completeExpected": 55,
-    "clarificationExpected": 9,
-    "suitePassed": 124,
+    "questions": 84,
+    "completeExpected": 70,
+    "clarificationExpected": 14,
+    "suitePassed": 161,
     "suiteFailed": 0,
     "provenance": "Original authored cases; not official examination questions."
   }

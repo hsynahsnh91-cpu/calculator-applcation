@@ -142,7 +142,7 @@ export default function MatrixBoard({
   }));
   const [name, setName] = useState(context?.active || "A"),
     [second, setSecond] = useState(context?.active === "B" ? "A" : "B");
-  const [k, setK] = useState("2"),
+  const [k, setK] = useState(context?.scalarFactor || "2"),
     [exponent, setExponent] = useState("2"),
     [order, setOrder] = useState("AB");
   const [method, setMethod] = useState("automatic"),
@@ -363,7 +363,7 @@ export default function MatrixBoard({
         }
       }
       return {
-        question: `لتكن المصفوفة ${name}=${literal(values[name])}${paired ? ` و${second}=${literal(values[second])}` : ""}، ${demand}`,
+        question: `لتكن المصفوفة ${name}=${literal(values[name])}${paired ? ` و${second}=${literal(values[second])}` : ""}${operation === "scale" ? ` وk=${k}` : ""}، ${demand}`,
         error: "",
       };
     } catch (e) {

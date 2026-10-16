@@ -9,6 +9,8 @@ export interface MatrixContext {
   values: Record<string, MatrixCells>;
   active?: string;
   lastScalar?: string;
+  /** Exact explicitly given real factor k, never inferred from a determinant. */
+  scalarFactor?: string;
   system?: MatrixSystem;
   origin?: "matrix" | "geometry" | "statistics" | "system";
 }
@@ -47,6 +49,7 @@ export function isMatrixContext(v: unknown): v is MatrixContext {
       (typeof v.active === "string" &&
         Object.prototype.hasOwnProperty.call(v.values, v.active))) &&
     (v.lastScalar === undefined || scalar(v.lastScalar)) &&
+    (v.scalarFactor === undefined || scalar(v.scalarFactor)) &&
     (v.origin === undefined ||
       ["matrix", "geometry", "statistics", "system"].includes(
         String(v.origin),

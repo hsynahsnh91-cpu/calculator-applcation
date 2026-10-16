@@ -479,6 +479,7 @@ export function solveProbabilityRequest(
         },
         active: "M",
         origin: "statistics",
+        scalarFactor: context.matrices?.scalarFactor,
       };
       finalLatex = `M=\\begin{pmatrix}${v.rows.map(([, f], i) => `${v.exactValues[i].tex()}&${f}`).join("\\\\")}\\end{pmatrix}`;
       v.steps.push({

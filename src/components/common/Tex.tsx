@@ -32,7 +32,7 @@ export const Tex: React.FC<{
   className?: string;
   display?: boolean;
 }> = ({ math, className = "", display = false }) => {
-  const html = useMemo(() => {
+  const { html, failed } = useMemo(() => {
     try {
       const sanitized = cleanMathLatex(math);
       const rendered = katex.renderToString(sanitized, {
@@ -43,21 +43,29 @@ export const Tex: React.FC<{
         maxExpand: 1000,
         maxSize: 20,
       });
-      return rendered.includes('class="katex-error"')
-        ? katex.renderToString("\\text{تعذّر عرض الصيغة الرياضية}", {
-            strict: false,
-          })
-        : rendered;
+      const failed = rendered.includes('class="katex-error"');
+      return {
+        html: failed
+          ? katex.renderToString("\\text{تعذّر عرض الصيغة الرياضية}", {
+              strict: false,
+            })
+          : rendered,
+        failed,
+      };
     } catch {
-      return katex.renderToString("\\text{تعذّر عرض الصيغة الرياضية}", {
-        strict: false,
-      });
+      return {
+        html: katex.renderToString("\\text{تعذّر عرض الصيغة الرياضية}", {
+          strict: false,
+        }),
+        failed: true,
+      };
     }
   }, [math, display]);
 
   return (
     <span
       dir="ltr"
+      data-math-error={failed || undefined}
       className={`${display ? "block overflow-x-auto max-w-full py-1" : "inline-block align-middle max-w-full overflow-x-auto"} ${className}`}
       style={{ unicodeBidi: "isolate", direction: "ltr" }}
       dangerouslySetInnerHTML={{ __html: html }}
@@ -162,18 +170,26 @@ function plainParts(text: string, autoMath: boolean): React.ReactNode {
   parts.push(clean.slice(end));
   return parts;
 }
+const latexTokens = new RegExp(
+  String.raw`(\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$[^$\n]+?\$|` +
+    ["cases", "aligned", "pmatrix", "bmatrix", "matrix", "vmatrix", "Vmatrix"]
+      .map((name) => String.raw`\\begin\{${name}\}[\s\S]*?\\end\{${name}\}`)
+      .join("|") +
+    ")",
+  "g",
+);
 // Both standard LaTeX delimiters and dollar delimiters, isolated from RTL prose.
 export const RichText: React.FC<{
   text: string;
   className?: string;
   autoMath?: boolean;
 }> = ({ text, className = "", autoMath = false }) => {
-  const tokens = text.split(
-    /(\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$[^$\n]+?\$)/g,
-  );
+  const tokens = text.split(latexTokens);
   return (
     <span className={className}>
       {tokens.map((part, index) => {
+        if (part.startsWith("\\begin{"))
+          return <Tex key={index} math={part} display />;
         if (part.startsWith("\\[") && part.endsWith("\\]"))
           return <Tex key={index} math={part.slice(2, -2)} display />;
         if (part.startsWith("\\(") && part.endsWith("\\)"))

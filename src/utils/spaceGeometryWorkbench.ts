@@ -1358,6 +1358,7 @@ export function solveSpaceRequest(
           },
           active: "M",
           origin: "geometry",
+          scalarFactor: previousMatrices?.scalarFactor,
         },
       };
       out.steps = [

@@ -125,7 +125,10 @@ async function completeAnswer() {
     );
 }
 async function cleanMath() {
-  assert.equal(await page.locator(".katex-error").count(), 0);
+  assert.equal(
+    await page.locator('.katex-error, [data-math-error="true"]').count(),
+    0,
+  );
   assert(
     !(await page.locator("main").innerText()).includes(
       "تعذّر عرض الصيغة الرياضية",
@@ -2892,6 +2895,118 @@ await test("capability and formula details remain hidden until their own titles 
   );
   await cleanMath();
   await page.keyboard.press("Escape");
+});
+
+await test("one matrix sentence binds A's determinant and B's trace in the written order", async () => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await fresh();
+  const t = await solve(
+    "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب أثر المصفوفة B ومحدد المصفوفة A",
+  );
+  await completeAnswer();
+  assert.equal(t.answer.unsolved.length, 0);
+  assert.equal(t.answer.results.length, 2);
+  assert.deepEqual(
+    t.answer.results.map((r) => r.title),
+    ["أثر المصفوفة B", "محدد المصفوفة A"],
+  );
+  assert(t.answer.results[0].finalLatex.endsWith("B=8"));
+  assert(t.answer.results[1].finalLatex.endsWith("A=-2"));
+  assert(t.answer.results.every((r) => r.verification.passed));
+  const visible = await page.locator(".final-answer").innerText();
+  assert(visible.includes("أثر المصفوفة") && visible.includes("محدد المصفوفة"));
+  assert(!visible.includes("tr(") && !visible.includes("det("));
+  await cleanMath();
+  await page.screenshot({
+    path: fileURLToPath(new URL("matrix-named-demands-mobile.png", output)),
+    fullPage: true,
+  });
+});
+await test("Arabic LaTeX cases reach the actual Cramer Worker with all three deltas", async () => {
+  await fresh();
+  const t = await solve(
+    String.raw`حل الجملة بطريقة كرامر: \begin{cases}س+ص+ع=6\\س-ص=-1\\ص-ع=-1\end{cases}`,
+  );
+  await completeAnswer();
+  assert.equal(t.answer.unsolved.length, 0);
+  const r = t.answer.results[0];
+  assert.equal(r.engine, "matricesEngine");
+  assert(
+    r.finalLatex.includes("x=1") &&
+      r.finalLatex.includes("y=2") &&
+      r.finalLatex.includes("z=3"),
+  );
+  for (const v of ["x", "y", "z"])
+    assert(r.steps.some((s) => s.latex.includes(`Delta_{${v}}`)));
+  assert(r.verification.passed);
+  assert((await page.locator(".user-message .katex-display").count()) > 0);
+  assert.equal(
+    await page.locator('.user-message [data-math-error="true"]').count(),
+    0,
+  );
+  await cleanMath();
+  await page.screenshot({
+    path: fileURLToPath(new URL("matrix-latex-cramer-mobile.png", output)),
+    fullPage: true,
+  });
+});
+await test("a last-column demand uses column three and an invalid column never falls back to row one", async () => {
+  await fresh();
+  const cells = "A=[[1,2,3],[0,4,5],[1,0,6]]";
+  const a = await solve(`احسب محدد ${cells} بالنشر حسب العمود الأخير`);
+  await completeAnswer();
+  assert(
+    a.answer.results[0].steps.some((s) => s.title === "النشر بحسب العمود 3"),
+  );
+  const bad = await solve(`احسب محدد ${cells} بالنشر حسب العمود السابع`);
+  assert.equal(bad.answer.results.length, 0);
+  assert.equal(bad.answer.unsolved.length, 1);
+  assert(bad.answer.unsolved[0].message.includes("ضمن قياس"));
+  await cleanMath();
+});
+await test("the exact named factor k reopens in the board and editing it still needs an explicit solve", async () => {
+  await fresh();
+  const a = await solve("لتكن A=[[1,2],[3,4]] وk=1/3، احسب k*A");
+  await completeAnswer();
+  assert.equal(a.answer.context.matrices.scalarFactor, "(1/3)");
+  const b = await solve("احسب k*A");
+  await completeAnswer();
+  assert.equal(b.answer.results[0].finalLatex, a.answer.results[0].finalLatex);
+  await page
+    .locator(".assistant-message")
+    .last()
+    .getByRole("button", { name: "تعديل معطيات المصفوفات", exact: true })
+    .click();
+  assert.equal(await page.locator(".matrix-input-grid input").count(), 0);
+  await matrixOperation("العمليات الجبرية", "scale");
+  const k = page.getByRole("textbox", {
+    name: "معامل ضرب المصفوفة",
+    exact: true,
+  });
+  assert.equal(await k.inputValue(), "(1/3)");
+  const count = await page.locator(".assistant-message").count();
+  await k.fill("0");
+  assert.equal(await page.locator(".assistant-message").count(), count);
+  const c = await submitMatrixBoard();
+  assert.equal(c.answer.context.matrices.scalarFactor, "0");
+  assert(c.answer.results[0].finalLatex.includes("0&0\\\\0&0"));
+  await cleanMath();
+  await page.screenshot({
+    path: fileURLToPath(new URL("matrix-factor-mobile.png", output)),
+    fullPage: true,
+  });
+});
+await test("a rectangular determinant failure leaves an independent B trace visible as a partial success", async () => {
+  await fresh();
+  const t = await solve(
+    "A=[[1,2,3],[4,5,6]]\nB=[[1,2],[3,7]]\nالمطلوب:\n1) احسب محدد A وأثر B",
+  );
+  await completeAnswer();
+  assert.equal(t.answer.unsolved.length, 1);
+  assert.equal(t.answer.results.length, 1);
+  assert.equal(t.answer.results[0].title, "أثر المصفوفة B");
+  assert(t.answer.results[0].finalLatex.endsWith("=8"));
+  await cleanMath();
 });
 
 await test("no external HTTP requests or uncaught browser errors", async () => {

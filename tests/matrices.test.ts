@@ -7,7 +7,11 @@ import { RichText } from "../src/components/common/Tex";
 import corpus from "./fixtures/matrices-school.json";
 import { solvePrompt } from "../src/solver/orchestrator";
 import { normalizePrompt } from "../src/solver/parser";
-import { extractMatrixRequest } from "../src/solver/extractors/matrices";
+import {
+  extractMatrixRequest,
+  splitMatrixDemands,
+  prepareMatrixContext,
+} from "../src/solver/extractors/matrices";
 import { isConversationTurn } from "../src/solver/validation";
 import {
   emptyContext,
@@ -483,6 +487,238 @@ await test("CX=B uses and labels C without renaming it to a different existing A
     a.context.matrices?.values.A,
     given.context.matrices?.values.A,
   );
+});
+await test("compound unary demands bind the actual operand and preserve the requested order", async () => {
+  const givens = "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، ";
+  for (const [demand, names, values] of [
+    ["احسب محدد المصفوفة A وأثر المصفوفة B", ["A", "B"], ["=-2", "=8"]],
+    ["احسب أثر المصفوفة B ومحدد المصفوفة A", ["B", "A"], ["=8", "=-2"]],
+    ["احسب tr(B) وdet(A)", ["B", "A"], ["=8", "=-2"]],
+  ] as const) {
+    const a = await solved(givens + demand);
+    assert.equal(a.results.length, 2);
+    a.results.forEach((r, i) => {
+      assert(r.title.includes(names[i]));
+      assert(r.finalLatex.endsWith(values[i]));
+      assert(r.verification.passed);
+    });
+  }
+});
+await test("a repeated operation on two named matrices is not deduplicated", async () => {
+  const a = await solved(
+    "A=[[1,2],[3,4]]؛ B=[[1,2],[3,7]]؛ احسب محدد A ومحدد B وأثر B",
+  );
+  assert.deepEqual(
+    a.results.map((r) => r.title),
+    ["محدد المصفوفة A", "محدد المصفوفة B", "أثر المصفوفة B"],
+  );
+  assert(a.results[0].finalLatex.endsWith("=-2"));
+  assert(a.results[1].finalLatex.endsWith("=1"));
+  assert(a.results[2].finalLatex.endsWith("=8"));
+});
+await test("one numbered compound demand keeps its source label for both operands", async () => {
+  const a = await solved(
+    "السؤال الأول\nA=[[1,2],[3,4]]\nB=[[1,2],[3,7]]\nالمطلوب:\nأ) احسب أثر B ومحدد A\nب) جد منقول B",
+  );
+  assert.equal(a.results.length, 3);
+  assert.deepEqual(
+    a.results.map((r) => r.school?.label),
+    ["أ)", "أ)", "ب)"],
+  );
+  assert(a.results[0].finalLatex.endsWith("=8"));
+  assert(a.results[1].finalLatex.endsWith("=-2"));
+});
+await test("a failed determinant does not block a separate explicit trace joined by waw", async () => {
+  for (const q of [
+    "A=[[1,2,3],[4,5,6]]؛ B=[[1,2],[3,7]]؛ احسب محدد A وأثر B",
+    "A=[[1,2,3],[4,5,6]]\nB=[[1,2],[3,7]]\nالمطلوب:\n1) احسب محدد A وأثر B",
+  ]) {
+    const a = await solve(q);
+    assert.equal(a.unsolved.length, 1);
+    assert.equal(a.results.length, 1);
+    assert.equal(a.results[0].title, "أثر المصفوفة B");
+    assert(a.results[0].finalLatex.endsWith("=8"));
+  }
+});
+await test("splitting matrix requests never cuts an arithmetic expression or a nested matrix", async () => {
+  for (const q of [
+    "احسب S=det(A)+tr(B)",
+    "احسب S=det(A) وtr(B)",
+    "احسب محدد ومقلوب المصفوفة [[1,2],[3,4]]",
+    "احسب det(A+tr(B)*I)",
+  ])
+    assert.deepEqual(splitMatrixDemands(normalizePrompt(q)), [
+      normalizePrompt(q),
+    ]);
+  for (const demand of ["تحقق أن det(A)=-2 وtr(B)=8", "احسب S=det(A) وtr(B)"]) {
+    const a = await solve(`لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، ${demand}`);
+    assert.equal(a.results.length, 0);
+    assert.equal(a.unsolved.length, 1);
+  }
+});
+await test("the chosen last cofactor row/column is reflected in real steps", async () => {
+  const cells = "A=[[1,2,3],[0,4,5],[1,0,6]]";
+  for (const [description, title] of [
+    ["العمود الأخير", "العمود 3"],
+    ["السطر الأخير", "السطر 3"],
+    ["الصف الثاني", "السطر 2"],
+    ["العمود 2", "العمود 2"],
+  ]) {
+    const a = await solved(
+      `احسب محدد المصفوفة ${cells} بالنشر حسب ${description}`,
+    );
+    assert(a.results[0].steps.some((s) => s.title === `النشر بحسب ${title}`));
+    assert(a.results[0].verification.passed);
+  }
+});
+await test("an unsupported cofactor index asks rather than silently choosing row one", async () => {
+  for (const position of [
+    "العمود السابع",
+    "العمود الأوسط",
+    "السطر",
+    "العمود 0",
+  ]) {
+    const a = await solve(
+      `احسب محدد A=[[1,2,3],[0,4,5],[1,0,6]] بالنشر حسب ${position}`,
+    );
+    assert.equal(a.results.length, 0);
+    assert.equal(a.unsolved.length, 1);
+  }
+});
+await test("unit and upper/lower adjective aliases verify the actual elements, including false claims", async () => {
+  const unit = await solved("لتكن A=[[1,0],[0,1]]، تحقق أن A مصفوفة وحدة");
+  assert(unit.results[0].finalLatex.includes("العبارة صحيحة"));
+  const notUnit = await solved("لتكن A=[[1,2],[0,1]]، تحقق أن A مصفوفة وحدة");
+  assert(notUnit.results[0].finalLatex.includes("العبارة غير صحيحة"));
+  const lower = await solved("لتكن A=[[2,0],[3,4]]، تحقق أن A مثلثية سفلية");
+  assert(lower.results[0].finalLatex.includes("العبارة صحيحة"));
+});
+await test("LaTeX cases/aligned equations retain exact fractions and actual Cramer deltas", async () => {
+  const a = await solved(
+    String.raw`حل الجملة بطريقة كرامر: \begin{aligned}\frac{1}{2}x+y&=2\\x-y&=1\end{aligned}`,
+  );
+  assert(a.results[0].finalLatex.includes("x=2"));
+  assert(a.results[0].verification.passed);
+  assert(a.results[0].steps.some((s) => s.latex?.includes("\\Delta_{x}")));
+  assert(
+    !normalizePrompt(
+      String.raw`\begin{cases}\frac12x+y=2\\x-y=1\end{cases}`,
+    ).includes("{cases}*"),
+  );
+});
+await test("Gaussian elimination wording cannot steal a Gaussian probability distribution", async () => {
+  const matrix = await solved("احسب محدد A=[[1,2],[3,4]]");
+  const system = await solved(
+    "حل الجملة بالحذف الغاوسي: x+y=3، x-y=1",
+    matrix.context,
+  );
+  assert.equal(system.results[0].engine, "matricesEngine");
+  assert(system.results[0].steps.some((s) => s.latex?.includes("L_{")));
+  const normal = await solved(
+    "التوزيع الغاوسي mu=0 sigma=1 x=1",
+    system.context,
+  );
+  assert.equal(normal.results[0].engine, "probabilityEngine");
+});
+await test("an explicitly named k is exact, persisted and reusable without changing its matrix", async () => {
+  const a = await solved("لتكن A=[[1,2],[3,4]] وk=1/3، احسب k*A");
+  assert.equal(a.context.matrices?.scalarFactor, "(1/3)");
+  const b = await solved("احسب k*A", JSON.parse(JSON.stringify(a.context)));
+  assert.equal(a.results[0].finalLatex, b.results[0].finalLatex);
+  assert(b.results[0].verification.passed);
+  assert(
+    equalMatrices(
+      readMatrix(a.context.matrices!.values.A),
+      readMatrix([
+        ["1", "2"],
+        ["3", "4"],
+      ]),
+    ),
+  );
+});
+await test("zero and radical k values multiply every element and never become a determinant alias", async () => {
+  for (const [factor, cells] of [
+    [
+      "0",
+      [
+        ["0", "0"],
+        ["0", "0"],
+      ],
+    ],
+    [
+      "√2",
+      [
+        ["sqrt(2)", "2*sqrt(2)"],
+        ["3*sqrt(2)", "4*sqrt(2)"],
+      ],
+    ],
+  ] as const) {
+    const a = await solved(`لتكن A=[[1,2],[3,4]] وk=${factor}، احسب C=k*A`);
+    assert(
+      equalMatrices(
+        readMatrix(a.context.matrices!.values.C),
+        readMatrix(cells.map((r) => [...r])),
+      ),
+    );
+  }
+  const determinant = await solved("احسب محدد A=[[1,2],[3,4]]");
+  const missing = await solve("احسب k*A", determinant.context);
+  assert.equal(missing.results.length, 0);
+  assert.equal(missing.unsolved.length, 1);
+});
+await test("a factor assertion is not harvested as a given and malformed factors do not run code", async () => {
+  for (const q of [
+    "لتكن A=[[1,2],[3,4]]، تحقق أن k=2",
+    "لتكن A=[[1,2],[3,4]] وk=1/0، احسب k*A",
+    "لتكن A=[[1,2],[3,4]] وk=globalThis.process.exit()، احسب k*A",
+  ]) {
+    const a = await solve(q);
+    assert.equal(a.results.length, 0);
+    assert.equal(a.unsolved.length, 1);
+  }
+  assert(
+    !isMatrixContext({ values: { A: [["1"]] }, scalarFactor: "alert(1)" }),
+  );
+});
+await test("a given exact factor survives the matrix/vector bridge and its return", async () => {
+  const a = await solved(
+    "لتكن A=[[1,0,0],[0,1,0]] وk=1/3، حول أسطر المصفوفة A إلى أشعة",
+  );
+  const b = await solved("حول الأشعة u وv إلى مصفوفة", a.context);
+  assert.equal(b.context.matrices?.scalarFactor, "(1/3)");
+  const c = await solved("احسب k*M", b.context);
+  assert(c.results[0].finalLatex.includes("\\frac{1}{3}"));
+});
+await test("an unrelated coordinate tuple cannot overwrite a previous named matrix when saving k", async () => {
+  const a = await solved("احسب محدد A=[[9,0],[0,9]]");
+  const context = prepareMatrixContext("A=(1,2,3)، k=1/2", a.context);
+  assert.deepEqual(context.matrices?.values.A, a.context.matrices?.values.A);
+  assert.equal(context.matrices?.scalarFactor, "(1/2)");
+});
+await test("preserving the command اضرب does not break spoken multiplication", async () => {
+  assert(normalizePrompt("اضرب المصفوفة A بالعدد 2").startsWith("اضرب"));
+  assert.equal(normalizePrompt("احسب ٣ ضرب ٤"), "احسب 3 * 4");
+  const a = await solved("اضرب المصفوفة A=[[1,2],[3,4]] بالعدد 1/2");
+  assert(a.results[0].finalLatex.includes("\\frac{3}{2}"));
+  const product = await solved(
+    "A=[[1,2],[3,4]]؛ B=[[2,0],[0,2]]؛ اضرب المصفوفة A في المصفوفة B",
+  );
+  assert(product.results[0].finalLatex.includes("2&4\\\\6&8"));
+});
+
+await test("complete LaTeX systems render as one mathematical block instead of two hidden fallback messages", () => {
+  for (const text of [
+    String.raw`حل الجملة: \begin{cases}س+ص+ع=6\\س-ص=-1\\ص-ع=-1\end{cases}`,
+    String.raw`حل الجملة: \begin{aligned}\frac{1}{2}x+y&=2\\x-y&=1\end{aligned}`,
+  ]) {
+    const html = renderToStaticMarkup(
+      createElement(RichText, { text, autoMath: true }),
+    );
+    assert(!html.includes("تعذّر عرض"));
+    assert(!html.includes("data-math-error"));
+    assert(!html.includes("katex-error"));
+    assert(html.includes("katex-display"));
+  }
 });
 if (process.env.MATRIX_OUTPUT)
   fs.writeFileSync(

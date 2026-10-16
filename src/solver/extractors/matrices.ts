@@ -9,11 +9,63 @@ import {
 } from "../matrixTypes";
 import { mathInstructionText, hasMathInstruction } from "../textbook";
 import { readMatrix, serializeMatrix } from "../../utils/matrixExact";
-import { polynomial, G } from "../../utils/spaceGeometryMath";
+import { polynomial, G, read, bounded } from "../../utils/spaceGeometryMath";
 import { mathFragments } from "./index";
 const fail = (s: string): never => {
   throw new ClarificationError(s);
 };
+const namedUnary = String.raw`(?:(?:ال)?(?:محدد|اثر|منقول|مبدلة|معكوس|مقلوب|ملحقة|رتبة)(?:\s+(?:ال)?مصفوفة)?\s+[A-Z](?![A-Za-z0-9_])|(?:det|tr|trace|inv|adj|rank)\s*\(\s*[A-Z]\s*\))`;
+/** Split only explicit, independently named unary demands, never an arithmetic AST. */
+export function splitMatrixDemands(text: string): string[] {
+  const demand = mathInstructionText(text);
+  if (
+    !new RegExp(namedUnary).test(demand) ||
+    /اثبت|برهن|بين ان|تحقق/.test(demand) ||
+    /^(?:(?:احسب|جد|اوجد|اكتب)\s+)?[A-Z]\s*=/.test(demand)
+  )
+    return [text];
+  const separator = new RegExp(
+    String.raw`\s+و\s*(?:(?:احسب|جد|اوجد|اكتب)\s+)?(?=${namedUnary})`,
+    "g",
+  );
+  const parts: string[] = [];
+  let start = 0,
+    scanned = 0,
+    depth = 0;
+  for (const m of text.matchAll(separator)) {
+    while (scanned < m.index!) {
+      const c = text[scanned++];
+      if ("([{".includes(c)) depth++;
+      else if (")]}".includes(c)) depth--;
+    }
+    if (
+      depth ||
+      !new RegExp(namedUnary).test(
+        mathInstructionText(text.slice(start, m.index)),
+      )
+    )
+      continue;
+    parts.push(text.slice(start, m.index).trim());
+    start = m.index! + m[0].length;
+    scanned = start;
+  }
+  parts.push(text.slice(start).trim());
+  return parts;
+}
+function scalarFactor(text: string): string | undefined {
+  const definitions = [...text.matchAll(/\bk\s*=\s*/g)];
+  if (definitions.length > 1)
+    return fail("تكرر تعريف العدد k؛ ما القيمة المقصودة؟");
+  const m = definitions[0];
+  if (!m) return;
+  const source = text
+    .slice(m.index! + m[0].length)
+    .split(/[،؛;\n]/)[0]
+    .split(/\s+(?=[\u0600-\u06ff])/)[0]
+    .trim();
+  if (!source) return fail("ما القيمة العددية للمعامل k؟");
+  return bounded(read(source)).text();
+}
 interface Definition {
   start: number;
   end: number;
@@ -138,20 +190,22 @@ export function prepareMatrixContext(
   context: SolverContext,
 ): SolverContext {
   if (/\b[XY]\s*=\s*\[/.test(text) && !/مصفوف/.test(text)) return context;
-  if (
-    !/\[\s*\[|\\begin\{[pbvV]?matrix\}|مصفوف|\b[A-Z]\s*=\s*[[(][^\n]*[;؛]/.test(
+  const matrixSyntax =
+    /\[\s*\[|\\begin\{[pbvV]?matrix\}|مصفوف|\b[A-Z]\s*=\s*[[(][^\n]*[;؛]/.test(
       text,
-    )
-  )
-    return context;
-  const defs = matrixDefinitions(text);
-  if (!defs.length) return context;
+    );
+  if (!matrixSyntax && !context.matrices) return context;
+  const defs = matrixSyntax ? matrixDefinitions(text) : [],
+    factor = scalarFactor(text);
+  if (!defs.length && factor === undefined) return context;
   const values = { ...context.matrices?.values };
   for (const d of defs) values[d.name] = d.cells;
   const matrices: MatrixContext = {
+    ...(defs.length ? {} : context.matrices),
     values,
-    active: defs[0].name,
-    origin: "matrix",
+    active: defs[0]?.name || context.matrices?.active,
+    scalarFactor: factor ?? context.matrices?.scalarFactor,
+    origin: defs.length ? "matrix" : context.matrices?.origin,
   };
   if (!isMatrixContext(matrices))
     return fail("تجاوزت تعريفات المصفوفات حدود السياق المحفوظ.");
@@ -160,7 +214,7 @@ export function prepareMatrixContext(
 export function matrixDefinitionOnly(text: string): boolean {
   return (
     !hasMathInstruction(text) &&
-    !/(?:^|[\s،؛])حول(?=\s)|افحص|اختبر|استقلال|قانون|احتمال|متغير|متحول|نوع|صنف|محدد|اثر|منقول|مقلوب|معكوس|غاوس|كرامر|رتبة/.test(
+    !/(?:^|[\s،؛])حول(?=\s)|افحص|اختبر|استقلال|قانون|احتمال|متغير|متحول|نوع|صنف|محدد|اثر|منقول|مقلوب|معكوس|غاوس|كرامر|رتبة|مصفوفة (?:ال)?وحدة/.test(
       text,
     ) &&
     /(?:\b[A-Z]\s*=\s*(?:\[|\(|\\begin))/.test(text)
@@ -177,10 +231,13 @@ export function matrixIntent(text: string, context?: SolverContext): boolean {
     !/مصفوف|محدد|اثر/.test(text)
   )
     return false;
-  if (/مدرج (?:ال)?تكراري|توزيع غاوسي/.test(text) && !/مصفوف/.test(text))
+  if (
+    /مدرج (?:ال)?تكراري|توزيع\s+(?:ال)?(?:غاوسي|جاوسي)/.test(text) &&
+    !/مصفوف/.test(text)
+  )
     return false;
   if (
-    /مصفوف|محدد المصفوفة|غاوس(?:\s|-)*جوردان|ساروس|كرامر|طريقة غاوس|طريقة جاوس|كريمر|\b(?:det|tr|trace|adj|rank|rref)\s*\(|\[\s*\[|\\begin\{[pbvV]?matrix\}/.test(
+    /مصفوف|محدد المصفوفة|غاوس(?:\s|-)*جوردان|ساروس|كرامر|طريقة غاوس|طريقة جاوس|(?:الحذف|حذف)\s+(?:ال)?(?:غاوسي|جاوسي)|كريمر|\b(?:det|tr|trace|adj|rank|rref)\s*\(|\[\s*\[|\\begin\{[pbvV]?matrix\}/.test(
       text,
     )
   )
@@ -192,7 +249,7 @@ export function matrixIntent(text: string, context?: SolverContext): boolean {
     (/منقول|مبدل|مقلوب|معكوس|اثر|محدد|رتبة|مدرج|ملحقة|مرافقة|واحدية|صفرية|مثلثية|قطرية|تبادلي|متبادل|غاوس|كرامر/.test(
       text,
     ) ||
-      (/\b[A-Z]\s*(?:[+*\-^']|[A-Z]\b)|(?:^|\s)[-+]?\d+(?:\/\d+)?\s*\*?\s*[A-Z]\b/.test(
+      (/\b[A-Z]\s*(?:[+*\-^']|[A-Z]\b)|\bk\s*\*?\s*[A-Z]\b|[A-Z]\s*\*\s*k\b|(?:^|\s)[-+]?\d+(?:\/\d+)?\s*\*?\s*[A-Z]\b/.test(
         text,
       ) &&
         [...text.matchAll(/[A-Z]/g)].some((n) =>
@@ -204,6 +261,13 @@ export function matrixIntent(text: string, context?: SolverContext): boolean {
   );
 }
 function systemFromText(text: string): MatrixSystem | undefined {
+  text = text.replace(
+    /\\begin\{(cases|aligned)\}([\s\S]*?)\\end\{\1\}/g,
+    (_, _environment: string, body: string) =>
+      body.replace(/\\\\(?:\[[0-9.]+(?:pt|em|ex)\])?/g, "\n").replace(/&/g, ""),
+  );
+  if (/\\(?:begin|end)\{(?:cases|aligned)\}/.test(text))
+    return fail("أكمل بداية جملة المعادلات ونهايتها في التنسيق الرياضي.");
   text = text.replace(
     /(^|[^\p{L}])([سصع])(?=$|[^\p{L}])/gu,
     (_, before: string, variable: string) =>
@@ -264,6 +328,14 @@ const ordinals: Record<string, number> = {
   الخامسة: 4,
   السادس: 5,
   السادسة: 5,
+  السابع: 6,
+  السابعة: 6,
+  الثامن: 7,
+  الثامنة: 7,
+  التاسع: 8,
+  التاسعة: 8,
+  العاشر: 9,
+  العاشرة: 9,
 };
 export function extractMatrixRequest(
   text: string,
@@ -287,13 +359,36 @@ export function extractMatrixRequest(
   for (const d of [...definitions].reverse())
     demandSource =
       demandSource.slice(0, d.start) + d.name + demandSource.slice(d.end);
-  const demand = mathInstructionText(demandSource).replace(/[،؛]/g, " ").trim();
+  const factor =
+    scalarFactor(proof ? beforeDemand : text) ?? context.matrices?.scalarFactor;
+  let demand = mathInstructionText(demandSource)
+    .replace(/[،؛]/g, " ")
+    .trim()
+    .replace(/(?:الحذف|حذف)\s+(?:ال)?(?:غاوسي|جاوسي)/g, "طريقة غاوس");
+  if (/\bk(?=\b|[A-Z])/.test(demand)) {
+    if (factor === undefined)
+      return fail("ما القيمة العددية للمعامل k الذي تريد ضرب المصفوفة به؟");
+    demand = demand.replace(/\bk(?=\b|[A-Z])/g, `(${factor})`);
+  }
+  if (
+    (proof || /^(?:(?:احسب|جد|اوجد|اكتب)\s+)?[A-Z]\s*=/.test(demand)) &&
+    new RegExp(
+      String.raw`\s+و\s*(?:(?:احسب|جد|اوجد|اكتب)\s+)?(?=${namedUnary})`,
+    ).test(demand)
+  )
+    return fail(
+      "افصل مساواة التحقق أو تعريف النتيجة عن الطلب الآخر؛ اكتب كل عبارة كاملة في سطر مستقل حتى لا نفترض المقصود.",
+    );
   const operations: MatrixOperation[] = [];
   const add = (op: MatrixOperation) => {
     if (!operations.includes(op)) operations.push(op);
   };
   const names = [...demand.matchAll(/\b[A-Z]\b/g)].map((m) => m[0]);
+  const namedOperand = demand
+    .match(new RegExp(namedUnary))?.[0]
+    .match(/[A-Z](?![A-Za-z0-9_])/)?.[0];
   const name =
+    namedOperand ||
     names.find(
       (n) => n !== "I" && n !== "T" && !new RegExp(`\\b${n}\\s*=`).test(demand),
     ) ||
@@ -304,6 +399,7 @@ export function extractMatrixRequest(
     ...context.matrices,
     values,
     active,
+    scalarFactor: factor,
     origin: definitions.length ? "matrix" : context.matrices?.origin,
   };
   const req: MatrixRequest = {
@@ -366,7 +462,11 @@ export function extractMatrixRequest(
   if (!values[name] && !/\b(?:AB|BA)\b/.test(demand))
     return fail(`ما عناصر المصفوفة ${name}؟ اكتبها مثل ${name}=[[1,2],[3,4]].`);
   if (values[name]) matrices.active = name;
-  if (/نوع|صنف|تصنيف|صفرية|واحدية|مثلثية|قطرية|متماثلة|مربعة/.test(demand))
+  if (
+    /نوع|صنف|تصنيف|صفرية|واحدية|مصفوفة (?:ال)?وحدة|مثلثية|قطرية|متماثلة|متناظرة|مربعة/.test(
+      demand,
+    )
+  )
     add("types");
   if (/قياس|ابعاد|عدد (?:الاسطر|الصفوف|الاعمدة)/.test(demand))
     add("dimensions");
@@ -390,10 +490,10 @@ export function extractMatrixRequest(
     /([A-Za-z0-9()+*/^'\s-]+)\s*(!=|≠|=)\s*([A-Za-z0-9()+*/^'\s-]+)(?=$|[\u0600-\u06ff])/,
   );
   const scalarMultiplier = demand.match(
-    /(?:بالعدد|بالثابت|بالمعامل)\s*([-+0-9.][0-9+*/().\s-]*)(?=$|[\u0600-\u06ff])/,
+    /(?:بالعدد|بالثابت|بالمعامل)\s*([A-Za-z0-9+*/^().\s-]+)(?=$|[\u0600-\u06ff])/,
   );
   if (scalarMultiplier) {
-    req.expression = `(${scalarMultiplier[1].trim()})*${name}`;
+    req.expression = `(${bounded(read(scalarMultiplier[1].trim())).text()})*${name}`;
     operations.length = 0;
     add("expression");
     return req;
@@ -415,7 +515,7 @@ export function extractMatrixRequest(
     operations.length = 0;
     add("compare");
   } else if (
-    /جمع|مجموع|اجمع|اطرح|طرح|فرق|جداء|حاصل\s*\*|(?:^|\s)ا\*|\b(?:AB|BA)\b/.test(
+    /جمع|مجموع|اجمع|اطرح|طرح|فرق|جداء|اضرب|حاصل الضرب|حاصل\s*\*|(?:^|\s)ا\*|\b(?:AB|BA)\b/.test(
       demand,
     ) ||
     /[A-Z][^\u0600-\u06ff]*[+*\-]/.test(demand) ||
@@ -460,15 +560,29 @@ export function extractMatrixRequest(
     );
   if (/ساروس/.test(demand)) req.determinantMethod = "sarrus";
   else if (/نشر|توسع/.test(demand)) req.determinantMethod = "expansion";
-  const expansion = demand.match(
-    /(?:سطر|صف|عمود)\s*(?:ال)?(اول|اولي|ثاني|ثانية|ثالث|ثالثة|رابع|رابعة|خامس|خامسة|سادس|سادسة|\d+)/,
-  );
-  if (expansion)
-    req.expansion = {
-      axis: /عمود/.test(expansion[0]) ? "column" : "row",
-      index: /^\d+$/.test(expansion[1])
-        ? Number(expansion[1]) - 1
-        : ordinals["ال" + expansion[1]],
-    };
+  if (req.determinantMethod === "expansion") {
+    const selected = demand.match(
+      /(?:^|[^\p{L}])(?:ال)?(سطر|صف|عمود)(?=\s|\d)\s*([^\s،؛.]+)/u,
+    );
+    if (selected) {
+      const ordinal = selected[2].replace(/^ال/, "");
+      const dimension =
+        selected[1] === "عمود" ? values[name][0].length : values[name].length;
+      const index = /^\d+$/.test(ordinal)
+        ? Number(ordinal) - 1
+        : /^(?:اخير|اخيرة)$/.test(ordinal)
+          ? dimension - 1
+          : ordinals["ال" + ordinal];
+      if (index === undefined)
+        return fail(
+          "حدّد رقم السطر أو العمود الذي تريد النشر بحسبه؛ لا نختار سطرًا بديلًا تلقائيًا.",
+        );
+      req.expansion = {
+        axis: selected[1] === "عمود" ? "column" : "row",
+        index,
+      };
+    } else if (/(?:سطر|صف|عمود)(?:\s|$)/.test(demand))
+      return fail("ما رقم السطر أو العمود الذي تريد النشر بحسبه؟");
+  }
   return req;
 }
