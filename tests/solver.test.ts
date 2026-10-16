@@ -107,7 +107,7 @@ export const acceptance: {
   {
     question: "جد محدد ومقلوب المصفوفة [[1,2],[3,4]]",
     engine: "matricesEngine",
-    final: /det A = -2.*A\^\{-1\}/,
+    final: /محدد المصفوفة.*A=-2.*A\^\{-1\}/,
   },
   {
     question: "حل المعادلة z^2+2z+5=0 في مجموعة الأعداد العقدية",

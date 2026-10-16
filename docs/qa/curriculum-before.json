@@ -1,0 +1,1378 @@
+{
+  "passed": 54,
+  "failed": 29,
+  "cases": [
+    {
+      "id": "C01",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "الشكل الأسي للعدد العقدي",
+          "latex": "z=2e^{i\\frac{\\pi}{3}}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C02",
+      "chapter": "complex",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "احسب قيمة المقدار مستخدما الشكل الاسي: S=(z1)^(12)+(z2)^(12)",
+          "engine": "complexEngine",
+          "message": "ما العدد العقدي الذي تريد العمل عليه؟ اكتب z=3+4i مثلًا.",
+          "choices": [
+            "اكتب الأشكال الثلاثة للعدد العقدي z=3+4i"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "chapter": "complex",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: result 0: undefined != 8192",
+      "results": [
+        {
+          "title": "الأشكال المطلوبة للأعداد العقدية",
+          "latex": "\\begin{aligned}z_{1}=2e^{i\\frac{\\pi}{3}}\\\\[5pt]z_{2}=2e^{-i\\frac{\\pi}{3}}\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C04",
+      "chapter": "complex",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"في مجموعة الاعداد العقدي:\\nالمطلوب:\",\"engine\":\"complexEngine\",\"message\":\"ما العدد العقدي الذي تريد العمل عليه؟ اكتب z=3+4i مثلًا.\",\"choices\":[\"اكتب الأشكال الثلاثة للعدد العقدي z=3+4i\"]},{\"request\":\"استنتج مستخدما الشكل الاسي S=z1^12+z2^12.\",\"engine\":\"complexEngine\",\"message\":\"للنتيجة السابقة عدة أعداد أو جذور؛ حدّد العدد الذي تريد متابعة العمل عليه بدل اختيار واحد دون إذنك.\",\"choices\":[\"حوّل العدد العقدي 3+4i إلى الشكل الأسي\"]}]\n\n2 !== 0\n",
+      "results": [
+        {
+          "title": "حل المعادلة في الأعداد العقدية",
+          "latex": "\\begin{aligned}z_{1}&=1 + \\sqrt{3}i\\\\[5pt]z_{2}&=1 - \\sqrt{3}i\\end{aligned}"
+        }
+      ],
+      "unsolved": [
+        {
+          "request": "في مجموعة الاعداد العقدي:\nالمطلوب:",
+          "engine": "complexEngine",
+          "message": "ما العدد العقدي الذي تريد العمل عليه؟ اكتب z=3+4i مثلًا.",
+          "choices": [
+            "اكتب الأشكال الثلاثة للعدد العقدي z=3+4i"
+          ]
+        },
+        {
+          "request": "استنتج مستخدما الشكل الاسي S=z1^12+z2^12.",
+          "engine": "complexEngine",
+          "message": "للنتيجة السابقة عدة أعداد أو جذور؛ حدّد العدد الذي تريد متابعة العمل عليه بدل اختيار واحد دون إذنك.",
+          "choices": [
+            "حوّل العدد العقدي 3+4i إلى الشكل الأسي"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C05",
+      "chapter": "complex",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: result 0: undefined != -8",
+      "results": [
+        {
+          "title": "الأشكال المطلوبة للأعداد العقدية",
+          "latex": "\\begin{aligned}z_{1}=\\sqrt{2}e^{i\\frac{\\pi}{4}}\\\\[5pt]z_{2}=\\sqrt{2}e^{-i\\frac{\\pi}{4}}\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C06",
+      "chapter": "complex",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: result 0: undefined != 6",
+      "results": [
+        {
+          "title": "الأشكال المطلوبة للأعداد العقدية",
+          "latex": "\\begin{aligned}z_{1}=2e^{i\\frac{\\pi}{6}}\\\\[5pt]z_{2}=3e^{-i\\frac{\\pi}{6}}\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C07",
+      "chapter": "complex",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: result 0: undefined != 5",
+      "results": [
+        {
+          "title": "الأشكال الثلاثة للعدد العقدي",
+          "latex": "\\begin{aligned}z&=2 + i\\\\[5pt]z&=\\sqrt{5}(\\cos\\theta+i\\sin\\theta)\\\\[5pt]z&=\\sqrt{5}e^{i\\theta}\\\\[5pt]\\theta&=\\arctan\\left(\\frac{1}{2}\\right)\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C08",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "مرافق العدد العقدي",
+          "latex": "\\overline z=3 - 2i"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C09",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "حل المعادلة في الأعداد العقدية",
+          "latex": "\\begin{aligned}z_{1}&=1 + \\sqrt{3}i\\\\[5pt]z_{2}&=1 - \\sqrt{3}i\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C10",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "الشكل الأسي للعدد العقدي",
+          "latex": "z=0"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C11",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "المسافة بين نقطتين",
+          "latex": "AB=|z_B-z_A|=5",
+          "decimal": 5
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C12",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "الزوايا وعمدة النسبة",
+          "latex": "\\begin{aligned}\\widehat{(\\overrightarrow{AB},\\overrightarrow{AC})}&=\\arg\\left(\\frac{z_C-z_A}{z_B-z_A}\\right)\\\\[5pt]&=\\frac{\\pi}{2}\\pmod{2\\pi}\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C13",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "الدوران بقانون أويلر",
+          "latex": "\\begin{aligned}z'-\\omega&=e^{i\\theta}(z-\\omega)\\\\[5pt]z'&=-1 + i\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C14",
+      "chapter": "complex",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "عين مجموعة النقط M في المستوي العقدي التي تحقق |z-1|=2.",
+          "engine": "complexEngine",
+          "message": "ما العدد العقدي الذي تريد العمل عليه؟ اكتب z=3+4i مثلًا.",
+          "choices": [
+            "اكتب الأشكال الثلاثة للعدد العقدي z=3+4i"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P01",
+      "chapter": "probability",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"يحتوي صندوقان علي كرات متماثلة لا نفرق بينها باللمس.\\nالصندوق الاول U1: يحتوي علي 3 كرات حمراء و2 كرات بيضاء.\\nالصندوق الثاني U2: يحتوي علي 2 كرات حمراء و4 كرات بيضاء.\\nنختار عشوائيا احد الصندوقين (احتمال اختيار كل صندوق هو ((1)/(2)))،\",\"engine\":\"probabilityEngine\",\"message\":\"حدّد أوزان اختيار الفروع q واحتمال B في كل فرع p؛ لا أفترض أن الصناديق متساوية الاختيار.\",\"choices\":[\"الاحتمال الكلي q=[1/3,2/3]، p=[1/2,1/4]\",\"بايز q=[1/3,2/3]، p=[1/2,1/4]، احسب P(H1|B)\"]},{\"request\":\"نسحب منه كرة 1.\\nالمطلوب:، احسب احتمال ان تكون الكرة المسحوبة حمراء.\",\"engine\":\"probabilityEngine\",\"message\":\"كم كرة سُحبت؟ حدّد r أو اكتب مثلًا: سحب كرتين.\",\"choices\":[\"احسب حجم مكعب طول حرفه 3\",\"كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون\",\"التوزيع الثنائي n=10 p=0.5 k=5\"]},{\"request\":\"اذا علمت ان الكرة المسحوبة حمراء، فما احتمال ان تكون قد سحبت من الصندوق الاول U1؟\",\"engine\":\"probabilityEngine\",\"message\":\"حدّد أوزان اختيار الفروع q واحتمال B في كل فرع p؛ لا أفترض أن الصناديق متساوية الاختيار.\",\"choices\":[\"الاحتمال الكلي q=[1/3,2/3]، p=[1/2,1/4]\",\"بايز q=[1/3,2/3]، p=[1/2,1/4]، احسب P(H1|B)\"]},{\"request\":\"نعيد الكرة المسحوبة الي صندوقها. نقوم الان بتجربة جديدة: نسحب من الصندوق الاول U1 كرتين معا. ليكن X المتغير العشوائي الذي يدل علي عدد الكرات البيضاء المسحوبة.\\nاوجد قيم المتغير العشوائي X.\",\"engine\":\"probabilityEngine\",\"message\":\"حدّد أوزان اختيار الفروع q واحتمال B في كل فرع p؛ لا أفترض أن الصناديق متساوية الاختيار.\",\"choices\":[\"الاحتمال الكلي q=[1/3,2/3]، p=[1/2,1/4]\",\"بايز q=[1/3,2/3]، p=[1/2,1/4]، احسب P(H1|B)\"]},{\"request\":\"احسب توقعه الرياضي E(X).\",\"engine\":\"probabilityEngine\",\"message\":\"حدّد نوع المسألة أو افتح لوحة الاحتمالات لبناء سؤال واضح.\",\"choices\":[\"كيس فيه 3 كرات حمراء و5 بيضاء، سحب كرتين معًا، احسب احتمال اختلاف اللون\",\"P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، احسب الاتحاد\",\"المتحول X=[0,1,2]، p=[1/4,1/2,1/4]، احسب الأمل والتباين\"]}]\n\n5 !== 0\n",
+      "results": [
+        {
+          "title": "قانون المتحول العشوائي وعزومه",
+          "latex": "X(\\Omega)=\\{x_i:p_i>0\\},\\quad 0\\le p_i\\le1,\\quad\\sum_ip_i=1"
+        }
+      ],
+      "unsolved": [
+        {
+          "request": "يحتوي صندوقان علي كرات متماثلة لا نفرق بينها باللمس.\nالصندوق الاول U1: يحتوي علي 3 كرات حمراء و2 كرات بيضاء.\nالصندوق الثاني U2: يحتوي علي 2 كرات حمراء و4 كرات بيضاء.\nنختار عشوائيا احد الصندوقين (احتمال اختيار كل صندوق هو ((1)/(2)))،",
+          "engine": "probabilityEngine",
+          "message": "حدّد أوزان اختيار الفروع q واحتمال B في كل فرع p؛ لا أفترض أن الصناديق متساوية الاختيار.",
+          "choices": [
+            "الاحتمال الكلي q=[1/3,2/3]، p=[1/2,1/4]",
+            "بايز q=[1/3,2/3]، p=[1/2,1/4]، احسب P(H1|B)"
+          ]
+        },
+        {
+          "request": "نسحب منه كرة 1.\nالمطلوب:، احسب احتمال ان تكون الكرة المسحوبة حمراء.",
+          "engine": "probabilityEngine",
+          "message": "كم كرة سُحبت؟ حدّد r أو اكتب مثلًا: سحب كرتين.",
+          "choices": [
+            "احسب حجم مكعب طول حرفه 3",
+            "كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون",
+            "التوزيع الثنائي n=10 p=0.5 k=5"
+          ]
+        },
+        {
+          "request": "اذا علمت ان الكرة المسحوبة حمراء، فما احتمال ان تكون قد سحبت من الصندوق الاول U1؟",
+          "engine": "probabilityEngine",
+          "message": "حدّد أوزان اختيار الفروع q واحتمال B في كل فرع p؛ لا أفترض أن الصناديق متساوية الاختيار.",
+          "choices": [
+            "الاحتمال الكلي q=[1/3,2/3]، p=[1/2,1/4]",
+            "بايز q=[1/3,2/3]، p=[1/2,1/4]، احسب P(H1|B)"
+          ]
+        },
+        {
+          "request": "نعيد الكرة المسحوبة الي صندوقها. نقوم الان بتجربة جديدة: نسحب من الصندوق الاول U1 كرتين معا. ليكن X المتغير العشوائي الذي يدل علي عدد الكرات البيضاء المسحوبة.\nاوجد قيم المتغير العشوائي X.",
+          "engine": "probabilityEngine",
+          "message": "حدّد أوزان اختيار الفروع q واحتمال B في كل فرع p؛ لا أفترض أن الصناديق متساوية الاختيار.",
+          "choices": [
+            "الاحتمال الكلي q=[1/3,2/3]، p=[1/2,1/4]",
+            "بايز q=[1/3,2/3]، p=[1/2,1/4]، احسب P(H1|B)"
+          ]
+        },
+        {
+          "request": "احسب توقعه الرياضي E(X).",
+          "engine": "probabilityEngine",
+          "message": "حدّد نوع المسألة أو افتح لوحة الاحتمالات لبناء سؤال واضح.",
+          "choices": [
+            "كيس فيه 3 كرات حمراء و5 بيضاء، سحب كرتين معًا، احسب احتمال اختلاف اللون",
+            "P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، احسب الاتحاد",
+            "المتحول X=[0,1,2]، p=[1/4,1/2,1/4]، احسب الأمل والتباين"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P02",
+      "chapter": "probability",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"U1: يحتوي علي 1 كرة حمراء و1 كرة بيضاء.\\nU2: يحتوي علي 3 كرات حمراء و1 كرة بيضاء.\\nاحتمال اختيار U1=2/3 واحتمال اختيار U2=1/3.\\nالمطلوب:\",\"engine\":\"probabilityEngine\",\"message\":\"كم كرة سُحبت؟ حدّد r أو اكتب مثلًا: سحب كرتين.\",\"choices\":[\"كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون\",\"التوزيع الثنائي n=10 p=0.5 k=5\"]},{\"request\":\"احسب احتمال سحب كرة حمراء بعد اختيار الصندوق.\",\"engine\":\"probabilityEngine\",\"message\":\"هل السحب معًا أم متتاليًا؟ وهل تعاد الكرة؟\",\"choices\":[\"السحب معًا دون إعادة\",\"السحب متتاليًا مع إعادة\",\"السحب متتاليًا دون إعادة\"]}]\n\n2 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "U1: يحتوي علي 1 كرة حمراء و1 كرة بيضاء.\nU2: يحتوي علي 3 كرات حمراء و1 كرة بيضاء.\nاحتمال اختيار U1=2/3 واحتمال اختيار U2=1/3.\nالمطلوب:",
+          "engine": "probabilityEngine",
+          "message": "كم كرة سُحبت؟ حدّد r أو اكتب مثلًا: سحب كرتين.",
+          "choices": [
+            "كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون",
+            "التوزيع الثنائي n=10 p=0.5 k=5"
+          ]
+        },
+        {
+          "request": "احسب احتمال سحب كرة حمراء بعد اختيار الصندوق.",
+          "engine": "probabilityEngine",
+          "message": "هل السحب معًا أم متتاليًا؟ وهل تعاد الكرة؟",
+          "choices": [
+            "السحب معًا دون إعادة",
+            "السحب متتاليًا مع إعادة",
+            "السحب متتاليًا دون إعادة"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P03",
+      "chapter": "probability",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "U1: يحتوي علي 2 حمراء و3 بيضاء. U2: يحتوي علي 4 حمراء و1 بيضاء. نختار احد الصندوقين ونسحب كرة. احسب احتمال الحمراء.",
+          "engine": "probabilityEngine",
+          "message": "هل السحب معًا أم متتاليًا؟ وهل تعاد الكرة؟",
+          "choices": [
+            "السحب معًا دون إعادة",
+            "السحب متتاليًا مع إعادة",
+            "السحب متتاليًا دون إعادة"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P04",
+      "chapter": "probability",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"يضم كيس 2 كرات حمراء و3 بيضاء متماثلة باللمس. نسحب عشوائيا كرة 1. احسب احتمال الحمراء.\",\"engine\":\"probabilityEngine\",\"message\":\"كم كرة سُحبت؟ حدّد r أو اكتب مثلًا: سحب كرتين.\",\"choices\":[\"كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون\",\"التوزيع الثنائي n=10 p=0.5 k=5\"]}]\n\n1 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "يضم كيس 2 كرات حمراء و3 بيضاء متماثلة باللمس. نسحب عشوائيا كرة 1. احسب احتمال الحمراء.",
+          "engine": "probabilityEngine",
+          "message": "كم كرة سُحبت؟ حدّد r أو اكتب مثلًا: سحب كرتين.",
+          "choices": [
+            "كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون",
+            "التوزيع الثنائي n=10 p=0.5 k=5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P05",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال المطلوب",
+          "latex": "P(X=1)=\\frac{3}{5}",
+          "decimal": 0.6
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P06",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال المطلوب",
+          "latex": "P(C_2\\mid C_1)=\\frac{\\frac{3}{10}}{\\frac{2}{5}}=\\frac{3}{4}",
+          "decimal": 0.75
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P07",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال المطلوب",
+          "latex": "P(C_2\\mid C_1)=\\frac{\\frac{6}{25}}{\\frac{2}{5}}=\\frac{3}{5}",
+          "decimal": 0.6
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P08",
+      "chapter": "probability",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"كيس فيه 3 حمراء و2 بيضاء، نسحب كرتين معا. X عدد الكرات البيضاء. اوجد القانون الاحتمالي\",\"engine\":\"probabilityEngine\",\"message\":\"أي لون يعدّه X؟ اختر اللون المطلوب؛ لا أختار لونًا خفيًا. \",\"choices\":[\"احسب قانون احتمال عدد الكرات من اللون حمراء\",\"احسب قانون احتمال عدد الكرات من اللون بيضاء\"]},{\"request\":\"احسب التوقع الرياضي E(X).\",\"engine\":\"probabilityEngine\",\"message\":\"حدّد نوع المسألة أو افتح لوحة الاحتمالات لبناء سؤال واضح.\",\"choices\":[\"كيس فيه 3 كرات حمراء و5 بيضاء، سحب كرتين معًا، احسب احتمال اختلاف اللون\",\"P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، احسب الاتحاد\",\"المتحول X=[0,1,2]، p=[1/4,1/2,1/4]، احسب الأمل والتباين\"]}]\n\n2 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "كيس فيه 3 حمراء و2 بيضاء، نسحب كرتين معا. X عدد الكرات البيضاء. اوجد القانون الاحتمالي",
+          "engine": "probabilityEngine",
+          "message": "أي لون يعدّه X؟ اختر اللون المطلوب؛ لا أختار لونًا خفيًا. ",
+          "choices": [
+            "احسب قانون احتمال عدد الكرات من اللون حمراء",
+            "احسب قانون احتمال عدد الكرات من اللون بيضاء"
+          ]
+        },
+        {
+          "request": "احسب التوقع الرياضي E(X).",
+          "engine": "probabilityEngine",
+          "message": "حدّد نوع المسألة أو افتح لوحة الاحتمالات لبناء سؤال واضح.",
+          "choices": [
+            "كيس فيه 3 كرات حمراء و5 بيضاء، سحب كرتين معًا، احسب احتمال اختلاف اللون",
+            "P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، احسب الاتحاد",
+            "المتحول X=[0,1,2]، p=[1/4,1/2,1/4]، احسب الأمل والتباين"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P09",
+      "chapter": "probability",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"P(A)=\\\\frac12، P(B)=\\\\frac13، P(A\\\\cap B)=\\\\frac16، احسب P_B(A).\",\"engine\":\"probabilityEngine\",\"message\":\"حدّد الحدث والعملية المطلوبة: متمم، اتحاد، تقاطع، شرط، أم فحص استقلال؟\",\"choices\":[\"كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون\",\"التوزيع الثنائي n=10 p=0.5 k=5\"]}]\n\n1 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "P(A)=\\frac12، P(B)=\\frac13، P(A\\cap B)=\\frac16، احسب P_B(A).",
+          "engine": "probabilityEngine",
+          "message": "حدّد الحدث والعملية المطلوبة: متمم، اتحاد، تقاطع، شرط، أم فحص استقلال؟",
+          "choices": [
+            "كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون",
+            "التوزيع الثنائي n=10 p=0.5 k=5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P10",
+      "chapter": "probability",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، احسب P(A/B).\",\"engine\":\"probabilityEngine\",\"message\":\"استخدم رموز أحداث بحرف كبير مثل P(A)، P(A∩B)، P(A|B)، P(A').\",\"choices\":[\"كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون\",\"التوزيع الثنائي n=10 p=0.5 k=5\"]}]\n\n1 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، احسب P(A/B).",
+          "engine": "probabilityEngine",
+          "message": "استخدم رموز أحداث بحرف كبير مثل P(A)، P(A∩B)، P(A|B)، P(A').",
+          "choices": [
+            "كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون",
+            "التوزيع الثنائي n=10 p=0.5 k=5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P11",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال الشرطي",
+          "latex": "P(A\\mid B)=\\frac{P(A\\cap B)}{P(B)}=\\frac{\\frac{1}{6}}{\\frac{1}{3}}=\\frac{1}{2}",
+          "decimal": 0.5
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P12",
+      "chapter": "probability",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، بين ان الحدثين مستقلان.\",\"engine\":\"probabilityEngine\",\"message\":\"لفحص الاستقلال نحتاج P(A) وP(B) وP(A∩B)، أو شرطًا/اتحادًا يسمح باشتقاق التقاطع. لن أفترض الاستقلال.\",\"choices\":[\"P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، هل الحدثان مستقلان؟\"]}]\n\n1 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، بين ان الحدثين مستقلان.",
+          "engine": "probabilityEngine",
+          "message": "لفحص الاستقلال نحتاج P(A) وP(B) وP(A∩B)، أو شرطًا/اتحادًا يسمح باشتقاق التقاطع. لن أفترض الاستقلال.",
+          "choices": [
+            "P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، هل الحدثان مستقلان؟"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P13",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال الكلاسيكي",
+          "latex": "P(A)=\\frac{5}{12}",
+          "decimal": 0.4166666666666667
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P14",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "التوزيع الثنائي",
+          "latex": "P(X=2)\\approx 0.375",
+          "decimal": 0.3749999999999999
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P15",
+      "chapter": "probability",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "X=[0,1,2]، p=[1/4,1/4,1/4]، اكتب القانون الاحتمالي.",
+          "engine": "probabilityEngine",
+          "message": "جدول قانون الاحتمال غير مكتمل أو غير متسق: يجب أن يكون مجموع الاحتمالات ١ تمامًا. لن أطبّع الأعداد تلقائيًا.",
+          "choices": [
+            "كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون",
+            "التوزيع الثنائي n=10 p=0.5 k=5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P16",
+      "chapter": "probability",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n3 !== 2\n",
+      "results": [
+        {
+          "title": "قانون المتحول العشوائي وعزومه",
+          "latex": "\\begin{aligned}E(X)&=0\\\\E(X^2)&=\\frac{1}{2}\\\\V(X)&=\\frac{1}{2}\\\\\\sigma_{X}&=\\sqrt{\\frac{1}{2}}\\approx 0.707106781187\\end{aligned}"
+        },
+        {
+          "title": "قانون المتحول العشوائي وعزومه",
+          "latex": "E(X)=0",
+          "decimal": 0
+        },
+        {
+          "title": "قانون المتحول العشوائي وعزومه",
+          "latex": "V(X)=\\frac{1}{2}",
+          "decimal": 0.5
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P17",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال الكلي",
+          "latex": "P(B)=\\sum_iP(H_i)P(B\\mid H_i)=\\frac{1}{3}",
+          "decimal": 0.3333333333333333
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P18",
+      "chapter": "probability",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "نسحب كرتين من كيس فيه 3 حمراء و2 بيضاء. احسب احتمال اختلاف اللون.",
+          "engine": "probabilityEngine",
+          "message": "هل السحب معًا أم متتاليًا؟ وهل تعاد الكرة؟",
+          "choices": [
+            "السحب معًا دون إعادة",
+            "السحب متتاليًا مع إعادة",
+            "السحب متتاليًا دون إعادة"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S01",
+      "chapter": "sequences",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"نعرف المتتالية (u_n) بالحد u_0=1 والعلاقة u_n+1=2u_n+3. المطلوب: اوجد عبارتها الصريحة.\",\"engine\":\"sequences\",\"message\":\"اكتب معامل التراجع a في uₙ₊₁ = a uₙ + b.\",\"choices\":[\"متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا\"]}]\n\n1 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "نعرف المتتالية (u_n) بالحد u_0=1 والعلاقة u_n+1=2u_n+3. المطلوب: اوجد عبارتها الصريحة.",
+          "engine": "sequences",
+          "message": "اكتب معامل التراجع a في uₙ₊₁ = a uₙ + b.",
+          "choices": [
+            "متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S02",
+      "chapter": "sequences",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"لتكن u_0=1 وu_n+1=2u_n+3. نضع v_n=u_n+3. بين ان v_n هندسية واوجد اساسها.\",\"engine\":\"sequences\",\"message\":\"اكتب معامل التراجع a في uₙ₊₁ = a uₙ + b.\",\"choices\":[\"متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا\"]}]\n\n1 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "لتكن u_0=1 وu_n+1=2u_n+3. نضع v_n=u_n+3. بين ان v_n هندسية واوجد اساسها.",
+          "engine": "sequences",
+          "message": "اكتب معامل التراجع a في uₙ₊₁ = a uₙ + b.",
+          "choices": [
+            "متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S03",
+      "chapter": "sequences",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"لتكن u_0=1 وu_n+1=2u_n+3. اثبت بالتدريج ان u_n=4*2^n-3 لكل n طبيعي.\",\"engine\":\"probabilityEngine\",\"message\":\"حدّد المتوسط μ والانحراف المعياري σ.\",\"choices\":[\"التوزيع الطبيعي mu=0 sigma=1 x=1\"]}]\n\n1 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "لتكن u_0=1 وu_n+1=2u_n+3. اثبت بالتدريج ان u_n=4*2^n-3 لكل n طبيعي.",
+          "engine": "probabilityEngine",
+          "message": "حدّد المتوسط μ والانحراف المعياري σ.",
+          "choices": [
+            "التوزيع الطبيعي mu=0 sigma=1 x=1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S04",
+      "chapter": "sequences",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"متتالية حسابية حدها u_0=2 واساسها r=3، احسب مجموع حدودها من الرتبة 0 الي الرتبة 4.\",\"engine\":\"sequences\",\"message\":\"كم حدًا تريد جمعه؟\",\"choices\":[\"متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا\"]},{\"request\":\"متتالية حسابية حدها u_0=2 واساسها r=3، احسب مجموع حدودها من الرتبة 0 الي الرتبة 4.\",\"engine\":\"matricesEngine\",\"message\":\"اكتب عناصر المصفوفة على شكل صفوف داخل أقواس.\",\"choices\":[\"جد محدد ومقلوب المصفوفة [[1,2],[3,4]]\"]}]\n\n2 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "متتالية حسابية حدها u_0=2 واساسها r=3، احسب مجموع حدودها من الرتبة 0 الي الرتبة 4.",
+          "engine": "sequences",
+          "message": "كم حدًا تريد جمعه؟",
+          "choices": [
+            "متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"
+          ]
+        },
+        {
+          "request": "متتالية حسابية حدها u_0=2 واساسها r=3، احسب مجموع حدودها من الرتبة 0 الي الرتبة 4.",
+          "engine": "matricesEngine",
+          "message": "اكتب عناصر المصفوفة على شكل صفوف داخل أقواس.",
+          "choices": [
+            "جد محدد ومقلوب المصفوفة [[1,2],[3,4]]"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S05",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [
+        {
+          "title": "متتالية هندسية",
+          "latex": "S = 45 \\qquad u_{n} = 3 \\cdot 2^{n - 1}",
+          "decimal": 45
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "S06",
+      "chapter": "sequences",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"u_0=4 وu_n+1=u_n+2، جد عبارة u_n.\",\"engine\":\"sequences\",\"message\":\"اكتب معامل التراجع a في uₙ₊₁ = a uₙ + b.\",\"choices\":[\"متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا\"]}]\n\n1 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "u_0=4 وu_n+1=u_n+2، جد عبارة u_n.",
+          "engine": "sequences",
+          "message": "اكتب معامل التراجع a في uₙ₊₁ = a uₙ + b.",
+          "choices": [
+            "متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S07",
+      "chapter": "sequences",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"u_0=0 وu_n+1=1/2*u_n+1، حدد نهاية المتتالية.\",\"engine\":\"sequences\",\"message\":\"اكتب معامل التراجع a في uₙ₊₁ = a uₙ + b.\",\"choices\":[\"متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا\",\"جد نهاية (x^2-1)/(x-1) عندما x تؤول إلى 1\"]},{\"request\":\"u_0=0 وu_n+1=1/2*u_n+1، حدد نهاية المتتالية.\",\"engine\":\"limitsEngine\",\"message\":\"ما قيمة المتغير u_n؟ عرّفه قبل الحساب.\",\"choices\":[\"متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا\",\"جد نهاية (x^2-1)/(x-1) عندما x تؤول إلى 1\"]}]\n\n2 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "u_0=0 وu_n+1=1/2*u_n+1، حدد نهاية المتتالية.",
+          "engine": "sequences",
+          "message": "اكتب معامل التراجع a في uₙ₊₁ = a uₙ + b.",
+          "choices": [
+            "متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا",
+            "جد نهاية (x^2-1)/(x-1) عندما x تؤول إلى 1"
+          ]
+        },
+        {
+          "request": "u_0=0 وu_n+1=1/2*u_n+1، حدد نهاية المتتالية.",
+          "engine": "limitsEngine",
+          "message": "ما قيمة المتغير u_n؟ عرّفه قبل الحساب.",
+          "choices": [
+            "متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا",
+            "جد نهاية (x^2-1)/(x-1) عندما x تؤول إلى 1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S08",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "u_n+1=2u_n+3، جد العبارة الصريحة للمتتالية.",
+          "engine": "sequences",
+          "message": "ما قيمة الحد الابتدائي u₀؟",
+          "choices": [
+            "متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S09",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "u_0=1 وu_n+1=u_n^2+1، اثبت بالتدريج انها محدودة.",
+          "engine": "sequences",
+          "message": "اكتب معامل التراجع a في uₙ₊₁ = a uₙ + b.",
+          "choices": [
+            "متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S10",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "ادرس تجاور متتاليتين عامتين u_n وv_n دون اعطاء عبارتيهما.",
+          "engine": "sequences",
+          "message": "ما الحد الأول للمتتالية؟",
+          "choices": [
+            "متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "F01",
+      "chapter": "functions",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 2\n",
+      "results": [
+        {
+          "title": "المشتقة ودراسة التغيرات",
+          "latex": "f'(x) = 3\\times{ x}^{2}-3"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "F02",
+      "chapter": "functions",
+      "passed": true,
+      "results": [
+        {
+          "title": "المشتقة ودراسة التغيرات",
+          "latex": "f'(x) = 3\\times{ x}^{2}-3\\qquad y = -3x + 1"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "F03",
+      "chapter": "functions",
+      "passed": true,
+      "results": [
+        {
+          "title": "النهاية وسلوك الدالة",
+          "latex": "\\begin{aligned}\\lim_{x\\to 1} \\frac{{ x}^{2}-1}{ x-1} = 2\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "F04",
+      "chapter": "functions",
+      "passed": true,
+      "results": [
+        {
+          "title": "النهاية وسلوك الدالة",
+          "latex": "\\begin{aligned}\\lim_{x\\to 0^{+}} \\ln\\left( x\\right) = -\\infty\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "F05",
+      "chapter": "functions",
+      "passed": true,
+      "results": [
+        {
+          "title": "النهاية وسلوك الدالة",
+          "latex": "\\begin{aligned}\\lim_{x\\to 2} \\sqrt{ x-2} = 0 \\\\ \\lim_{x\\to +\\infty} \\sqrt{ x-2} = +\\infty\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "F06",
+      "chapter": "functions",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"f(x)=x^3-3x+1، اثبت وجود حل وحيد للمعادلة f(x)=0 في الفترة (0,1).\",\"engine\":\"equationSolver\",\"message\":\"الدالة المكتوبة غير مدعومة. تحقق من اسمها الرياضي.\",\"choices\":[\"حل المعادلة 2x^2-5x+3=0\"]}]\n\n1 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "f(x)=x^3-3x+1، اثبت وجود حل وحيد للمعادلة f(x)=0 في الفترة (0,1).",
+          "engine": "equationSolver",
+          "message": "الدالة المكتوبة غير مدعومة. تحقق من اسمها الرياضي.",
+          "choices": [
+            "حل المعادلة 2x^2-5x+3=0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "F07",
+      "chapter": "functions",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "ادرس استمرار تابع معرف علي اجزاء دون اعطاء تعريفه علي الاجزاء.",
+          "message": "هل تريد حساب قيمة، أم حل معادلة، أم دراسة دالة؟ لا توجد معطيات كافية لاختيار حل موثوق.",
+          "choices": [
+            "حل المعادلة 2x^2-5x+3=0",
+            "جد مشتق f(x)=x^3-3x+1 ونظم جدول تغيراته",
+            "كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "F08",
+      "chapter": "functions",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "f(x)=exp(x)/x، ادرس التابع دراسة كاملة مع الاستمرار والمقاربات والحصر والرسم.",
+          "engine": "limitsEngine",
+          "message": "إلى أي قيمة يؤول x؟",
+          "choices": [
+            "جد نهاية exp(x)/x عندما x تؤول إلى 0",
+            "جد نهايات exp(x)/x عند أطراف المجال"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "F09",
+      "chapter": "functions",
+      "passed": true,
+      "results": [
+        {
+          "title": "المشتقة ودراسة التغيرات",
+          "latex": "f'(x) = { e}^{ x}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "F10",
+      "chapter": "functions",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "نظم جدول تغيرات الدالة دون اعطاء عبارتها.",
+          "engine": "calculusEngine",
+          "message": "ما عبارة الدالة التي تريد دراستها؟",
+          "choices": [
+            "جد مشتق f(x)=x^3-3x+1",
+            "احسب تكامل x^2 من 0 إلى 1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "I01",
+      "chapter": "integration",
+      "passed": true,
+      "results": [
+        {
+          "title": "قيمة التكامل المحدد",
+          "latex": "\\int_{0}^{1} e^{x} \\cdot x\\,dx = 1",
+          "decimal": 1
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "I02",
+      "chapter": "integration",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"اوجد تابعا اصليا للدالة sin(x).\",\"message\":\"هل تريد حساب قيمة، أم حل معادلة، أم دراسة دالة؟ لا توجد معطيات كافية لاختيار حل موثوق.\",\"choices\":[\"حل المعادلة 2x^2-5x+3=0\",\"جد مشتق f(x)=x^3-3x+1 ونظم جدول تغيراته\",\"كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون\"]}]\n\n1 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "اوجد تابعا اصليا للدالة sin(x).",
+          "message": "هل تريد حساب قيمة، أم حل معادلة، أم دراسة دالة؟ لا توجد معطيات كافية لاختيار حل موثوق.",
+          "choices": [
+            "حل المعادلة 2x^2-5x+3=0",
+            "جد مشتق f(x)=x^3-3x+1 ونظم جدول تغيراته",
+            "كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "I03",
+      "chapter": "integration",
+      "passed": true,
+      "results": [
+        {
+          "title": "قيمة التكامل المحدد",
+          "latex": "\\int_{0}^{1} \\frac{2 \\cdot x}{x^{2}+1}\\,dx = \\frac{34657359027997265471}{50000000000000000000}",
+          "decimal": 0.6931471805599453
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "I04",
+      "chapter": "integration",
+      "passed": true,
+      "results": [
+        {
+          "title": "قيمة التكامل المحدد",
+          "latex": "\\int_{0}^{3} x^{2}\\,dx = 9",
+          "decimal": 9
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "I05",
+      "chapter": "integration",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: result 0: undefined != 1/6",
+      "results": [
+        {
+          "title": "المشتقة ودراسة التغيرات",
+          "latex": "f'(x) = 1"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "I06",
+      "chapter": "integration",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"f(x)=x، احسب الحجم الدوراني حول محور الفواصل للحيز تحت المنحني في الفترة [0,1].\",\"engine\":\"geometryTools\",\"message\":\"اكتب أعدادًا وكسورًا وجذورًا حقيقية بسيطة، دون رموز مجهولة أو أوامر.\",\"choices\":[\"احسب حجم مكعب طول حرفه 3\",\"جد مشتق f(x)=x^3-3x+1 ونظم جدول تغيراته\",\"حل المعادلة 2x^2-5x+3=0\"]}]\n\n1 !== 0\n",
+      "results": [
+        {
+          "title": "المشتقة ودراسة التغيرات",
+          "latex": "f'(x) = 1"
+        }
+      ],
+      "unsolved": [
+        {
+          "request": "f(x)=x، احسب الحجم الدوراني حول محور الفواصل للحيز تحت المنحني في الفترة [0,1].",
+          "engine": "geometryTools",
+          "message": "اكتب أعدادًا وكسورًا وجذورًا حقيقية بسيطة، دون رموز مجهولة أو أوامر.",
+          "choices": [
+            "احسب حجم مكعب طول حرفه 3",
+            "جد مشتق f(x)=x^3-3x+1 ونظم جدول تغيراته",
+            "حل المعادلة 2x^2-5x+3=0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "I07",
+      "chapter": "integration",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"f(x)=x^2، احسب القيمة الوسطي للتابع في الفترة [0,3].\",\"engine\":\"equationSolver\",\"message\":\"الدالة المكتوبة غير مدعومة. تحقق من اسمها الرياضي.\",\"choices\":[\"حل المعادلة 2x^2-5x+3=0\"]}]\n\n1 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "f(x)=x^2، احسب القيمة الوسطي للتابع في الفترة [0,3].",
+          "engine": "equationSolver",
+          "message": "الدالة المكتوبة غير مدعومة. تحقق من اسمها الرياضي.",
+          "choices": [
+            "حل المعادلة 2x^2-5x+3=0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "I08",
+      "chapter": "integration",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "احسب تكامل 1/x من -1 الي 1.",
+          "engine": "integrationEngine",
+          "message": "يتضمن مجال التكامل نقطة شذوذ داخلية. لا يجوز التعويض المباشر بفرق الدالة الأصلية أو اعتماد القيمة الرئيسية على أنها تكامل متقارب.",
+          "choices": [
+            "احسب تكامل x e^x من 0 إلى 1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "G01",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [
+        {
+          "title": "بعد نقطة عن مستوٍ ومسقطها العمودي",
+          "latex": "\\begin{aligned}d(A,P)=\\frac{1}{3}\\\\[5pt]H\\left(\\frac{7}{9},\\,\\frac{19}{9},\\,\\frac{25}{9}\\right)\\end{aligned}",
+          "decimal": 0.3333333333333333
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G02",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [
+        {
+          "title": "إحداثيات شعاع وطويلته",
+          "latex": "\\begin{aligned}\\overrightarrow{AB}=\\left(3,\\,4,\\,0\\right)\\\\[5pt]\\|\\overrightarrow{AB}\\|=5\\end{aligned}",
+          "decimal": 5
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G03",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [
+        {
+          "title": "النقاط الأربع تقع في مستوٍ واحد",
+          "latex": "\\text{النقاط الأربع تقع في مستوٍ واحد}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G04",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [
+        {
+          "title": "الأوضاع النسبية لمستويين",
+          "latex": "P\\cap Q=D,\\qquad \\begin{cases}x=\\frac{1}{2}+t\\\\y=\\frac{1}{2}+t\\\\z=-2t\\end{cases},\\quad t\\in\\mathbb R"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G05",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [
+        {
+          "title": "المعادلة الديكارتية للكرة",
+          "latex": "\\left(x-1\\right)^2+\\left(y-2\\right)^2+\\left(z-3\\right)^2=4"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G06",
+      "chapter": "geometry",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: missing مماس",
+      "results": [
+        {
+          "title": "المعادلة الديكارتية للكرة",
+          "latex": "x^2+y^2+\\left(z-1\\right)^2=1"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G07",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [
+        {
+          "title": "مركز الأبعاد المتناسبة",
+          "latex": "G\\left(1,\\,1,\\,0\\right)"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G08",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "جد بعد النقطة Z عن المستوي P: x+y+z=0 دون تعريف Z.",
+          "engine": "geometryEngine",
+          "message": "ما معطيات Z؟ عرّفه بدل استعمال أول عنصر معطى أو نتيجة قديمة.",
+          "choices": [
+            "جد المسافة بين النقطة A(1,2,3) والمستوي 2x-y+2z-5=0",
+            "حل المعادلة 2x^2-5x+3=0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "A01",
+      "chapter": "algebra",
+      "passed": true,
+      "results": [
+        {
+          "title": "حل المعادلة",
+          "latex": "x_{1} = \\frac{3}{2} \\qquad x_{2} = 1",
+          "decimal": "x₁ = 1.5، x₂ = 1"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "A02",
+      "chapter": "algebra",
+      "passed": true,
+      "results": [
+        {
+          "title": "حل المعادلة",
+          "latex": "\\begin{aligned}\\Delta&=-4<0\\\\[4pt]S_{\\mathbb R}&=\\varnothing\\\\[4pt]&\\text{مستحيلة الحل}\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "A03",
+      "chapter": "algebra",
+      "passed": true,
+      "results": [
+        {
+          "title": "حل المعادلة",
+          "latex": "x_{1} = 1 \\qquad x_{2} = 3 \\qquad x_{3} = 2",
+          "decimal": "x₁ = 1، x₂ = 3، x₃ = 2"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "A04",
+      "chapter": "algebra",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"احسب sin(30°)+sqrt(2).\",\"engine\":\"mathEngine\",\"message\":\"تعذّر إكمال هذا الجزء بهذه الصيغة. تحقق من المعطيات ومجال التعريف.\",\"choices\":[\"احسب sin(30°)+√2\"]}]\n\n1 !== 0\n",
+      "results": [],
+      "unsolved": [
+        {
+          "request": "احسب sin(30°)+sqrt(2).",
+          "engine": "mathEngine",
+          "message": "تعذّر إكمال هذا الجزء بهذه الصيغة. تحقق من المعطيات ومجال التعريف.",
+          "choices": [
+            "احسب sin(30°)+√2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "A05",
+      "chapter": "algebra",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "حل المتراجحة |x-1|<2 في R.",
+          "engine": "equationSolver",
+          "message": "اكتب المعادلة كاملة مع الطرفين وعلامة المساواة.",
+          "choices": [
+            "حل المعادلة 2x^2-5x+3=0",
+            "حل المعادلة z^2+2z+5=0 في الأعداد العقدية"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "A06",
+      "chapter": "algebra",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "حل المعادلة x^5-x+1=0 جبريا في R.",
+          "engine": "equationSolver",
+          "message": "المعادلات الرمزية المدعومة هنا حتى الدرجة الثالثة. حدّد مجالًا عدديًا إذا كانت المعادلة غير كثيرة حدود.",
+          "choices": [
+            "حل المعادلة 2x^2-5x+3=0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01",
+      "chapter": "matrices",
+      "passed": true,
+      "results": [
+        {
+          "title": "عمليات المصفوفة",
+          "latex": "\\begin{aligned}\\det A = 3\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "M02",
+      "chapter": "matrices",
+      "passed": true,
+      "results": [
+        {
+          "title": "عمليات المصفوفة",
+          "latex": "\\begin{aligned}A^{-1} = \\begin{pmatrix}1 & 0 \\\\ 0 & \\frac{1}{2}\\end{pmatrix}\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "M03",
+      "chapter": "matrices",
+      "passed": true,
+      "results": [
+        {
+          "title": "حل الجملة الخطية",
+          "latex": "x = 2 \\qquad y = 1"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "U01",
+      "chapter": "unsupported",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "حل المعادلة التفاضلية y'=2y مع الشرط y(0)=1.",
+          "engine": "calculusEngine",
+          "message": "الدالة المكتوبة غير مدعومة. تحقق من اسمها الرياضي.",
+          "choices": [
+            "جد مشتق f(x)=x^3-3x+1 ونظم جدول تغيراته",
+            "حل المعادلة 2x^2-5x+3=0"
+          ]
+        },
+        {
+          "request": "حل المعادلة التفاضلية y'=2y مع الشرط y(0)=1.",
+          "engine": "equationSolver",
+          "message": "هل تقصد معادلة واحدة أم جملة معادلات؟ اكتب كل معادلة في سطر.",
+          "choices": [
+            "جد مشتق f(x)=x^3-3x+1 ونظم جدول تغيراته",
+            "حل المعادلة 2x^2-5x+3=0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "U02",
+      "chapter": "unsupported",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "اكتب برهانا عاما لمبرهنة القيم المتوسطة دون تحديد تابع او مجال.",
+          "engine": "probabilityEngine",
+          "message": "اكتب البيانات أو جدول القيم والتكرارات.",
+          "choices": [
+            "احسب إحصاء البيانات [1,2,3,4,5]",
+            "القيم=[1,2,3]، التكرارات=[2,3,1]، احسب المتوسط والمدرج التكراري"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "U03",
+      "chapter": "unsupported",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "برهن ان كل عدد اولي فردي دون اي فرض اخر.",
+          "message": "هل تريد حساب قيمة، أم حل معادلة، أم دراسة دالة؟ لا توجد معطيات كافية لاختيار حل موثوق.",
+          "choices": [
+            "حل المعادلة 2x^2-5x+3=0",
+            "جد مشتق f(x)=x^3-3x+1 ونظم جدول تغيراته",
+            "كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "L01",
+      "chapter": "layout",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: [{\"request\":\"المسالة الاولي\\n(10 درجات)\\nلتكن f(x)=x^2+1.\\nوالمطلوب:\",\"engine\":\"equationSolver\",\"message\":\"الدالة المكتوبة غير مدعومة. تحقق من اسمها الرياضي.\",\"choices\":[\"حل المعادلة 2x^2-5x+3=0\"]}]\n\n1 !== 0\n",
+      "results": [
+        {
+          "title": "المشتقة ودراسة التغيرات",
+          "latex": "f'(x) = 2\\times x"
+        },
+        {
+          "title": "قيمة التكامل المحدد",
+          "latex": "\\int_{0}^{1} x^{2}+1\\,dx = \\frac{4}{3}",
+          "decimal": 1.3333333333333333
+        }
+      ],
+      "unsolved": [
+        {
+          "request": "المسالة الاولي\n(10 درجات)\nلتكن f(x)=x^2+1.\nوالمطلوب:",
+          "engine": "equationSolver",
+          "message": "الدالة المكتوبة غير مدعومة. تحقق من اسمها الرياضي.",
+          "choices": [
+            "حل المعادلة 2x^2-5x+3=0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "L02",
+      "chapter": "layout",
+      "passed": true,
+      "results": [
+        {
+          "title": "الشكل الأسي للعدد العقدي",
+          "latex": "z_{A}=2e^{i\\frac{\\pi}{3}}"
+        },
+        {
+          "title": "الشكل الأسي للعدد العقدي",
+          "latex": "z_{C}=2e^{-i\\frac{\\pi}{3}}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "L03",
+      "chapter": "layout",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 2\n",
+      "results": [
+        {
+          "title": "المشتقة ودراسة التغيرات",
+          "latex": "f'(x) = 2\\times x"
+        }
+      ],
+      "unsolved": [
+        {
+          "request": "ليكن f(x)=x^2.\nالمطلوب:",
+          "engine": "equationSolver",
+          "message": "الدالة المكتوبة غير مدعومة. تحقق من اسمها الرياضي.",
+          "choices": [
+            "حل المعادلة 2x^2-5x+3=0"
+          ]
+        },
+        {
+          "request": "احسب التكامل من الحد المجهول الي 1.",
+          "engine": "integrationEngine",
+          "message": "ما الحد السفلي والحد العلوي للتكامل؟",
+          "choices": [
+            "احسب تكامل x^2 من 0 إلى 1"
+          ]
+        },
+        {
+          "request": "احسب sin(30°).",
+          "engine": "mathEngine",
+          "message": "تعذّر إكمال هذا الجزء بهذه الصيغة. تحقق من المعطيات ومجال التعريف.",
+          "choices": [
+            "احسب sin(30°)+√2"
+          ]
+        }
+      ]
+    }
+  ]
+}

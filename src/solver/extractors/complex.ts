@@ -196,6 +196,17 @@ export function extractComplexRequest(
           ? "algebraic"
           : undefined;
 
+  const measure: ComplexRequest["measure"] = requestedForm
+    ? undefined
+    : /عمدة(?!.*نسبة)|\barg\s*\(/.test(rest)
+      ? "argument"
+      : /طويلة|مقياس|\babs\s*\(|\|\s*z(?:_[A-Z]|[1-9])?\s*\|/.test(rest)
+        ? "modulus"
+        : undefined;
+  if (measure)
+    rest = rest
+      .replace(/\b(?:arg|abs)\s*\(\s*(z(?:_[A-Z]|[1-9])?)\s*\)/g, "$1")
+      .replace(/\|\s*(z(?:_[A-Z]|[1-9])?)\s*\|/g, "$1");
   const fragments = mathFragments(rest)
     .map(clean)
     .filter((part) => !part.includes("=") && !/^(?:n|theta|power)$/.test(part));
@@ -242,6 +253,7 @@ export function extractComplexRequest(
     values,
     points,
     form: requestedForm,
+    measure,
   };
   if (symbolicTrig) {
     request.operation = "trig";
@@ -368,6 +380,12 @@ export function extractComplexRequest(
   ) {
     request.operation = "angle";
     request.vertex = text.match(/(?:زاوية|زاويه)\s*([A-Z]{3})/)?.[1];
+    const ratio = text.match(
+      /\(\s*z_([A-Z])\s*-\s*z_([A-Z])\s*\)\s*\/\s*\(\s*z_([A-Z])\s*-\s*z_([A-Z])\s*\)/,
+    );
+    if (ratio && ratio[2] === ratio[4])
+      request.vertex = ratio[3] + ratio[2] + ratio[1];
+
     request.unsigned = /غير موجه|غير الموجه/.test(text);
     if (
       points.length >= 3 &&

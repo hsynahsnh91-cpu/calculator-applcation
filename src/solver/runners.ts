@@ -1,4 +1,3 @@
-import { decodeLatex } from "./parser";
 import type { AngleMode, AppMode } from "../types";
 import {
   ClarificationError,
@@ -12,13 +11,8 @@ import {
   extractEquation,
   extractExpression,
   extractLimit,
-  extractMatrices,
-  extractPoints,
   extractScientific,
   extractSequence,
-  mathFragments,
-  numericMatch,
-  requireValue,
 } from "./extractors";
 
 const unverified = (
@@ -48,7 +42,6 @@ export async function runEngine(
     canonical,
     expressionTex,
     numberTex,
-    matrixTex,
     parseExpression,
     polynomialCoefficients,
     angularExpression,
@@ -58,15 +51,71 @@ export async function runEngine(
   } = await import("./math");
   if (engine === "mathEngine") {
     const { evaluateMathExpression } = await import("../utils/mathEngine");
-    const scalar = context.probability?.lastScalar;
+    const geometricReference =
+      /النتيجة\s+الهندسية\s+السابق(?:ة)?/.test(text) ||
+      ((context.lastEngine === "geometryEngine" ||
+        context.lastEngine === "geometryTools") &&
+        /النتيجة\s+السابق(?:ة)?|\bans\b/.test(text));
+    let scalar = geometricReference
+      ? context.geometry?.lastScalar
+      : context.probability?.lastScalar;
+    let exactScalar = geometricReference
+      ? context.geometry?.lastScalarExpression
+      : context.probability?.lastScalarExact;
+    const genericPrevious =
+      /النتيجة\s+السابق(?:ة)?|\bans\b/.test(text) &&
+      !/الاحتمال\s+السابق|النتيجة\s+الهندسية/.test(text);
+    if (
+      genericPrevious &&
+      (context.lastEngine === "complexEngine" ||
+        context.lastEngine === "complexTools")
+    ) {
+      if (!context.complex?.current || context.complex.ambiguous)
+        throw new ClarificationError(
+          "النتيجة السابقة ليست عددًا واحدًا محددًا؛ ما العدد المقصود؟",
+        );
+      const { complexValue, zero } = await import("../utils/complexMath");
+      const v = complexValue(context.complex.current),
+        prompt = context.lastPrompt || "";
+      exactScalar = /طويلة|مقياس|\babs\s*\(/.test(prompt)
+        ? v.norm
+        : /عمدة|\barg\s*\(/.test(prompt)
+          ? v.angle
+          : zero(v.i)
+            ? v.r
+            : v.expression;
+      if (!exactScalar)
+        throw new ClarificationError(
+          "لا توجد قيمة عددية محددة لهذه النتيجة السابقة.",
+        );
+      scalar = undefined;
+    } else if (genericPrevious && context.lastEngine === "matricesEngine") {
+      if (!context.matrices?.lastScalar)
+        throw new ClarificationError(
+          "النتيجة المصفوفية السابقة ليست عددًا واحدًا؛ اطلب المحدد أو الأثر أو اكتب العنصر المقصود.",
+        );
+      exactScalar = context.matrices.lastScalar;
+      scalar = undefined;
+    } else if (
+      genericPrevious &&
+      !geometricReference &&
+      context.lastEngine !== "probabilityEngine" &&
+      context.lastEngine !== "probabilityTools"
+    )
+      throw new ClarificationError(
+        "النتيجة السابقة ليست متاحة كقيمة واحدة لهذا المسار؛ سمّها أو اكتب قيمتها بدل استعمال قيمة قديمة.",
+      );
+    const quantitySubstitutions = context.school?.values || {};
     const original = extractScientific(
-      text.replace(/(?:الاحتمال|النتيجة)\s+السابق(?:ة)?/g, "ans"),
-    ).replace(
-      /\bans\b/g,
-      context.probability?.lastScalarExact
-        ? `(${context.probability.lastScalarExact})`
-        : "ans",
-    );
+      text.replace(
+        /(?:الاحتمال|النتيجة(?:\s+الهندسية)?)\s+السابق(?:ة)?/g,
+        "ans",
+      ),
+    )
+      .replace(/\bans\b/g, exactScalar ? `(${exactScalar})` : "ans")
+      .replace(/\b[A-Z]\b/g, (name) =>
+        quantitySubstitutions[name] ? `(${quantitySubstitutions[name]})` : name,
+      );
     const scope = {
       ...context.assignments,
       ...context.solutions,
@@ -74,6 +123,15 @@ export async function runEngine(
     };
     const expression = angularExpression(canonical(original, scope), angleMode);
     const value = evaluateMathExpression(expression, "RAD");
+    if (
+      (typeof value.result === "number" && !Number.isFinite(value.result)) ||
+      (math.isComplex(value.result) &&
+        (!Number.isFinite(value.result.re) ||
+          !Number.isFinite(value.result.im)))
+    )
+      throw new ClarificationError(
+        "القيمة غير معرفة أو خرجت عن المجال العددي؛ لا تُعرض اللانهاية بديلًا عن قسمة على صفر أو عن تجاوز السعة.",
+      );
     const out = result(engine, "scientific", "قيمة العبارة");
     out.finalLatex = value.latexStr;
     out.decimal = value.decimalStr;
@@ -265,6 +323,17 @@ export async function runEngine(
     return out;
   }
   if (engine === "calculusEngine") {
+    const { schoolSubstitution } = await import("../utils/schoolAnalysis");
+    const substitution = schoolSubstitution(text, context);
+    if (substitution)
+      return {
+        ...result(engine, "calculus", "التحقق بالتعويض"),
+        ...substitution,
+      };
+    const { schoolUniqueRoot } = await import("../utils/schoolAnalysis");
+    const proof = schoolUniqueRoot(text, context);
+    if (proof)
+      return { ...result(engine, "calculus", "وجود حل وحيد"), ...proof };
     const expression = canonical(
       extractExpression(text, context),
       context.assignments,
@@ -293,10 +362,17 @@ export async function runEngine(
         },
       ];
     } else {
-      const point = numericMatch(
-        text,
-        "(?:عند|x_?0\\s*=)\\s*(-?\\d+(?:\\.\\d+)?)",
-      );
+      const { assigned } = await import("./extractors/probability");
+      const { exact } = await import("../utils/probabilityExact");
+      const pointExpression = assigned(text, "x_?0|x|عند");
+      const point =
+        pointExpression === undefined
+          ? undefined
+          : exact(pointExpression).number();
+      if (/مماس/.test(text) && point === undefined)
+        throw new ClarificationError(
+          "عند أي نقطة تريد المماس؟ أعط فاصلتها بصورة عددية محددة.",
+        );
       let atX =
         point ??
         [0, 1, 2, -1, 0.5, 3].find((x) => {
@@ -329,6 +405,48 @@ export async function runEngine(
           latex: step.latex,
         }));
       out.verification = verifyDerivative(expression, derivative);
+      if (point !== undefined) {
+        const { scalar, tex, evaluateScalar } = await import(
+          "../utils/complexMath"
+        );
+        const replace = (source: string) =>
+            source.replace(/\bx\b/g, `(${exact(pointExpression!).text()})`),
+          slope = scalar(replace(derivative)),
+          height = scalar(replace(expression));
+        const slopeValue = evaluateScalar(slope),
+          h = 1e-5 * Math.max(1, Math.abs(point)),
+          numeric =
+            (Number(math.evaluate(expression, { x: point + h })) -
+              Number(math.evaluate(expression, { x: point - h }))) /
+            (2 * h);
+        out.verification = {
+          ...out.verification,
+          passed:
+            out.verification.passed &&
+            Number.isFinite(numeric) &&
+            Math.abs(numeric - slopeValue) <=
+              2e-5 * Math.max(1, Math.abs(slopeValue)),
+          method:
+            "مطابقة المشتق بفروق مركزية مستقلة، وفحص قيمته عند نقطة الدراسة المعطاة",
+        };
+        if (/مماس/.test(text)) {
+          const tangent = scalar(
+            `(${slope})*(x-(${exact(pointExpression!).text()}))+(${height})`,
+          );
+          out.finalLatex = `f'(x)=${expressionTex(derivative)}\\qquad y=${tex(tangent)}`;
+          out.steps.push({
+            title: "معادلة المماس بالقيم الدقيقة",
+            latex: `y=f'(a)(x-a)+f(a)=${tex(tangent)}`,
+          });
+        } else {
+          out.finalLatex += `\\qquad f'(${exact(pointExpression!).tex()})=${tex(slope)}`;
+          out.decimal = slopeValue;
+          out.steps.push({
+            title: "التعويض بنقطة الدراسة",
+            latex: `f'(${exact(pointExpression!).tex()})=${tex(slope)}`,
+          });
+        }
+      }
       const table = buildVariationTableLatex(expression);
       if (table)
         out.visuals.push({
@@ -350,6 +468,13 @@ export async function runEngine(
     return out;
   }
   if (engine === "integrationEngine") {
+    const { schoolIntegral } = await import("../utils/schoolAnalysis");
+    const derived = await schoolIntegral(text, context);
+    if (derived)
+      return {
+        ...result(engine, "integration", "التكامل المدرسي"),
+        ...derived,
+      };
     const expression = canonical(
       extractExpression(text, context),
       context.assignments,
@@ -499,6 +624,10 @@ export async function runEngine(
     return out;
   }
   if (engine === "sequences") {
+    const { schoolSequence } = await import("../utils/schoolSequence");
+    const schoolAnswer = schoolSequence(text, context);
+    if (schoolAnswer)
+      return { ...result(engine, "sequences", "المتتالية"), ...schoolAnswer };
     const input = extractSequence(text);
     const { solveSequence } = await import("../utils/sequences");
     const { solution, verification } = solveSequence(input);
@@ -506,8 +635,12 @@ export async function runEngine(
     out.finalLatex = /مجموع|اجمع/.test(text)
       ? `S = ${numberTex(solution.sumValue!)} \\qquad ${solution.generalTermLatex}`
       : solution.generalTermLatex;
-    out.decimal = solution.sumValue;
-    out.verification = verification;
+    out.decimal = /مجموع|اجمع/.test(text) ? solution.sumValue : undefined;
+    out.verification = /مجموع|اجمع/.test(text)
+      ? verification
+      : unverified(
+          "لم يجر فحص مستقل لهذه الصيغة؛ فحص المجموع لا يكفي للتحقق من كل طلب عن المتتالية.",
+        );
     out.steps = solution.steps.map((step) => ({
       title: step.title,
       text: step.text,
@@ -543,235 +676,26 @@ export async function runEngine(
     return out;
   }
   if (engine === "matricesEngine") {
-    const [matrix, second] = extractMatrices(text, context);
-    const { solveMatrixOperations } = await import("../utils/matricesEngine");
-    const solution = solveMatrixOperations(matrix, second);
-    const out = result(engine, "matrices", "عمليات المصفوفة");
-    const finals: string[] = [];
-    if (/محدد/.test(text) || !/مقلوب|منقول|رتبة|جداء|ضرب|ذاتي/.test(text))
-      finals.push(`\\det A = ${numberTex(solution.detA!)}`);
-    if (/مقلوب/.test(text))
-      finals.push(
-        solution.inverseA
-          ? `A^{-1} = ${matrixTex(solution.inverseA)}`
-          : "\\det A=0 \\implies \\text{لا يوجد مقلوب}",
-      );
-    if (/منقول/.test(text))
-      finals.push(`A^{T} = ${matrixTex(solution.transposeA!)}`);
-    if (/رتبة/.test(text))
-      finals.push(`\\operatorname{rg}(A)=${solution.rankA}`);
-    if (/جداء|ضرب/.test(text)) {
-      if (!solution.productAB)
-        throw new ClarificationError("ما المصفوفة الثانية لحساب الجداء؟");
-      finals.push(`AB=${matrixTex(solution.productAB)}`);
-    }
-    if (/ذاتي/.test(text))
-      finals.push(`\\lambda \\in \\{${solution.eigenvaluesA?.join(",")}\\}`);
-    out.finalLatex = `\\begin{aligned}${finals.join("\\\\[6pt]")}\\end{aligned}`;
-    out.steps = solution.steps.map((step) => ({
-      title: step.title,
-      text: step.text,
-      latex: step.latex,
-    }));
-    const independent = math.det(matrix);
-    let error = Math.abs(independent - (solution.detA ?? NaN));
-    if (solution.inverseA) {
-      const product = math.multiply(matrix, solution.inverseA) as number[][];
-      error = Math.max(
-        error,
-        ...product.flatMap((row, i) =>
-          row.map((value, j) => Math.abs(value - (i === j ? 1 : 0))),
-        ),
-      );
-    }
-    out.verification = {
-      passed:
-        !/منقول|رتبة|جداء|ضرب|ذاتي/.test(text) &&
-        Number.isFinite(error) &&
-        error < 1e-7,
-      maxError: Number.isFinite(error) ? error : undefined,
-      method:
-        "مطابقة المحدد بمحرك mathjs والتحقق من حاصل ضرب المصفوفة بمقلوبها؛ لا تشمل الشارة عمليات أخرى",
-    };
-    if (solution.gauss)
-      out.visuals.push({
-        kind: "table",
-        title: "الشكل المدرج المختزل",
-        latex: solution.gauss.rrefLatex,
-      });
-    out.contextPatch = { matrix };
-    return out;
+    const { extractMatrixRequest } = await import("./extractors/matrices");
+    const { solveMatrixRequest } = await import("../utils/matrixWorkbench");
+    return solveMatrixRequest(extractMatrixRequest(text, context), context);
   }
   if (engine === "geometryEngine" || engine === "geometryTools") {
-    const geometry = await import("../utils/geometryEngine");
-    const tools = await import("../utils/geometryTools");
-    const points = extractPoints(text);
-    const out = result(engine, "geometry", "نتيجة الهندسة الفراغية");
-    if (engine === "geometryTools") {
-      const id: import("../utils/geometryTools").SolidId = /مكعب/.test(text)
-        ? "cube"
-        : /متوازي مستطيلات/.test(text)
-          ? "cuboid"
-          : /اسطوان/.test(text)
-            ? "cylinder"
-            : /مخروط/.test(text)
-              ? "cone"
-              : /هرم/.test(text)
-                ? "pyramid"
-                : /موشور/.test(text)
-                  ? "triangularPrism"
-                  : "sphere";
-      const dimensions: Record<string, number> = {};
-      const symbols =
-        id === "cube"
-          ? ["a"]
-          : id === "cuboid"
-            ? ["a", "b", "c"]
-            : id === "sphere"
-              ? ["r"]
-              : id === "pyramid"
-                ? ["a", "h"]
-                : id === "triangularPrism"
-                  ? ["area", "perimeter", "h"]
-                  : ["r", "h"];
-      for (const symbol of symbols) {
-        const arabic =
-          symbol === "r"
-            ? "نصف قطر(?:ها|ه)?"
-            : symbol === "h"
-              ? "ارتفاع(?:ها|ه)?"
-              : symbol === "a"
-                ? "(?:حرف(?:ه|ها)?|ضلعه|طول(?:ه|ها)?)"
-                : symbol === "area"
-                  ? "مساحة القاعدة"
-                  : symbol === "perimeter"
-                    ? "محيط القاعدة"
-                    : symbol;
-        dimensions[symbol] = requireValue(
-          numericMatch(
-            text,
-            `(?:${symbol}\\s*=|${arabic}\\s*(?:يساوي|=)?)\\s*(-?\\d+(?:\\.\\d+)?)`,
-          ),
-          `ما قيمة ${symbol} للمجسم؟`,
-        );
-      }
-      const solution = tools.solidSolution(id, dimensions);
-      out.finalLatex = solution.metrics
-        .map((metric) => metric.latex)
-        .join("\\qquad ");
-      out.steps = solution.steps.map((step) => ({
-        title: step.title,
-        text: step.explanation,
-        latex: step.latex,
-      }));
-      return out;
-    }
-    const planeText = mathFragments(text).find(
-      (part) => part.includes("=") && /[xyz]/.test(part),
+    const { schoolSphereTangency } = await import("../utils/schoolAnalysis");
+    const tangent = await schoolSphereTangency(text, context);
+    if (tangent)
+      return { ...result(engine, "geometry", "تماس الكرة"), ...tangent };
+    const { extractSpaceRequest } = await import("./extractors/geometry");
+    const { solveSpaceRequest } = await import(
+      "../utils/spaceGeometryWorkbench"
     );
-    let plane: import("../utils/geometryEngine").Plane | undefined;
-    if (planeText) {
-      const [left, right] = planeText.split("=");
-      const source = canonical(`(${left})-(${right})`);
-      const node = parseExpression(source);
-      const f = (x: number, y: number, z: number) =>
-        Number(node.evaluate({ x, y, z }));
-      const d = f(0, 0, 0);
-      plane = { a: f(1, 0, 0) - d, b: f(0, 1, 0) - d, c: f(0, 0, 1) - d, d };
-      for (const [x, y, z] of [
-        [2, -1, 3],
-        [-1, 2, 0.5],
-      ])
-        if (
-          Math.abs(
-            f(x, y, z) - (plane.a * x + plane.b * y + plane.c * z + plane.d),
-          ) > 1e-8
-        )
-          throw new ClarificationError(
-            "معادلة المستوي يجب أن تكون خطية في x وy وz.",
-          );
-    }
-    let outcome: import("../utils/geometryEngine").Outcome;
-    if (/مسافة/.test(text) && plane && points[0]) {
-      outcome = geometry.distancePointPlane(points[0].value, plane);
-      const projected = tools.projectPointOntoPlane(points[0].value, plane);
-      const independent = geometry.norm(
-        geometry.sub(points[0].value, projected),
-      );
-      const residual = Math.abs(
-        plane.a * projected[0] +
-          plane.b * projected[1] +
-          plane.c * projected[2] +
-          plane.d,
-      );
-      const shown = outcome.verdictLatex?.split("=").pop();
-      const expected = shown ? Number(math.evaluate(decodeLatex(shown))) : NaN;
-      const error = Math.max(residual, Math.abs(independent - expected));
-      out.verification = {
-        passed: error < 1e-8 && Number.isFinite(independent),
-        maxError: Number.isFinite(error) ? error : undefined,
-        method:
-          "إسقاط النقطة عموديًا على المستوي، وفحص انتماء المسقط وطول متجه الإسقاط",
-      };
-      out.decimal = independent;
-      out.engines = ["geometryEngine", "geometryTools"];
-    } else if (/مسافة/.test(text) && points.length >= 2) {
-      const distance = geometry.norm(
-        geometry.sub(points[0].value, points[1].value),
-      );
-      out.finalLatex = `d(${points[0].name},${points[1].name})=${numberTex(distance)}`;
-      out.decimal = distance;
-      out.steps = [
-        {
-          title: "قانون المسافة في الفضاء",
-          latex: `d=\\sqrt{(x_B-x_A)^2+(y_B-y_A)^2+(z_B-z_A)^2}=${numberTex(distance)}`,
-        },
-      ];
-      return out;
-    } else if (/مستوي/.test(text) && points.length >= 3)
-      outcome = geometry.planeFromThreePoints(
-        points[0].value,
-        points[1].value,
-        points[2].value,
-      ).outcome;
-    else if (/مستقيم/.test(text) && points.length >= 2)
-      outcome = geometry.lineFromTwoPoints(
-        points[0].value,
-        points[1].value,
-      ).outcome;
-    else if (/حجم|رباعي/.test(text) && points.length >= 4)
-      outcome = geometry.tetrahedronVolume(
-        points[0].value,
-        points[1].value,
-        points[2].value,
-        points[3].value,
-      );
-    else if (points.length >= 2 && /متجه|جداء|تعامد|تواز/.test(text))
-      outcome = geometry.vectorOps(
-        points[0].value,
-        points[1].value,
-        [0, 0, 0],
-        [0, 0, 0],
-      );
-    else
-      throw new ClarificationError(
-        "اكتب إحداثيات النقاط ومعادلة المستوي أو اتجاه المستقيم.",
-        [
-          "جد المسافة بين النقطة A(1,2,3) والمستوي 2x-y+2z-5=0",
-          "جد معادلة المستوي المار بالنقط A(0,0,0) وB(1,0,0) وC(0,1,0)",
-        ],
-      );
-    if (outcome.tone === "bad") throw new ClarificationError(outcome.verdict);
-    out.finalLatex =
-      outcome.verdictLatex ??
-      outcome.metrics.map((metric) => metric.latex).join("\\qquad ");
-    out.title = outcome.verdict;
-    out.steps = outcome.steps.map((step) => ({
-      title: step.title,
-      text: step.explanation,
-      latex: step.latex,
-    }));
-    return out;
+    return {
+      ...result(engine, "geometry", "الهندسة الفراغية"),
+      ...solveSpaceRequest(
+        extractSpaceRequest(text, context, angleMode),
+        context.matrices,
+      ),
+    };
   }
   if (engine === "probabilityEngine" || engine === "probabilityTools") {
     const { extractProbabilityRequest, assigned } = await import(
@@ -813,13 +737,44 @@ export async function runEngine(
     };
   }
   if (engine === "complexEngine") {
+    const { schoolComplexExpression } = await import("../utils/schoolComplex");
+    const quantity = schoolComplexExpression(text, context);
+    if (quantity)
+      return {
+        ...result(engine, "complex", "قيمة المقدار العقدي"),
+        ...quantity,
+      };
     const { extractComplexRequest } = await import("./extractors/complex");
     const { solveComplexRequest } = await import("../utils/complexEngine");
     const input = extractComplexRequest(text, context);
-    return {
-      ...result(engine, "complex", "الأعداد العقدية"),
-      ...solveComplexRequest(input, angleMode),
-    };
+    const solved = solveComplexRequest(input, angleMode);
+    if (input.measure && input.expression) {
+      const { complexValue, zero, evaluateScalar } = await import(
+        "../utils/complexMath"
+      );
+      const v = complexValue(input.expression),
+        name =
+          input.targetName
+            ?.replace(/^z_([A-Z])$/, "z_{$1}")
+            .replace(/^z([1-9])$/, "z_{$1}") || "z";
+      if (input.measure === "modulus") {
+        solved.title = "طويلة العدد العقدي — المقياس";
+        solved.finalLatex = `|${name}|=${v.normTex}`;
+        solved.decimal = evaluateScalar(v.norm);
+      } else {
+        solved.title = "عمدة العدد العقدي";
+        solved.finalLatex = zero(v.norm)
+          ? `\\arg(0)\\ \\text{غير معرّفة}`
+          : `\\arg(${name})=${v.angleTex}\\pmod{2\\pi}`;
+        solved.decimal = undefined;
+        if (zero(v.norm))
+          solved.verification = {
+            passed: false,
+            method: "لا توجد عمدة للعدد0 لفحصها.",
+          };
+      }
+    }
+    return { ...result(engine, "complex", "الأعداد العقدية"), ...solved };
   }
   throw new ClarificationError("أي عملية رياضية تريد تنفيذها؟");
 }

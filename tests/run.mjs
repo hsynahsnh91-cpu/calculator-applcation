@@ -11,6 +11,11 @@ try {
     "complex",
     "probability",
     "textbook",
+    "geometry",
+    "curriculum",
+    "school-safety",
+    "matrices",
+    "space-school",
   ]) {
     const output = new URL(`${name}.mjs`, directory).pathname;
     await build({

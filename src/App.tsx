@@ -13,6 +13,8 @@ import {
   ChevronLeft,
   History,
   Dices,
+  Grid2X2,
+  Cuboid,
   ImagePlus,
   Keyboard,
   LoaderCircle,
@@ -50,6 +52,8 @@ import {
 } from "./solver/types";
 import type { AngleMode, HistoryEntry } from "./types";
 import type { ProbabilityContext } from "./solver/probabilityTypes";
+import type { GeometryContext } from "./solver/geometryTypes";
+import type { MatrixContext } from "./solver/matrixTypes";
 import type { NaturalMathFieldHandle } from "./components/common/NaturalMathField";
 const NaturalMathField = lazy(() =>
   import("./components/common/NaturalMathField").then((module) => ({
@@ -79,7 +83,15 @@ const ImageAttachment = lazy(() =>
 const ProbabilityBoard = lazy(
   () => import("./components/probability/ProbabilityBoard"),
 );
+const MatrixBoard = lazy(() => import("./components/matrices/MatrixBoard"));
+const GeometryBoard = lazy(() => import("./components/geometry/GeometryBoard"));
+const CurriculumGuide = lazy(
+  () => import("./components/reference/CurriculumGuide"),
+);
 type Modal =
+  | "matrices"
+  | "curriculum"
+  | "geometry"
   | "math"
   | "probability"
   | "reference"
@@ -105,6 +117,18 @@ export default function App() {
     [error, setError] = useState("");
   const [menu, setMenu] = useState(false),
     [modal, setModal] = useState<Modal>(null);
+  const [matrixDraft, setMatrixDraft] = useState<MatrixContext>();
+  const openMatrices = useCallback((value?: MatrixContext) => {
+    setMatrixDraft(value);
+    setMenu(false);
+    setModal("matrices");
+  }, []);
+  const [geometryDraft, setGeometryDraft] = useState<GeometryContext>();
+  const openGeometry = useCallback((value?: GeometryContext) => {
+    setGeometryDraft(value);
+    setMenu(false);
+    setModal("geometry");
+  }, []);
   const [probabilityDraft, setProbabilityDraft] =
     useState<ProbabilityContext>();
   const openProbability = useCallback((value?: ProbabilityContext) => {
@@ -130,6 +154,25 @@ export default function App() {
     fileInput = useRef<HTMLInputElement>(null),
     menuRoot = useRef<HTMLDivElement>(null),
     pendingElement = useRef<HTMLDivElement>(null);
+  const latestTurn = turns[turns.length - 1]?.id;
+  const lastTurnElement = useRef<HTMLElement>(null),
+    displayedTurn = useRef(latestTurn);
+  useEffect(() => {
+    if (!latestTurn || latestTurn === displayedTurn.current) {
+      displayedTurn.current = latestTurn;
+      return;
+    }
+    displayedTurn.current = latestTurn;
+    const frame = requestAnimationFrame(() => {
+      const section = lastTurnElement.current;
+      const target =
+        section?.querySelector<HTMLElement>(
+          ".final-answer,.clarification-card",
+        ) || section;
+      target?.scrollIntoView({ block: "start", behavior: "auto" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [latestTurn]);
   const controller = useRef<AbortController | null>(null),
     token = useRef(0);
   const sendRef = useRef<(text: string) => Promise<void>>(async () => {});
@@ -210,6 +253,19 @@ export default function App() {
     setMenu(false);
     if (value === "name") setEditName(name);
     if (value === "math") setMathLatex("");
+    if (value === "matrices") {
+      const stored = context.current;
+      setMatrixDraft(
+        stored.matrices ||
+          (stored.matrix
+            ? {
+                values: { M: stored.matrix.map((r) => r.map(String)) },
+                active: "M",
+              }
+            : undefined),
+      );
+    }
+    if (value === "geometry") setGeometryDraft(context.current.geometry);
     if (value === "probability")
       setProbabilityDraft(context.current.probability);
     setModal(value);
@@ -392,7 +448,11 @@ export default function App() {
         {chatting && (
           <div className="conversation" aria-label="المحادثة الرياضية">
             {turns.map((turn, index) => (
-              <section className="conversation-turn" key={turn.id}>
+              <section
+                className="conversation-turn"
+                key={turn.id}
+                ref={index === turns.length - 1 ? lastTurnElement : undefined}
+              >
                 <div className="user-message" dir="auto">
                   {turn.image && (
                     <img
@@ -410,6 +470,8 @@ export default function App() {
                     onFollowUp={followUp}
                     onSave={save}
                     onProbability={openProbability}
+                    onGeometry={openGeometry}
+                    onMatrices={openMatrices}
                     saved={history.some((entry) =>
                       entry.tags?.includes(turn.answer.id),
                     )}
@@ -535,10 +597,24 @@ export default function App() {
                       <span>إرفاق صورة للمسألة</span>
                       <span className="menu-tag">OCR محلي</span>
                     </button>
+                    <button role="menuitem" onClick={() => open("matrices")}>
+                      <Grid2X2 size={17} />
+                      <span>لوحة المصفوفات والجمل</span>
+                      <ChevronLeft size={14} />
+                    </button>
+                    <button role="menuitem" onClick={() => open("geometry")}>
+                      <Cuboid size={17} />
+                      <span>لوحة الهندسة الفراغية</span>
+                      <ChevronLeft size={14} />
+                    </button>
                     <button role="menuitem" onClick={() => open("probability")}>
                       <Dices size={17} />
                       <span>لوحة الاحتمالات والإحصاء</span>
                       <ChevronLeft size={14} />
+                    </button>
+                    <button role="menuitem" onClick={() => open("curriculum")}>
+                      <BookOpen size={17} />
+                      <span>دليل قدرات التطبيق</span>
                     </button>
                     <button role="menuitem" onClick={() => open("reference")}>
                       <BookOpen size={17} />
@@ -712,25 +788,42 @@ export default function App() {
       {modal && (
         <ToolModal
           title={
-            modal === "probability"
-              ? "لوحة الاحتمالات والإحصاء"
-              : modal === "math"
-                ? "لوحة المفاتيح الرياضية"
-                : modal === "reference"
-                  ? "بنك القوانين"
-                  : modal === "history"
-                    ? "السجل"
-                    : modal === "name"
-                      ? "كيف أناديك؟"
-                      : "مسح المحادثة"
+            modal === "matrices"
+              ? "المصفوفات والجمل الخطية"
+              : modal === "curriculum"
+                ? "قدرات التطبيق وحدود الدعم"
+                : modal === "geometry"
+                  ? "الهندسة الفراغية"
+                  : modal === "probability"
+                    ? "لوحة الاحتمالات والإحصاء"
+                    : modal === "math"
+                      ? "لوحة المفاتيح الرياضية"
+                      : modal === "reference"
+                        ? "بنك القوانين"
+                        : modal === "history"
+                          ? "السجل"
+                          : modal === "name"
+                            ? "كيف أناديك؟"
+                            : "مسح المحادثة"
           }
           onClose={() => setModal(null)}
           wide={
+            modal === "matrices" ||
+            modal === "curriculum" ||
             modal === "reference" ||
             modal === "history" ||
-            modal === "probability"
+            modal === "probability" ||
+            modal === "geometry"
           }
-          className={modal === "probability" ? "probability-modal" : ""}
+          className={
+            modal === "matrices"
+              ? "matrix-modal"
+              : modal === "geometry"
+                ? "geometry-modal"
+                : modal === "probability"
+                  ? "probability-modal"
+                  : ""
+          }
         >
           <SectionErrorBoundary label="الأداة" resetKey={modal}>
             <Suspense fallback={loading}>
@@ -767,6 +860,35 @@ export default function App() {
                   </button>
                 </div>
               )}
+              {modal === "matrices" && (
+                <MatrixBoard
+                  context={matrixDraft}
+                  busy={busy}
+                  onInsert={(question) => {
+                    prompt.current?.setValue(question);
+                    setModal(null);
+                  }}
+                  onSolve={(question) => {
+                    setModal(null);
+                    void sendRef.current(question);
+                  }}
+                />
+              )}
+              {modal === "geometry" && (
+                <GeometryBoard
+                  context={geometryDraft}
+                  angleMode={angle}
+                  busy={busy}
+                  onInsert={(question) => {
+                    prompt.current?.setValue(question);
+                    setModal(null);
+                  }}
+                  onSolve={(question) => {
+                    setModal(null);
+                    void sendRef.current(question);
+                  }}
+                />
+              )}
               {modal === "probability" && (
                 <ProbabilityBoard
                   context={probabilityDraft}
@@ -778,6 +900,14 @@ export default function App() {
                   onSolve={(question) => {
                     setModal(null);
                     void sendRef.current(question);
+                  }}
+                />
+              )}
+              {modal === "curriculum" && (
+                <CurriculumGuide
+                  onInsert={(question) => {
+                    prompt.current?.setValue(question);
+                    setModal(null);
                   }}
                 />
               )}

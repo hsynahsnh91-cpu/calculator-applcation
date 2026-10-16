@@ -1,3 +1,4 @@
+import { bridgeMatrixName } from "../solver/matrixTypes";
 import { isProbabilityContext } from "../solver/probabilityTypes";
 import {
   ClarificationError,
@@ -472,11 +473,25 @@ export function solveProbabilityRequest(
           "جسر المصفوفات محدود بستة صفوف. اطلب إحصاء الجدول كاملًا أو اختر ست قيم مميزة.",
         );
       contextPatch.matrix = v.rows.map(([x, f]) => [x, f]);
-      finalLatex = `M=\\begin{pmatrix}${v.rows.map(([, f], i) => `${v.exactValues[i].tex()}&${f}`).join("\\\\")}\\end{pmatrix}`;
+      const cells = v.rows.map(([, f], i) => [
+          v.exactValues[i].text(),
+          String(f),
+        ]),
+        alias = bridgeMatrixName(context.matrices?.values, cells);
+      contextPatch.matrices = {
+        values: {
+          ...context.matrices?.values,
+          [alias]: cells,
+        },
+        active: alias,
+        origin: "statistics",
+        scalarFactor: context.matrices?.scalarFactor,
+      };
+      finalLatex = `${alias}=\\begin{pmatrix}${v.rows.map(([, f], i) => `${v.exactValues[i].tex()}&${f}`).join("\\\\")}\\end{pmatrix}`;
       v.steps.push({
         title: "الجسر إلى أدوات المصفوفات",
         text: "العمود الأول قيم البيانات والثاني تكراراتها. أصبح هذا الجدول المصفوفة النشطة للطلبات اللاحقة، مثل المنقول أو الرتبة.",
-        latex: "M_{i1}=x_i,\\quad M_{i2}=f_i",
+        latex: `${alias}_{i1}=x_i,\\quad ${alias}_{i2}=f_i`,
       });
     }
     return {

@@ -296,7 +296,7 @@ export function extractUrn(text: string): UrnInput {
 export function extractScientific(text: string): string {
   const stripped = text
     .replace(
-      /(?:احسبلي|احسب|جد|قيمة|كم|يساوي|نتيجة|درجة|راديان|غراد|جراد|لي|بالتفصيل)/g,
+      /(?:احسبلي|احسب|جد|قيمة|كم|يساوي|نتيجة|درجة|راديان|غراد|جراد|لي|بالتفصيل|عدديا|تقريبا|تقريبي|تقريب)/g,
       "",
     )
     .trim();

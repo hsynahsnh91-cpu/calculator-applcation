@@ -1,0 +1,719 @@
+{
+  "corpus": {
+    "total": 92,
+    "completeExpected": 78,
+    "clarificationExpected": 14
+  },
+  "passed": 177,
+  "failed": 0,
+  "results": [
+    {
+      "name": "school M01: محدد2×2",
+      "pass": true
+    },
+    {
+      "name": "school M02: الأرقام العربية والفارسية",
+      "pass": true
+    },
+    {
+      "name": "school M03: اسم الأثر",
+      "pass": true
+    },
+    {
+      "name": "school M04: الأثر الكسري",
+      "pass": true
+    },
+    {
+      "name": "school M05: منقول مستطيل",
+      "pass": true
+    },
+    {
+      "name": "school M06: الجمع المستطيل",
+      "pass": true
+    },
+    {
+      "name": "school M07: الطرح المستطيل",
+      "pass": true
+    },
+    {
+      "name": "school M08: جداء سلمي ضمني",
+      "pass": true
+    },
+    {
+      "name": "school M09: معامل صفري",
+      "pass": true
+    },
+    {
+      "name": "school M10: جداء2×3ب3×2",
+      "pass": true
+    },
+    {
+      "name": "school M11: ترتيبBA",
+      "pass": true
+    },
+    {
+      "name": "school M12: عدم التبديل فعليا",
+      "pass": true
+    },
+    {
+      "name": "school M13: دحض مساواة خاطئة",
+      "pass": true
+    },
+    {
+      "name": "school M14: تبديل في مثال خاص",
+      "pass": true
+    },
+    {
+      "name": "school M15: الواحدية لها أنواع متعددة",
+      "pass": true
+    },
+    {
+      "name": "school M16: صفرية مستطيلة",
+      "pass": true
+    },
+    {
+      "name": "school M17: مثلثية عليا",
+      "pass": true
+    },
+    {
+      "name": "school M18: مثلثية سفلى",
+      "pass": true
+    },
+    {
+      "name": "school M19: قطرية",
+      "pass": true
+    },
+    {
+      "name": "school M20: متماثلة",
+      "pass": true
+    },
+    {
+      "name": "school M21: تمييز القياس عن الرتبة",
+      "pass": true
+    },
+    {
+      "name": "school M22: رتبة مستطيلة",
+      "pass": true
+    },
+    {
+      "name": "school M23: مبادلة غاوس",
+      "pass": true
+    },
+    {
+      "name": "school M24: مدرجة مختزلة شاذة",
+      "pass": true
+    },
+    {
+      "name": "school M25: ساروس",
+      "pass": true
+    },
+    {
+      "name": "school M26: نشر بحسب سطر",
+      "pass": true
+    },
+    {
+      "name": "school M27: نشر بحسب عمود",
+      "pass": true
+    },
+    {
+      "name": "school M28: معكوس كسري",
+      "pass": true
+    },
+    {
+      "name": "school M29: معكوس3×3",
+      "pass": true
+    },
+    {
+      "name": "school M30: عدم وجود معكوس",
+      "pass": true
+    },
+    {
+      "name": "school M31: ملحقة الشاذة موجودة",
+      "pass": true
+    },
+    {
+      "name": "school M32: غاوس بمجهولين",
+      "pass": true
+    },
+    {
+      "name": "school M33: كرامر بمجهولين",
+      "pass": true
+    },
+    {
+      "name": "school M34: غاوس بثلاثة مجاهيل",
+      "pass": true
+    },
+    {
+      "name": "school M35: كرامر بثلاثة مجاهيل",
+      "pass": true
+    },
+    {
+      "name": "school M36: حلول غير منتهية",
+      "pass": true
+    },
+    {
+      "name": "school M37: محدد معدوم وتناقض",
+      "pass": true
+    },
+    {
+      "name": "school M38: طرفان غير مرتبَين مسبقا",
+      "pass": true
+    },
+    {
+      "name": "school M39: متغيرات عربية",
+      "pass": true
+    },
+    {
+      "name": "school M40: عشري دقيق",
+      "pass": true
+    },
+    {
+      "name": "school M41: محدد جذري",
+      "pass": true
+    },
+    {
+      "name": "school M42: معكوس جذري",
+      "pass": true
+    },
+    {
+      "name": "school M43: مصفوفة بصيغة لاتكس",
+      "pass": true
+    },
+    {
+      "name": "school M44: منقول لاتكس مع سطر جديد",
+      "pass": true
+    },
+    {
+      "name": "school M45: فواصل منقوطة داخل أقواس",
+      "pass": true
+    },
+    {
+      "name": "school M46: أسطر بفراغات",
+      "pass": true
+    },
+    {
+      "name": "school M47: كثيرة حدود مصفوفية",
+      "pass": true
+    },
+    {
+      "name": "school M48: أس سالب واحد",
+      "pass": true
+    },
+    {
+      "name": "school M49: قوة صفرية",
+      "pass": true
+    },
+    {
+      "name": "school M50: تسمية نتيجة ونقلها للفقرة التالية",
+      "pass": true
+    },
+    {
+      "name": "school M51: ترقيم مدرسي",
+      "pass": true
+    },
+    {
+      "name": "school M52: رمز الأثر المدعوم بإجابة عربية",
+      "pass": true
+    },
+    {
+      "name": "school M53: عبارة عددية من المصفوفات",
+      "pass": true
+    },
+    {
+      "name": "school M54: محدد4×4",
+      "pass": true
+    },
+    {
+      "name": "school M55: رتبة6×2",
+      "pass": true
+    },
+    {
+      "name": "school M56: مصفوفة غير معرفة",
+      "pass": true
+    },
+    {
+      "name": "school M57: جمع بقياسين مختلفين",
+      "pass": true
+    },
+    {
+      "name": "school M58: جداء غير معرف",
+      "pass": true
+    },
+    {
+      "name": "school M59: أثر غير مربعة",
+      "pass": true
+    },
+    {
+      "name": "school M60: محدد غير مربعة",
+      "pass": true
+    },
+    {
+      "name": "school M61: ساروس لا تعمم",
+      "pass": true
+    },
+    {
+      "name": "school M62: جملة غير خطية",
+      "pass": true
+    },
+    {
+      "name": "school M63: معادلة ناقصة",
+      "pass": true
+    },
+    {
+      "name": "school M64: التعاريف ليست نتائج",
+      "pass": true
+    },
+    {
+      "name": "school M65: اسمان في طلب واحد",
+      "pass": true
+    },
+    {
+      "name": "school M66: أثر قبل المحدد",
+      "pass": true
+    },
+    {
+      "name": "school M67: منقول ومعكوس لمصفوفتين",
+      "pass": true
+    },
+    {
+      "name": "school M68: رمزا المحدد والأثر بمصفوفتين",
+      "pass": true
+    },
+    {
+      "name": "school M69: النشر حسب العمود الأخير",
+      "pass": true
+    },
+    {
+      "name": "school M70: النشر حسب السطر الأخير",
+      "pass": true
+    },
+    {
+      "name": "school M71: رفض العمود السابع",
+      "pass": true
+    },
+    {
+      "name": "school M72: لا تخمين للعمود الأوسط",
+      "pass": true
+    },
+    {
+      "name": "school M73: مصفوفة وحدة",
+      "pass": true
+    },
+    {
+      "name": "school M74: رفض وصف واحدية خاطئ",
+      "pass": true
+    },
+    {
+      "name": "school M75: المثلثية العلوية",
+      "pass": true
+    },
+    {
+      "name": "school M76: رفض العلوية لمثلثية سفلية",
+      "pass": true
+    },
+    {
+      "name": "school M77: جملة aligned وكسر في البداية",
+      "pass": true
+    },
+    {
+      "name": "school M78: جملة cases بمجاهيل عربية",
+      "pass": true
+    },
+    {
+      "name": "school M79: الحذف الغاوسي",
+      "pass": true
+    },
+    {
+      "name": "school M80: معامل k كسري صريح",
+      "pass": true
+    },
+    {
+      "name": "school M81: فعل اضرب وجذر حقيقي",
+      "pass": true
+    },
+    {
+      "name": "school M82: معامل k ناقص",
+      "pass": true
+    },
+    {
+      "name": "school M83: بداية cases غير مكتملة",
+      "pass": true
+    },
+    {
+      "name": "school M84: تعريفان مختلفان للمعامل k",
+      "pass": true
+    },
+    {
+      "name": "school M85: محددا مصفوفتين",
+      "pass": true
+    },
+    {
+      "name": "school M86: أثرا مصفوفتين",
+      "pass": true
+    },
+    {
+      "name": "school M87: منقولا مصفوفتين",
+      "pass": true
+    },
+    {
+      "name": "school M88: عبارتان حسابيتان مستقلتان",
+      "pass": true
+    },
+    {
+      "name": "school M89: مصفوفة بأسطر منقوطة",
+      "pass": true
+    },
+    {
+      "name": "school M90: رتبة ومحدد بالاسم نفسه",
+      "pass": true
+    },
+    {
+      "name": "school M91: ثلاث معادلات في مجهولين",
+      "pass": true
+    },
+    {
+      "name": "school M92: جملة بوسيطي التقاطع",
+      "pass": true
+    },
+    {
+      "name": "independent exact determinant/inverse/row reduction, order 1",
+      "pass": true
+    },
+    {
+      "name": "independent exact determinant/inverse/row reduction, order 2",
+      "pass": true
+    },
+    {
+      "name": "independent exact determinant/inverse/row reduction, order 3",
+      "pass": true
+    },
+    {
+      "name": "independent exact determinant/inverse/row reduction, order 4",
+      "pass": true
+    },
+    {
+      "name": "independent exact determinant/inverse/row reduction, order 5",
+      "pass": true
+    },
+    {
+      "name": "independent exact determinant/inverse/row reduction, order 6",
+      "pass": true
+    },
+    {
+      "name": "dependent exact rational rows, shape 2×1",
+      "pass": true
+    },
+    {
+      "name": "dependent exact rational rows, shape 3×2",
+      "pass": true
+    },
+    {
+      "name": "dependent exact rational rows, shape 4×3",
+      "pass": true
+    },
+    {
+      "name": "dependent exact rational rows, shape 5×4",
+      "pass": true
+    },
+    {
+      "name": "dependent exact rational rows, shape 6×5",
+      "pass": true
+    },
+    {
+      "name": "tiny nonzero determinant is not treated as singular by an epsilon",
+      "pass": true
+    },
+    {
+      "name": "inverse fractions and radicals stay exact through JSON round-trip",
+      "pass": true
+    },
+    {
+      "name": "named matrix result C is the actual operand in the next demand",
+      "pass": true
+    },
+    {
+      "name": "scalar quantities produced by matrices flow to scientific arithmetic",
+      "pass": true
+    },
+    {
+      "name": "single determinant ans flows to scientific engine, not an unrelated probability",
+      "pass": true
+    },
+    {
+      "name": "a nonscalar matrix answer never inherits the old determinant ans",
+      "pass": true
+    },
+    {
+      "name": "failed matrix demand invalidates scalar ans rather than consuming stale success",
+      "pass": true
+    },
+    {
+      "name": "school source labels, dependent failure and independent success survive",
+      "pass": true
+    },
+    {
+      "name": "false square and false identity claims are tested rather than assumed",
+      "pass": true
+    },
+    {
+      "name": "a concrete polynomial-matrix identity is actually evaluated, not copied as a given",
+      "pass": true
+    },
+    {
+      "name": "proof conclusions cannot define missing matrices",
+      "pass": true
+    },
+    {
+      "name": "arbitrary matrix proof and symbolic parameters ask for clarification",
+      "pass": true
+    },
+    {
+      "name": "Gauss records actual row swaps, coefficients and augmented matrices",
+      "pass": true
+    },
+    {
+      "name": "Cramer replaces each column and independently agrees with Gauss and substitution",
+      "pass": true
+    },
+    {
+      "name": "singular systems clear stale named numerical solutions",
+      "pass": true
+    },
+    {
+      "name": "geometry-to-matrix bridge retains exact fractions/radicals and both contexts",
+      "pass": true
+    },
+    {
+      "name": "matrix-to-geometry bridge supplies the real named vectors for later dot products",
+      "pass": true
+    },
+    {
+      "name": "statistics-to-matrix rectangular bridge is exact and transposable",
+      "pass": true
+    },
+    {
+      "name": "matrix-to-statistics bridge keeps duplicates and never invents frequencies",
+      "pass": true
+    },
+    {
+      "name": "radical statistics bridge asks rather than silently approximating",
+      "pass": true
+    },
+    {
+      "name": "eigenvalue approximation remains an available unverified supplemental tool",
+      "pass": true
+    },
+    {
+      "name": "unrelated probability and complex prompts are never swallowed by matrix follow-up",
+      "pass": true
+    },
+    {
+      "name": "safety: missing cell",
+      "pass": true
+    },
+    {
+      "name": "safety: ragged rows",
+      "pass": true
+    },
+    {
+      "name": "safety: bad bracket",
+      "pass": true
+    },
+    {
+      "name": "safety: duplicate name",
+      "pass": true
+    },
+    {
+      "name": "safety: nonfinite",
+      "pass": true
+    },
+    {
+      "name": "safety: oversized value",
+      "pass": true
+    },
+    {
+      "name": "safety: division by zero",
+      "pass": true
+    },
+    {
+      "name": "safety: unreviewed OCR",
+      "pass": true
+    },
+    {
+      "name": "safety: nonreal",
+      "pass": true
+    },
+    {
+      "name": "safety: unknown second",
+      "pass": true
+    },
+    {
+      "name": "safety: bad expansion index",
+      "pass": true
+    },
+    {
+      "name": "safety: fractional power",
+      "pass": true
+    },
+    {
+      "name": "safety: oversized power",
+      "pass": true
+    },
+    {
+      "name": "safety: matrix division",
+      "pass": true
+    },
+    {
+      "name": "safety: singular negative power",
+      "pass": true
+    },
+    {
+      "name": "safety: unsafe expression",
+      "pass": true
+    },
+    {
+      "name": "matrix storage guard rejects ragged, huge, malformed and prototype-shaped metadata",
+      "pass": true
+    },
+    {
+      "name": "school method honors the requested column instead of hardcoding the first row",
+      "pass": true
+    },
+    {
+      "name": "raw det/tr abbreviations do not replace the requested Arabic matrix names in final answers",
+      "pass": true
+    },
+    {
+      "name": "the expression parser is bounded and cannot run property access or arbitrary functions",
+      "pass": true
+    },
+    {
+      "name": "extractor normalizes a custom requested determinant method and retains the actual operand",
+      "pass": true
+    },
+    {
+      "name": "named matrices in the question use mathematical brackets, fractions and radicals",
+      "pass": true
+    },
+    {
+      "name": "matrix-form AX=B uses the actual RHS column instead of reducing A alone",
+      "pass": true
+    },
+    {
+      "name": "identities and explicitly zero coefficient columns retain the free unknown",
+      "pass": true
+    },
+    {
+      "name": "inline givens before a bridge verb are not mistaken for a setup-only declaration",
+      "pass": true
+    },
+    {
+      "name": "a derived coefficient matrix never overwrites the user's previous A",
+      "pass": true
+    },
+    {
+      "name": "CX=B uses and labels C without renaming it to a different existing A",
+      "pass": true
+    },
+    {
+      "name": "compound unary demands bind the actual operand and preserve the requested order",
+      "pass": true
+    },
+    {
+      "name": "a repeated operation on two named matrices is not deduplicated",
+      "pass": true
+    },
+    {
+      "name": "one numbered compound demand keeps its source label for both operands",
+      "pass": true
+    },
+    {
+      "name": "a failed determinant does not block a separate explicit trace joined by waw",
+      "pass": true
+    },
+    {
+      "name": "splitting matrix requests never cuts an arithmetic expression or a nested matrix",
+      "pass": true
+    },
+    {
+      "name": "the chosen last cofactor row/column is reflected in real steps",
+      "pass": true
+    },
+    {
+      "name": "an unsupported cofactor index asks rather than silently choosing row one",
+      "pass": true
+    },
+    {
+      "name": "unit and upper/lower adjective aliases verify the actual elements, including false claims",
+      "pass": true
+    },
+    {
+      "name": "LaTeX cases/aligned equations retain exact fractions and actual Cramer deltas",
+      "pass": true
+    },
+    {
+      "name": "Gaussian elimination wording cannot steal a Gaussian probability distribution",
+      "pass": true
+    },
+    {
+      "name": "an explicitly named k is exact, persisted and reusable without changing its matrix",
+      "pass": true
+    },
+    {
+      "name": "zero and radical k values multiply every element and never become a determinant alias",
+      "pass": true
+    },
+    {
+      "name": "a factor assertion is not harvested as a given and malformed factors do not run code",
+      "pass": true
+    },
+    {
+      "name": "a given exact factor survives the matrix/vector bridge and its return",
+      "pass": true
+    },
+    {
+      "name": "an unrelated coordinate tuple cannot overwrite a previous named matrix when saving k",
+      "pass": true
+    },
+    {
+      "name": "preserving the command اضرب does not break spoken multiplication",
+      "pass": true
+    },
+    {
+      "name": "complete LaTeX systems render as one mathematical block instead of two hidden fallback messages",
+      "pass": true
+    },
+    {
+      "name": "Gauss checks an extra contradictory equation instead of solving only a convenient pair",
+      "pass": true
+    },
+    {
+      "name": "two equations in three unknowns produce the entire verified affine family",
+      "pass": true
+    },
+    {
+      "name": "free parameters never collide with t and s as actual unknown names",
+      "pass": true
+    },
+    {
+      "name": "Cramer explicitly refuses a rectangular system rather than inventing a determinant",
+      "pass": true
+    },
+    {
+      "name": "rectangular CX=B uses the actual RHS, coefficient name and every row",
+      "pass": true
+    },
+    {
+      "name": "a specifically named augmented operand overrides an unrelated saved system",
+      "pass": true
+    },
+    {
+      "name": "school-system givens survive a formatted preamble and both requested methods",
+      "pass": true
+    },
+    {
+      "name": "rectangular-system storage remains bounded and saved t/s solutions stay usable in arithmetic",
+      "pass": true
+    }
+  ]
+}

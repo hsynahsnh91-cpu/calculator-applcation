@@ -1,5 +1,12 @@
+import type {
+  SchoolContext,
+  SchoolPart,
+  SchoolResultInfo,
+} from "./schoolTypes";
 import type { AngleMode, AppMode } from "../types";
 import type { ProbabilityContext } from "./probabilityTypes";
+import type { GeometryContext } from "./geometryTypes";
+import type { MatrixContext } from "./matrixTypes";
 
 export const ENGINE_LABELS = {
   mathEngine: "الحساب العلمي",
@@ -31,7 +38,10 @@ export interface SolverContext {
   assignments: Record<string, number>;
   solutions?: Record<string, number>;
   matrix?: number[][];
+  matrices?: MatrixContext;
   probability?: ProbabilityContext;
+  geometry?: GeometryContext;
+  school?: SchoolContext;
   complex?: {
     values: Record<string, string>;
     current?: string;
@@ -41,6 +51,8 @@ export interface SolverContext {
 }
 export const emptyContext = (): SolverContext => ({ assignments: {} });
 export interface ParsedPrompt {
+  parts?: SchoolPart[];
+  preamble?: string;
   original: string;
   text: string;
   requests: string[];
@@ -104,7 +116,33 @@ export interface HistogramVisual {
   color?: string;
   note?: string;
 }
+export interface SpaceVisual {
+  kind: "space";
+  title: string;
+  points: {
+    position: [number, number, number];
+    label: string;
+    latex?: string;
+  }[];
+  lines?: {
+    point: [number, number, number];
+    direction: [number, number, number];
+    label: string;
+  }[];
+  planes?: {
+    normal: [number, number, number];
+    offset: number;
+    label: string;
+  }[];
+  segments?: { from: number; to: number; arrow?: boolean; dashed?: boolean }[];
+  sphere?: { center: [number, number, number]; radius: number };
+  solid?: {
+    id: import("../utils/geometryTools").SolidId;
+    dimensions: Record<string, number>;
+  };
+}
 export type Visual =
+  | SpaceVisual
   | CurveVisual
   | HistogramVisual
   | TableVisual
@@ -112,6 +150,7 @@ export type Visual =
   | TreeVisual
   | FormulaCardsVisual;
 export interface SolverResult {
+  school?: SchoolResultInfo;
   id: string;
   engine: EngineId;
   engines: EngineId[];
@@ -126,6 +165,7 @@ export interface SolverResult {
   note?: string;
 }
 export interface UnsolvedPart {
+  school?: SchoolResultInfo;
   request: string;
   engine?: EngineId;
   message: string;

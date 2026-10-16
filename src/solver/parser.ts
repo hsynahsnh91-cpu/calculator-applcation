@@ -1,3 +1,5 @@
+import { preserveSpaceOperators } from "./spaceNotation";
+import { readSchoolDocument } from "./schoolDocument";
 import {
   normalizeMathTypography,
   stripPromptMarkdown,
@@ -111,6 +113,9 @@ function readGroup(text: string, start: number): [string, number] | null {
 /** A balanced, deterministic LaTeX decoder, not a language model. */
 export function decodeLatex(source: string): string {
   let out = "";
+  const implicitFactor = () =>
+    /[A-Za-z0-9_)\]}]$/.test(out) &&
+    !/\\begin\{(?:[pbvV]?matrix|cases|aligned)\}\s*$/.test(out);
   const text = source
     .replace(/\^\{\\circ\}|\^\\circ(?![a-zA-Z])|\\degree(?![a-zA-Z])/g, "°")
     .replace(/\\(?:left|right|displaystyle|limits)\b/g, "")
@@ -133,6 +138,11 @@ export function decodeLatex(source: string): string {
       }
     }
     let first = readGroup(text, next);
+    if (!first && /frac/.test(command[1])) {
+      let at = next;
+      while (/\s/.test(text[at] || "") && at < text.length) at++;
+      if (/[A-Za-z0-9]/.test(text[at] || "")) first = [text[at], at + 1];
+    }
     if (!first && command[1] === "sqrt") {
       let atom = next;
       while (atom < text.length && /\s/.test(text[atom])) atom++;
@@ -143,19 +153,24 @@ export function decodeLatex(source: string): string {
       continue;
     }
     if (/frac/.test(command[1])) {
-      const second = readGroup(text, first[1]);
+      let second = readGroup(text, first[1]);
+      if (!second) {
+        let at = first[1];
+        while (/\s/.test(text[at] || "") && at < text.length) at++;
+        if (/[A-Za-z0-9]/.test(text[at] || "")) second = [text[at], at + 1];
+      }
       if (!second) {
         out += text[index++];
         continue;
       }
-      out += `${/[A-Za-z0-9_)\]}]$/.test(out) ? "*" : ""}((${decodeLatex(first[0])})/(${decodeLatex(second[0])}))`;
+      out += `${implicitFactor() ? "*" : ""}((${decodeLatex(first[0])})/(${decodeLatex(second[0])}))`;
       index = second[1];
     } else {
       out +=
         command[1] === "sqrt"
           ? rootIndex === "2"
-            ? `${/[A-Za-z0-9_)\]}]$/.test(out) ? "*" : ""}sqrt(${decodeLatex(first[0])})`
-            : `${/[A-Za-z0-9_)\]}]$/.test(out) ? "*" : ""}((${decodeLatex(first[0])})^(1/(${rootIndex})))`
+            ? `${implicitFactor() ? "*" : ""}sqrt(${decodeLatex(first[0])})`
+            : `${implicitFactor() ? "*" : ""}((${decodeLatex(first[0])})^(1/(${rootIndex})))`
           : decodeLatex(first[0]);
       index = first[1];
     }
@@ -192,6 +207,7 @@ export function decodeLatex(source: string): string {
     .replace(/\bz\s+([A-Z])(?=\s*=)/g, "z_$1");
 }
 export function normalizePrompt(source: string): string {
+  source = preserveSpaceOperators(source);
   let text = decodeLatex(
     stripPromptMarkdown(normalizeMathTypography(normalizeArabic(source))),
   );
@@ -240,7 +256,7 @@ export function normalizePrompt(source: string): string {
     .replace(/([xyz0-9)])\s*اس\s*(-?\d+)/g, "$1^$2")
     .replace(/زائد/g, "+")
     .replace(/ناقص/g, "-")
-    .replace(/بضرب|ضرب/g, "*")
+    .replace(/(^|[^\p{L}\p{N}_])(?:بضرب|ضرب)(?=$|[^\p{L}\p{N}_])/gu, "$1*")
     .replace(/(?:تقسيم|مقسوم علي)/g, "/")
     .replace(/(?:سالب)\s*(?=\d)/g, "-")
     .replace(/(?:موجب)\s*(?=\d)/g, "+")
@@ -252,22 +268,57 @@ export function normalizePrompt(source: string): string {
     .replace(/نهايتها|نهاياتها|نهايات/g, "نهاية")
     .replace(/بتؤول|بيؤول|يؤول|تقترب|يقترب/g, "تؤول")
     .replace(/مستوى|مستو(?:ٍ|ي)?\b/g, "مستوي")
-    .replace(/مركبة|مركب|عقدية|عقدي/g, "عقدي")
+    .replace(/(^|[^\p{L}\p{N}_])(?:عقدية|عقدي)(?=$|[^\p{L}\p{N}_])/gu, "$1عقدي")
+    .replace(/عدد مركب|العدد المركب/g, (word) => word.replace("مركب", "عقدي"))
     .replace(/سحبنا|سحبناها|انسحبت/g, "سحبت")
     .replace(/سوا|بنفس الوقت/g, "معا")
     .replace(
       /(^|[^\u0600-\u06ff])(?:بدي|عايز|اريد)(?=$|[^\u0600-\u06ff])/g,
       "$1جد",
     );
+  text = text
+    .replace(/احدا(?=\s+(?:الصندوقين|الصناديق))/g, "احد")
+    .replace(
+      /\bP_\{?([A-Z](?:[1-8])?)\}?\s*\(\s*([A-Z](?:[1-8])?)\s*\)/g,
+      "P($2|$1)",
+    )
+    .replace(
+      /\bP\(\s*([A-Z](?:[1-8])?)\s*\/\s*([A-Z](?:[1-8])?)\s*\)/g,
+      "P($1|$2)",
+    )
+    .replace(/(?:القانون الاحتمالي|التوزيع الاحتمالي)/g, "قانون الاحتمال")
+    .replace(/(?:التوقع الرياضي|الامل الرياضي)/g, "الامل الرياضي")
+    .replace(/تابعا اصليا|تابع اصلي|دالة اصلية/g, "تابع اصلي")
+    .replace(/\.\s*$/g, "");
   return normalizeMathDialect(text).trim();
 }
 export function parsePrompt(
   source: string,
   previous: SolverContext = emptyContext(),
+  plain = false,
 ): ParsedPrompt {
+  const document = plain ? undefined : readSchoolDocument(source);
+  if (document) {
+    const base = parsePrompt(document.preamble || "", previous, true);
+    const legacy = parsePrompt(source, previous, true);
+    const parts = document.parts.map((p) => ({
+      ...p,
+      text: normalizePrompt(p.text),
+    }));
+    return {
+      original: source,
+      text: parts.map((p) => p.text).join("\n"),
+      requests: legacy.requests,
+      context: base.context,
+      preamble: normalizePrompt(document.preamble),
+      parts,
+    };
+  }
   let raw = stripPromptMarkdown(
     normalizeMathTypography(normalizeArabic(source)),
   );
+  if (/(?:[DLd][1-6]?\s*:|بارامتري|بارامتر|وسيطي)/.test(raw))
+    raw = raw.replace(/[؛;](?=\s*[xyz]\s*=)/g, "،");
   if (/جملة|نظام/.test(raw))
     raw = raw.replace(/[؛;](?=\s*(?:[-+(\d]|[xyz])[^؛;\n]*=)/g, "،");
   const context: SolverContext = {
@@ -282,6 +333,11 @@ export function parsePrompt(
   const requests: string[] = [];
   let pendingDefinitions = "";
   let pendingComplex = "";
+  let pendingSpace = "";
+  const spaceDefinition = (part: string) =>
+    !hasMathInstruction(part) &&
+    (/\b[A-Zuvwn]\s*(?:=|:)?\s*\([^()]*,[^()]*,[^()]*\)/.test(part) ||
+      /\b[DLdPQR][1-6]?\s*:/.test(part));
   const complexDefinition = (part: string) =>
     /\bz(?:_[A-Z]|[1-9])?\s*=/.test(part) && !hasMathInstruction(part);
   const probabilityDefinition = (part: string) =>
@@ -293,6 +349,20 @@ export function parsePrompt(
       /[0-9]|كرتان|كرتين/.test(part) &&
       /كيس|صندوق|سحب|السحب/.test(part));
   for (let part of fragments) {
+    if (spaceDefinition(part)) {
+      pendingSpace += (pendingSpace ? "\n" : "") + part;
+      continue;
+    }
+    if (pendingSpace) {
+      if (
+        /شعاع|اشعة|متجه|نقط|مستوي|مستقيم|بعد|مسافة|مركز|ارتباط|استقلال|تعامد|سلمي|كرة|استقامة|استواء|متلاق|تلاقي|مستوية|حجم|تقاطع|مصفوف|احداثيات/.test(
+          part,
+        )
+      )
+        part = pendingSpace + "\n" + part;
+      else requests.push(pendingSpace);
+      pendingSpace = "";
+    }
     if (complexDefinition(part)) {
       pendingComplex += (pendingComplex ? "\n" : "") + part;
       continue;
@@ -324,6 +394,7 @@ export function parsePrompt(
   }
   if (pendingDefinitions) requests.push(pendingDefinitions);
   if (pendingComplex) requests.push(pendingComplex);
+  if (pendingSpace) requests.push(pendingSpace);
   const text = requests.join("\n");
   const initial = requests[0] ?? text;
   const definition = initial.match(
@@ -337,7 +408,12 @@ export function parsePrompt(
   for (const assignment of initial.matchAll(
     /\b([a-dkmpqrt])\s*=\s*(-?\d+(?:\.\d+)?)(?=\s|[,،;؛]|$)/g,
   ))
-    context.assignments[assignment[1]] = Number(assignment[2]);
+    if (
+      !(
+        assignment[1] === "t" && /جملة|نظام|غاوس|جاوس|كرامر|كريمر/.test(initial)
+      )
+    )
+      context.assignments[assignment[1]] = Number(assignment[2]);
   return {
     original: source,
     text,

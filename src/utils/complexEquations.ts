@@ -126,7 +126,18 @@ export function solveComplexEquation(
     maxError: Number.isFinite(maxError) ? maxError : undefined,
     method: "تعويض كل جذر في المعادلة الأصلية بحساب عقدي عددي مستقل",
   };
-  out.contextPatch = { complex: { values: {}, ambiguous: values.length > 1 } };
+  out.contextPatch = {
+    complex: {
+      values:
+        variable === "z"
+          ? Object.fromEntries(
+              values.map((v, i) => [`z${i + 1}`, v.expression]),
+            )
+          : {},
+      ambiguous: values.length > 1,
+      current: values.length === 1 ? values[0].expression : undefined,
+    },
+  };
   out.visuals = [
     {
       kind: "complex",

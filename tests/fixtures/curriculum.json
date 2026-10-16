@@ -1,0 +1,810 @@
+[
+  {
+    "id": "C01",
+    "chapter": "complex",
+    "prompt": "المسألة الأولى (10 درجات)\nنتأمل العدد z=1+i√3.\nالمطلوب:\n1. اكتب z بالشكل الأسي.",
+    "expect": {
+      "contains": [
+        "\\pi"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "C02",
+    "chapter": "complex",
+    "prompt": "3. احسب قيمة المقدار مستخدمًا الشكل الأسي: S=(z_{1})^{12}+(z_{2})^{12}",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "C03",
+    "chapter": "complex",
+    "prompt": "المسألة الثانية\nلتكن z_{1}=1+i\\sqrt{3} وz_{2}=1-i\\sqrt{3}.\nالمطلوب:\n3. احسب مستخدمًا الشكل الأسي: S=(z_{1})^{12}+(z_{2})^{12}",
+    "expect": {
+      "scalar": "8192",
+      "results": 1,
+      "exponential": true,
+      "label": "3."
+    }
+  },
+  {
+    "id": "C04",
+    "chapter": "complex",
+    "prompt": "في مجموعة الأعداد العقدية:\nالمطلوب:\n1) حل المعادلة z^2-2z+4=0.\n2) استنتج مستخدمًا الشكل الأسي S=z1^12+z2^12.",
+    "expect": {
+      "scalar": "8192",
+      "results": 2,
+      "exponential": true
+    }
+  },
+  {
+    "id": "C05",
+    "chapter": "complex",
+    "prompt": "z1=1+i، z2=1-i، احسب S=z1^4+z2^4 باستخدام الشكل الأسي",
+    "expect": {
+      "scalar": "-8",
+      "results": 1,
+      "exponential": true
+    }
+  },
+  {
+    "id": "C06",
+    "chapter": "complex",
+    "prompt": "z1=2e^(i*pi/6)، z2=3e^(-i*pi/6)، احسب S=z1*z2 مستخدما الشكل الأسي",
+    "expect": {
+      "scalar": "6",
+      "results": 1,
+      "exponential": true
+    }
+  },
+  {
+    "id": "C07",
+    "chapter": "complex",
+    "prompt": "z1=2+i، z2=2-i، احسب S=z1*z2",
+    "expect": {
+      "scalar": "5",
+      "results": 1
+    }
+  },
+  {
+    "id": "C08",
+    "chapter": "complex",
+    "prompt": "ليكن z=3+2i، أوجد مرافق العدد z.",
+    "expect": {
+      "contains": [
+        "3",
+        "2"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "C09",
+    "chapter": "complex",
+    "prompt": "حل في C المعادلة z^2-2z+4=0.",
+    "expect": {
+      "contains": [
+        "sqrt",
+        "1"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "C10",
+    "chapter": "complex",
+    "prompt": "اكتب العدد z=0 بالشكل الأسي وفسر شأن عمدته.",
+    "expect": {
+      "contains": [
+        "0"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "C11",
+    "chapter": "complex",
+    "prompt": "في المستوي العقدي، z_A=1+2i وz_B=4+6i، احسب طول القطعة AB.",
+    "expect": {
+      "scalar": "5",
+      "results": 1
+    }
+  },
+  {
+    "id": "C12",
+    "chapter": "complex",
+    "prompt": "z_A=0، z_B=1، z_C=i، احسب الزاوية BAC في المستوي العقدي.",
+    "expect": {
+      "contains": [
+        "pi"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "C13",
+    "chapter": "complex",
+    "prompt": "عين صورة z=1+i بدوران حول المبدأ بزاوية pi/2 راديان.",
+    "expect": {
+      "contains": [
+        "-1",
+        "i"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "C14",
+    "chapter": "complex",
+    "prompt": "عين مجموعة النقط M في المستوي العقدي التي تحقق |z-1|=2.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "P01",
+    "chapter": "probability",
+    "prompt": "يحتوي صندوقان على كرات متماثلة لا نفرق بينها باللمس.\n• الصندوق الأول U1: يحتوي على 3 كرات حمراء و2 كرات بيضاء.\n• الصندوق الثاني U2: يحتوي على 2 كرات حمراء و4 كرات بيضاء.\nنختار عشوائيًا أحد الصندوقين (احتمال اختيار كل صندوق هو \\frac{1}{2})، ثم نسحب منه كرة واحدة.\nالمطلوب:\n1. احسب احتمال أن تكون الكرة المسحوبة حمراء.\n2. إذا علمت أن الكرة المسحوبة حمراء، فما احتمال أن تكون قد سحبت من الصندوق الأول U1؟\n3. نعيد الكرة المسحوبة إلى صندوقها. نقوم الآن بتجربة جديدة: نسحب من الصندوق الأول U1 كرتين معًا. ليكن X المتغير العشوائي الذي يدل على عدد الكرات البيضاء المسحوبة.\n• أوجد قيم المتغير العشوائي X.\n• اكتب القانون الاحتمالي للمتغير العشوائي X، ثم احسب توقعه الرياضي E(X).",
+    "expect": {
+      "results": 5,
+      "scalar": "4/5",
+      "scalars": {
+        "0": "7/15",
+        "1": "9/14"
+      },
+      "reset": true
+    }
+  },
+  {
+    "id": "P02",
+    "chapter": "probability",
+    "prompt": "U1: يحتوي على 1 كرة حمراء و1 كرة بيضاء.\nU2: يحتوي على 3 كرات حمراء و1 كرة بيضاء.\nاحتمال اختيار U1=2/3 واحتمال اختيار U2=1/3.\nالمطلوب:\n1. احسب احتمال سحب كرة حمراء بعد اختيار الصندوق.",
+    "expect": {
+      "scalar": "7/12",
+      "results": 1
+    }
+  },
+  {
+    "id": "P03",
+    "chapter": "probability",
+    "prompt": "U1: يحتوي على 2 حمراء و3 بيضاء. U2: يحتوي على 4 حمراء و1 بيضاء. نختار أحد الصندوقين ونسحب كرة. احسب احتمال الحمراء.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "P04",
+    "chapter": "probability",
+    "prompt": "يضم كيس 2 كرات حمراء و3 بيضاء متماثلة باللمس. نسحب عشوائيا كرة واحدة. احسب احتمال الحمراء.",
+    "expect": {
+      "scalar": "2/5",
+      "results": 1
+    }
+  },
+  {
+    "id": "P05",
+    "chapter": "probability",
+    "prompt": "كيس فيه 3 حمراء و2 بيضاء، نسحب كرتين معًا، احسب احتمال سحب كرة بيضاء واحدة بالضبط.",
+    "expect": {
+      "scalar": "3/5",
+      "results": 1
+    }
+  },
+  {
+    "id": "P06",
+    "chapter": "probability",
+    "prompt": "كيس فيه 3 حمراء و2 بيضاء. نسحب كرتين على التوالي دون إعادة. احسب احتمال أن تكون الثانية حمراء إذا علمت أن الأولى بيضاء.",
+    "expect": {
+      "scalar": "3/4",
+      "results": 1
+    }
+  },
+  {
+    "id": "P07",
+    "chapter": "probability",
+    "prompt": "كيس فيه 3 حمراء و2 بيضاء. نسحب كرتين على التوالي مع الإعادة. احسب احتمال الثانية حمراء بشرط الأولى بيضاء.",
+    "expect": {
+      "scalar": "3/5",
+      "results": 1
+    }
+  },
+  {
+    "id": "P08",
+    "chapter": "probability",
+    "prompt": "كيس فيه 3 حمراء و2 بيضاء، نسحب كرتين معًا. X عدد الكرات البيضاء. أوجد القانون الاحتمالي ثم احسب التوقع الرياضي E(X).",
+    "expect": {
+      "scalar": "4/5",
+      "results": 2
+    }
+  },
+  {
+    "id": "P09",
+    "chapter": "probability",
+    "prompt": "P(A)=\\frac12، P(B)=\\frac13، P(A\\cap B)=\\frac16، احسب P_B(A).",
+    "expect": {
+      "scalar": "1/2",
+      "results": 1
+    }
+  },
+  {
+    "id": "P10",
+    "chapter": "probability",
+    "prompt": "P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، احسب P(A/B).",
+    "expect": {
+      "scalar": "1/2",
+      "results": 1
+    }
+  },
+  {
+    "id": "P11",
+    "chapter": "probability",
+    "prompt": "P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، احسب P(A|B).",
+    "expect": {
+      "scalar": "1/2",
+      "results": 1
+    }
+  },
+  {
+    "id": "P12",
+    "chapter": "probability",
+    "prompt": "P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، بين أن الحدثين مستقلان.",
+    "expect": {
+      "contains": [
+        "مستقلان"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "P13",
+    "chapter": "probability",
+    "prompt": "الفضاء العيني متساوي الاحتمال وعدد عناصره n(Ω)=12 وn(A)=5. جد P(A).",
+    "expect": {
+      "scalar": "5/12",
+      "results": 1
+    }
+  },
+  {
+    "id": "P14",
+    "chapter": "probability",
+    "prompt": "متحول عشوائي يتبع القانون الثنائي B(4,1/2)، احسب P(X=2).",
+    "expect": {
+      "scalar": "3/8",
+      "results": 1
+    }
+  },
+  {
+    "id": "P15",
+    "chapter": "probability",
+    "prompt": "X=[0,1,2]، p=[1/4,1/4,1/4]، اكتب القانون الاحتمالي.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "P16",
+    "chapter": "probability",
+    "prompt": "المتحول X=[-1,0,1]، p=[1/4,1/2,1/4].\nالمطلوب:\nأ) احسب التوقع الرياضي E(X).\nب) احسب التباين V(X).",
+    "expect": {
+      "scalar": "1/2",
+      "results": 2
+    }
+  },
+  {
+    "id": "P17",
+    "chapter": "probability",
+    "prompt": "الاحتمال الكلي q=[1/3,2/3]، p=[1/2,1/4]، احسب احتمال الملاحظة.",
+    "expect": {
+      "scalar": "1/3",
+      "results": 1
+    }
+  },
+  {
+    "id": "P18",
+    "chapter": "probability",
+    "prompt": "نسحب كرتين من كيس فيه 3 حمراء و2 بيضاء. احسب احتمال اختلاف اللون.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "S01",
+    "chapter": "sequences",
+    "prompt": "نعرّف المتتالية (u_n) بالحد u_0=1 والعلاقة u_{n+1}=2u_n+3. المطلوب: أوجد عبارتها الصريحة.",
+    "expect": {
+      "contains": [
+        "4",
+        "2",
+        "-3"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "S02",
+    "chapter": "sequences",
+    "prompt": "لتكن u_0=1 وu_{n+1}=2u_n+3. نضع v_n=u_n+3. بيّن أن v_n هندسية وأوجد أساسها.",
+    "expect": {
+      "contains": [
+        "v",
+        "2"
+      ],
+      "results": 1,
+      "proof": true
+    }
+  },
+  {
+    "id": "S03",
+    "chapter": "sequences",
+    "prompt": "لتكن u_0=1 وu_{n+1}=2u_n+3. أثبت بالتدريج أن u_n=4*2^n-3 لكل n طبيعي.",
+    "expect": {
+      "results": 1,
+      "proof": true,
+      "induction": true
+    }
+  },
+  {
+    "id": "S04",
+    "chapter": "sequences",
+    "prompt": "متتالية حسابية حدها u_0=2 وأساسها r=3، احسب مجموع حدودها من الرتبة 0 إلى الرتبة 4.",
+    "expect": {
+      "scalar": "40",
+      "results": 1
+    }
+  },
+  {
+    "id": "S05",
+    "chapter": "sequences",
+    "prompt": "متتالية هندسية حدها الأول u_1=3 وأساسها q=2، احسب مجموع أول 4 حدود.",
+    "expect": {
+      "scalar": "45",
+      "results": 1
+    }
+  },
+  {
+    "id": "S06",
+    "chapter": "sequences",
+    "prompt": "u_0=4 وu_{n+1}=u_n+2، جد عبارة u_n.",
+    "expect": {
+      "contains": [
+        "2",
+        "n",
+        "4"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "S07",
+    "chapter": "sequences",
+    "prompt": "u_0=0 وu_{n+1}=1/2*u_n+1، حدد نهاية المتتالية.",
+    "expect": {
+      "contains": [
+        "2"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "S08",
+    "chapter": "sequences",
+    "prompt": "u_{n+1}=2u_n+3، جد العبارة الصريحة للمتتالية.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "S09",
+    "chapter": "sequences",
+    "prompt": "u_0=1 وu_{n+1}=u_n^2+1، أثبت بالتدريج أنها محدودة.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "S10",
+    "chapter": "sequences",
+    "prompt": "ادرس تجاور متتاليتين عامتين u_n وv_n دون إعطاء عبارتيهما.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "F01",
+    "chapter": "functions",
+    "prompt": "السؤال الثالث (20 درجة)\nليكن f التابع المعرف على R بالعلاقة f(x)=x^3-3x+1.\nالمطلوب:\nI) احسب مشتقه ونظم جدول تغيراته.\nII) بين أن المعادلة f(x)=0 تقبل حلا وحيدا في المجال (0,1).",
+    "expect": {
+      "results": 2,
+      "unique": true
+    }
+  },
+  {
+    "id": "F02",
+    "chapter": "functions",
+    "prompt": "ليكن f(x)=x^3-3x+1. اكتب معادلة المماس عند x=1.",
+    "expect": {
+      "contains": [
+        "-1"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "F03",
+    "chapter": "functions",
+    "prompt": "احسب نهاية (x^2-1)/(x-1) عندما x تؤول إلى 1.",
+    "expect": {
+      "contains": [
+        "2"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "F04",
+    "chapter": "functions",
+    "prompt": "احسب نهاية ln(x) عندما x تؤول إلى 0 من اليمين.",
+    "expect": {
+      "contains": [
+        "infty"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "F05",
+    "chapter": "functions",
+    "prompt": "ليكن f(x)=sqrt(x-2). جد النهايات عند أطراف مجال التعريف.",
+    "expect": {
+      "contains": [
+        "0",
+        "infty"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "F06",
+    "chapter": "functions",
+    "prompt": "f(x)=x^3-3x+1، أثبت وجود حل وحيد للمعادلة f(x)=0 في الفترة (0,1).",
+    "expect": {
+      "results": 1,
+      "unique": true
+    }
+  },
+  {
+    "id": "F07",
+    "chapter": "functions",
+    "prompt": "ادرس استمرار تابع معرف على أجزاء دون إعطاء تعريفه على الأجزاء.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "F08",
+    "chapter": "functions",
+    "prompt": "f(x)=exp(x)/x، ادرس التابع دراسة كاملة مع الاستمرار والمقاربات والحصر والرسم.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "F09",
+    "chapter": "functions",
+    "prompt": "f(x)=e^x، احسب المشتق عند x=0.",
+    "expect": {
+      "contains": [
+        "e"
+      ],
+      "results": 1,
+      "scalar": "1"
+    }
+  },
+  {
+    "id": "F10",
+    "chapter": "functions",
+    "prompt": "نظم جدول تغيرات الدالة دون إعطاء عبارتها.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "I01",
+    "chapter": "integration",
+    "prompt": "احسب بالتجزئة التكامل \\int_{0}^{1} x e^{x} dx.",
+    "expect": {
+      "scalar": "1",
+      "results": 1
+    }
+  },
+  {
+    "id": "I02",
+    "chapter": "integration",
+    "prompt": "أوجد تابعًا أصليًا للدالة sin(x).",
+    "expect": {
+      "contains": [
+        "cos"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "I03",
+    "chapter": "integration",
+    "prompt": "احسب بالتبديل تكامل 2x/(1+x^2) من 0 إلى 1.",
+    "expect": {
+      "scalar": "log(2)",
+      "results": 1
+    }
+  },
+  {
+    "id": "I04",
+    "chapter": "integration",
+    "prompt": "احسب تكامل x^2 من 0 إلى 3.",
+    "expect": {
+      "scalar": "9",
+      "results": 1
+    }
+  },
+  {
+    "id": "I05",
+    "chapter": "integration",
+    "prompt": "f(x)=x، g(x)=x^2، احسب مساحة الحيز بين المنحنيين في الفترة [0,1].",
+    "expect": {
+      "scalar": "1/6",
+      "results": 1
+    }
+  },
+  {
+    "id": "I06",
+    "chapter": "integration",
+    "prompt": "f(x)=x، احسب الحجم الدوراني حول محور الفواصل للحيز تحت المنحنى في الفترة [0,1].",
+    "expect": {
+      "scalar": "pi/3",
+      "results": 1
+    }
+  },
+  {
+    "id": "I07",
+    "chapter": "integration",
+    "prompt": "f(x)=x^2، احسب القيمة الوسطى للتابع في الفترة [0,3].",
+    "expect": {
+      "scalar": "3",
+      "results": 1
+    }
+  },
+  {
+    "id": "I08",
+    "chapter": "integration",
+    "prompt": "احسب تكامل 1/x من -1 إلى 1.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "G01",
+    "chapter": "geometry",
+    "prompt": "في معلم متعامد متجانس، احسب بعد A(1,2,3) عن المستوي P: 2x-y+2z-5=0.",
+    "expect": {
+      "scalar": "1/3",
+      "results": 1
+    }
+  },
+  {
+    "id": "G02",
+    "chapter": "geometry",
+    "prompt": "A(1,2,3)، B(4,6,3)، عين إحداثيات الشعاع AB وطويلته.",
+    "expect": {
+      "scalar": "5",
+      "results": 1
+    }
+  },
+  {
+    "id": "G03",
+    "chapter": "geometry",
+    "prompt": "A(0,0,0)، B(1,0,0)، C(0,1,0)، D(1,1,0)، برهن أن النقاط الأربع مستوية.",
+    "expect": {
+      "results": 1,
+      "proof": true
+    }
+  },
+  {
+    "id": "G04",
+    "chapter": "geometry",
+    "prompt": "حدد الوضع النسبي للمستويين P: x+y+z=1، Q: x-y=0.",
+    "expect": {
+      "contains": [
+        "cap"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "G05",
+    "chapter": "geometry",
+    "prompt": "اكتب معادلة الكرة مركزها K(1,2,3) ونصف قطرها r=2.",
+    "expect": {
+      "contains": [
+        "=4"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "G06",
+    "chapter": "geometry",
+    "prompt": "K(0,0,1)، P: z=0، كرة مركزها K ونصف قطرها r=1، أثبت أن المستوي P مماس للكرة.",
+    "expect": {
+      "contains": [
+        "مماس"
+      ],
+      "results": 1,
+      "proof": true
+    }
+  },
+  {
+    "id": "G07",
+    "chapter": "geometry",
+    "prompt": "A(0,0,0)، B(3,0,0)، C(0,3,0)، جد مركز الثقل وفسر تلاقي المتوسطات.",
+    "expect": {
+      "contains": [
+        "1"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "G08",
+    "chapter": "geometry",
+    "prompt": "جد بعد النقطة Z عن المستوي P: x+y+z=0 دون تعريف Z.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "A01",
+    "chapter": "algebra",
+    "prompt": "حل في R المعادلة 2x^2-5x+3=0.",
+    "expect": {
+      "contains": [
+        "3",
+        "2"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "A02",
+    "chapter": "algebra",
+    "prompt": "حل في R المعادلة x^2+1=0.",
+    "expect": {
+      "contains": [
+        "varnothing"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "A03",
+    "chapter": "algebra",
+    "prompt": "حل المعادلة x^3-6x^2+11x-6=0.",
+    "expect": {
+      "contains": [
+        "1",
+        "2",
+        "3"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "A04",
+    "chapter": "algebra",
+    "prompt": "احسب sin(30°)+sqrt(2).",
+    "expect": {
+      "scalar": "1/2+sqrt(2)",
+      "results": 1
+    }
+  },
+  {
+    "id": "A05",
+    "chapter": "algebra",
+    "prompt": "حل المتراجحة |x-1|<2 في R.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "A06",
+    "chapter": "algebra",
+    "prompt": "حل المعادلة x^5-x+1=0 جبريا في R.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "M01",
+    "chapter": "matrices",
+    "prompt": "احسب محدد المصفوفة [[2,1],[1,2]].",
+    "expect": {
+      "contains": [
+        "3"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "M02",
+    "chapter": "matrices",
+    "prompt": "احسب مقلوب المصفوفة [[1,0],[0,2]].",
+    "expect": {
+      "contains": [
+        "frac"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "M03",
+    "chapter": "matrices",
+    "prompt": "حل الجملة x+y=3، x-y=1.",
+    "expect": {
+      "contains": [
+        "2",
+        "1"
+      ],
+      "results": 1
+    }
+  },
+  {
+    "id": "U01",
+    "chapter": "unsupported",
+    "prompt": "حل المعادلة التفاضلية y'=2y مع الشرط y(0)=1.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "U02",
+    "chapter": "unsupported",
+    "prompt": "اكتب برهانا عاما لمبرهنة القيم المتوسطة دون تحديد تابع أو مجال.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "U03",
+    "chapter": "unsupported",
+    "prompt": "برهن أن كل عدد أولي فردي دون أي فرض آخر.",
+    "expect": {
+      "clarify": true
+    }
+  },
+  {
+    "id": "L01",
+    "chapter": "layout",
+    "prompt": "المسألة الأولى\n(10 درجات)\nلتكن f(x)=x^2+1.\nوالمطلوب:\n١) احسب مشتق التابع.\n٢) احسب تكامله من ۰ إلى ۱.",
+    "expect": {
+      "results": 2
+    }
+  },
+  {
+    "id": "L02",
+    "chapter": "layout",
+    "prompt": "في معلم متجانس (O; \\vec{u},\\vec{v})، z_A=1+i√3 وz_C=1-i√3. المطلوب: 1) اكتب z_A بالشكل الأسي ثم استنتج الشكل الأسي لـ z_C.",
+    "expect": {
+      "results": 2
+    }
+  },
+  {
+    "id": "L03",
+    "chapter": "layout",
+    "prompt": "ليكن f(x)=x^2.\nالمطلوب:\n1. احسب مشتقه.\n2. احسب التكامل من الحد المجهول إلى 1.\n3. احسب sin(30°).",
+    "expect": {
+      "results": 2,
+      "partial": true
+    }
+  }
+]

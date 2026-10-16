@@ -1,0 +1,506 @@
+
+> react-vite-tailwind@0.0.0 test
+> node tests/run.mjs
+
+PASS scientific sin DEG
+PASS scientific sin RAD
+PASS scientific sin GRAD
+PASS undefined tan 90
+PASS fraction evaluation
+PASS exact surd recognition
+PASS scientific constants
+PASS nested expression insertion/deletion
+PASS linear
+PASS quadratic real
+PASS quadratic complex
+PASS cubic rational roots
+PASS cubic Cardano
+PASS system 2x2
+PASS system 3x3
+PASS arithmetic sequence
+PASS geometric sequence
+PASS recurrence sequence
+PASS derivative+tangent
+limit-result 1
+PASS limit sin(x)/x
+limit-result 2
+PASS limit (x^2-1)/(x-1)
+limit-result \frac{1}{2}
+PASS limit (1-cos(x))/x^2
+limit-result 2
+PASS limit (2*x^2+1)/(x^2-3)
+PASS two-sided limit does not exist
+PASS calculus definite integral
+PASS integral x^2+3*x
+PASS integral sin(x)
+PASS integral 2*x*cos(x^2)
+PASS integral x*exp(x)
+PASS integral exp(-x^2)
+PASS integral sin(x)/x
+PASS integral sin(x^2)
+PASS definite integral exact
+PASS matrix inverse and Gauss
+PASS singular matrix
+PASS complex number 3+4i
+PASS algebraic complex square root
+PASS combinatorics
+binomial {"n":10,"p":0.5,"q":0.5,"mean":5,"variance":2.5,"stdDev":1.5811388300841898,"pk":{"k":5,"pVal":0.2460937500000009,"latex":"P(X = 5) = \\binom{10}{5} (0.5)^{5} (0.5)^{5} = 0.246094"},"table":[{"k":0,"pmf":0.0009765625,"cdf":0.0009765625},{"k":1,"pmf":0.00976562500000001,"cdf":0.01074218750000001},{"k
+PASS binomial distribution
+normal {"mu":0,"sigma":1,"singleX":{"x":0,"z":0,"pLess":0.5,"pGreater":0.5,"latex":"Z = \\frac{0 - 0}{1} = 0 \\implies P(X \\le 0) = \\Phi(0) = 0.5"},"interval":{"a":-1,"b":1,"zA":-1,"zB":1,"pBetween":0.682689,"latex":"P(-1 \\le X \\le 1) = \\Phi(1) - \\Phi(-1) = 0.682689"},"curvePoints":[{"x":-4,"density"
+PASS normal distribution
+PASS descriptive statistics
+urn simultaneous {"totalBalls":5,"drawCount":2,"drawMode":"simultaneous","omegaCount":10,"omegaFormulaLatex":"\\opera
+rv {"colorName":"أبيض","values":[{"k":0,"pTex":"\\dfrac{1}{10}","pVal":0.1},{"k":1,"pTex":"\\dfrac{3}{5}","pVal":0.6},{"k":2,"pTex":"\\dfrac{3}{10}","pVal":0.3}],"tableTex":"\\begin{array}{|c|ccc|}\\hlin
+PASS urn simultaneous
+urn successive_without_rep {"totalBalls":5,"drawCount":2,"drawMode":"successive_without_rep","omegaCount":20,"omegaFormulaLatex
+rv {"colorName":"أبيض","values":[{"k":0,"pTex":"\\dfrac{1}{10}","pVal":0.1},{"k":1,"pTex":"\\dfrac{3}{5}","pVal":0.6},{"k":2,"pTex":"\\dfrac{3}{10}","pVal":0.3}],"tableTex":"\\begin{array}{|c|ccc|}\\hlin
+PASS urn successive_without_rep
+urn successive_with_rep {"totalBalls":5,"drawCount":2,"drawMode":"successive_with_rep","omegaCount":25,"omegaFormulaLatex":"
+rv {"colorName":"أبيض","values":[{"k":0,"pTex":"\\dfrac{4}{25}","pVal":0.16},{"k":1,"pTex":"\\dfrac{12}{25}","pVal":0.48},{"k":2,"pTex":"\\dfrac{9}{25}","pVal":0.36}],"tableTex":"\\begin{array}{|c|ccc|}\
+PASS urn successive_with_rep
+PASS geometry dot+cross
+PASS flat minimum x^4
+PASS nonstationary inflection x^3+x
+PASS critical points outside the old scan range
+PASS derivative rule explanations for product and quotient
+PASS variable exponent derivative rule
+PASS variation table 5
+PASS variation table x
+PASS variation table x^2
+PASS variation table x^3
+PASS variation table x^4
+PASS variation table 1/x
+PASS variation table sqrt(x)
+PASS unary minus in famous limits
+PASS LHopital validates its form
+PASS incompatible singular system 2x2
+PASS compatible singular system 3x3
+PASS incompatible singular system 3x3
+PASS alternating divergent recurrence is unbounded on both sides
+PASS zero geometric sequence avoids 0 times Infinity
+PASS invalid sequence ranks are rejected
+PASS complex inverse sign and principal angle
+PASS complex power zero and first root
+PASS invalid complex inputs and excessive roots rejected
+PASS replacement random variable can exceed the colour stock
+PASS urn input counts are copied
+PASS urn enumeration resource cap
+PASS large combinations remain exact while representable
+PASS binomial boundary distributions
+PASS invalid probability parameters
+PASS normal curve for tiny sigma keeps distinct x coordinates
+PASS singleton statistics and constant histograms
+PASS integral domain rejects 1/x
+PASS integral domain rejects 1/(x-0.1)
+PASS integral domain rejects 1/x^2
+PASS integral domain rejects sqrt(x)
+PASS integral domain rejects tan(x)
+PASS convergent improper integral 1/sqrt(x)
+PASS convergent improper integral log(x)
+PASS removable sinc singularity integrates correctly
+PASS parenthesized rational denominator stays intact
+PASS reversed definite bounds
+PASS non-x integration variable
+PASS history cap and ordering
+PASS history favorite and delete
+PASS history export/import
+PASS history import must cap at 150
+PASS settings default merge
+{
+  "passes": 92,
+  "failures": [],
+  "latexErrors": []
+}
+PASS acceptance 1: sole input → calculusEngine
+PASS acceptance 2: sole input → equationSolver
+PASS acceptance 3: sole input → integrationEngine
+PASS acceptance 4: sole input → limitsEngine
+PASS acceptance 5: sole input → matricesEngine
+PASS acceptance 6: sole input → complexTools
+PASS acceptance 7: sole input → probabilityEngine
+PASS acceptance 8: sole input → sequences
+PASS acceptance 9: sole input → geometryEngine
+PASS acceptance 10: sole input → mathEngine
+PASS the ten different questions do not inherit unrelated engines
+PASS Arabic and Persian numerals
+PASS Syrian spoken variables, powers, and numbers
+PASS spoken scientific arithmetic
+PASS balanced nested LaTeX normalization
+PASS formatted definite integral, limit notation, and degree exponent
+PASS MathLive exponent islands stay valid solver input
+PASS letter-enumerated compound, shared definition, and propagated derivative
+PASS numeric enumeration and partial failures preserve successful parts
+PASS inline enumerated requests
+PASS parallel calculus and integral use the same function
+PASS follow-up curve, primitive, and explanation share context
+PASS assignments are shared and applied in sequential order
+PASS assigned polynomial coefficient reaches the equation engine
+PASS matrix follow-up reuses its elements
+PASS missing urn draw mode asks then resolves from the chosen clarification
+PASS unclear input asks rather than inventing
+PASS an incorrect derivative does not receive verification
+PASS polynomial poles and redundant outer parentheses preserve correct limits
+PASS explicit degrees override RAD; GRAD is respected otherwise
+PASS solids use the extracted pure geometry helper
+PASS binomial, statistics, and combinatorics are accessible through chat
+PASS complex polar conversion uses the complex engine
+PASS all four RichText delimiter styles are typeset
+PASS plain user-question exponents, radicals, and matrices render as math
+PASS malformed persistence, external image URLs, and nested display trees are rejected
+PASS linear systems in two and three variables use the original solvers
+PASS nonlinear systems ask for clarification rather than being linearized
+PASS normal distribution is reachable and does not claim independent verification
+PASS logarithmic and oscillating limits do not turn finite probes into fake answers
+PASS verified system results propagate without binding a new function variable
+PASS compound LaTeX integrals keep their own bounds
+PASS domain endpoints exclude the non-real half-line
+PASS symbolic confirmation replaces tiny finite probe estimates
+PASS complex powers, roots, conjugate, and inverse are reachable without sections
+PASS probability parameters never truncate invalid decimals or out-of-domain values
+
+Chat solver: 46 passed, 0 failed
+PASS Arabic normalization preserves the name De Moivre, not the spoken بدي prefix
+PASS all three forms have a principal argument and independent reconstruction
+PASS all quadrants, axes, irrational and rational coordinates preserve their signs
+PASS zero has no argument, no division by its norm, and no imaginary invented angle
+PASS Euler exponential is decomposed into exact real and imaginary pairs
+PASS Euler handles a nonunit coefficient and explicit degrees even under RAD
+PASS Euler formula, prerequisites and reverse trigonometric identities are accessible
+PASS Euler rejects a negative magnitude, nonreal angle and missing angle
+PASS algebraic to exponential conversion is not mistaken for an equation
+PASS large powers never expand n+1 or round before exact angle reduction
+PASS trillion-scale exponents use exact integer arithmetic for rational-pi phases
+PASS symbolic overflow remains an exact answer without a fabricated numeric badge
+PASS small powers which exceed the coordinate budget fall back to polar form
+PASS negative, zero, and zero-base powers respect domain restrictions
+PASS missing bases, fractional powers and oversized exponents ask for clarification
+PASS De Moivre expands multiple angles with correctly grouped powers of cosine
+PASS Euler lowers odd and even sine/cosine powers with correct signs
+PASS mathematical LaTeX powers and x rather than theta are also typeset
+PASS unsupported or mixed trigonometric orders do not produce invented identities
+PASS all four complex arithmetic operations are exact and individually checked
+PASS natural Arabic multiplication and explicit operand order work
+PASS division by zero is clarified; other requested operations survive
+PASS conjugate, inverse and direct conj syntax are correct
+PASS point and vector representations link to M(x,y) with arrowed geometry
+PASS distance is the norm of the difference, for affixes or ordinary 2D coordinates
+PASS named segment order is explicit and incomplete geometry asks for data
+PASS ratio arguments use the requested point names, signs and nonzero guards
+PASS three-point angles use the correct vertex, not the origin
+PASS translation is z+b and its displacement is drawn as a vector, not a center
+PASS homothety handles negative and zero real ratios around a nonzero center
+PASS rotation handles degree/radian/grad units independently of the setting
+PASS rotation does not mistake the angle fragment for the point
+PASS an explicit origin overrides an old transformation center
+PASS missing transformation data never invent a point, center, angle or coefficient
+PASS general transformation laws are rendered without fabricated numeric verification
+PASS nth roots use independent repeated squaring, including nontrivial orders
+PASS zero roots, invalid ranks and ambiguous root follow-ups are safe
+PASS negative real discriminant is impossible in R, not silently solved in C
+PASS the real-domain instruction overrides z; C instruction overrides x
+PASS complex quadratics accept genuinely complex coefficients and discriminants
+PASS complex linear, double-root, identity, contradiction and real cubic separation
+PASS complex follow-ups operate on the latest result and reuse explicitly named points
+PASS compound complex requests share context and preserve partial successes
+PASS unrelated old points do not contaminate a new two-point question
+PASS geometry follow-ups use the latest active pair, not unrelated cached points
+PASS a single-number plotting follow-up does not draw an old point group
+PASS pair arithmetic matches independently evaluated expressions over a varied grid
+PASS nonfinite independent values and overflowing norms never get false badges
+PASS unsupported unary operators and recursive aliases do not fabricate arithmetic
+PASS formula cards, circle metadata, edge indices and context are persistence-guarded
+PASS complex follow-up questions render Greek symbols and functions, not raw theta syntax
+PASS copied answers contain valid single-backslash display delimiters
+
+Complex regression: 52 passed, 0 failed
+PASS decimal lexemes and large integer fractions never lose precision through Number
+PASS rational parser rejects code, missing values, division by zero and runaway powers
+PASS sample-space count: simultaneous
+PASS sample-space count: successive_without_rep
+PASS sample-space count: successive_with_rep
+PASS different-colour probability and independent path check: simultaneous
+PASS different-colour probability and independent path check: successive_without_rep
+PASS different-colour probability and independent path check: successive_with_rep
+PASS urn comparator tails are distinct exact events, never renamed success probabilities
+PASS target colour changes work symmetrically
+PASS zero-probability colour counts are absent from the actual support
+PASS simple events avoid exhaustive colour composition enumeration
+PASS same, at least two colours and pairwise distinct are not confused for three balls
+PASS a varied urn grid matches sequential DP for every target and comparator
+PASS invalid urn populations and impossible draw models fail closed
+PASS bounded ball randomization preserves physical counts and never mutates the model
+PASS the original urn chat regression still yields 15/28 with sample space first
+PASS drawing-mode follow-ups replace the mode without concatenating old conditions
+PASS urn board serialized questions route through the same exact engine
+PASS a custom colour and replacement mode are not tied to red/white hardcoding
+PASS sample-space-only counting works without inventing an event
+PASS all colour compositions for two colours and 32 replacement draws stay bounded
+PASS ambiguous multi-colour wording asks rather than choosing an unintended event
+PASS Urn random-variable laws expose complete support and moments
+PASS large legacy urn limits no longer constrain a simple direct colour event
+PASS basic event algebra: الاتحاد
+PASS basic event algebra: التقاطع
+PASS basic event algebra: P(A|B)
+PASS basic event algebra: متمم A
+PASS event definitions separated by semicolons bind to their query
+PASS classical complements include impossible and certain events
+PASS mutually exclusive events use a zero intersection but are not automatically independent
+PASS explicit independent-event assumption is honored, not silently inferred
+PASS an independence question is not mistaken for an independence assumption
+PASS zero-probability conditioning is undefined, not zero
+PASS inconsistent event probabilities fail Fréchet bounds and relation checks
+PASS conditional data derive a joint probability and support the reverse conditional
+PASS union data can derive the intersection without assuming independence
+PASS event follow-ups preserve named events and clear stale numeric results
+PASS LaTeX event notation and fractions normalize correctly
+PASS total-probability tree weights are normalized and path probabilities multiply
+PASS Bayes computes posterior weights and reuses a validated mixture
+PASS different boxes require explicit weights or an explicit equal-selection assumption
+PASS unnormalized or negative tree weights and impossible Bayes observations fail closed
+PASS a complete discrete law exposes E, E2, variance and sigma together
+PASS law moment follow-up: احسب E(X)
+PASS law moment follow-up: احسب E(X^2)
+PASS law moment follow-up: احسب V(X)
+PASS law moment follow-up: احسب الانحراف المعياري
+PASS explicit zero-probability support values are removed, not retained as actual outcomes
+PASS incomplete, negative, duplicated and nonnormalizable laws are rejected
+PASS affine transforms aggregate equal output values and update all moments
+PASS nonlinear transforms and missing new law probabilities do not reuse an unrelated old law
+PASS a generating polynomial bridges a validated law to the calculus engine
+PASS generating-polynomial bridge refuses unsupported support instead of pretending
+PASS random-variable independence checks every joint cell against both marginals
+PASS dependent random variables and structural zeros are not declared independent
+PASS invalid joint dimensions and total mass are rejected
+PASS frequency tables use weighted exact statistics and a real histogram
+PASS sample and population variance are distinguished; N=1 never yields fake sample variance
+PASS large frequencies do not allocate repeated observations
+PASS constant and negative data have nonnegative complete histogram bins
+PASS fractional, negative and mismatched frequencies fail closed
+PASS histogram requests are not misrouted to matrix row reduction
+PASS frequency tables bridge to matrices and survive subsequent matrix operations
+PASS a single probability result can be reused in scientific arithmetic
+PASS binomial tail = is explicit and independently verified
+PASS binomial tail >= is explicit and independently verified
+PASS binomial tail < is explicit and independently verified
+PASS binomial tail > is explicit and independently verified
+PASS binomial tail <= is explicit and independently verified
+PASS binomial p endpoints and zero trials have actual deterministic support
+PASS large binomial tails are not accumulated from rounded six-decimal rows
+PASS binomial generating polynomial is reusable by calculus
+PASS invalid distribution parameters never truncate decimals or round p to an endpoint
+PASS normal curves remain density curves, not frequency histograms
+PASS normal point probabilities are zero, not cumulative probabilities
+PASS normal intervals and parameter follow-ups preserve the correct parameters
+PASS counting and theoretical explanations are honest about verification
+PASS ordered colour draws compute the joint event rather than a colour-count event
+PASS urn conditional events restrict the correct sample space
+PASS the reverse urn conditional uses the observed second colour
+PASS with replacement, conditioning on the first colour leaves the next marginal unchanged
+PASS conditioning on a zero-count colour and assigning order to simultaneous draws fail closed
+PASS one specified draw has its marginal probability, not exactly one colour in the whole sample
+PASS a requested three-colour composition is not reduced to only its first colour
+PASS complete compositions work for ordered replacement samples and colour aliases
+PASS incomplete multiple-colour requests ask instead of silently ignoring a colour
+PASS Arabic punctuation after population colours never deletes the final colour
+PASS multi-word custom colours survive the board question bridge
+PASS classical counts use favorable over total only for equiprobable cases
+PASS classical counts cover impossible, certain and complementary events
+PASS a named urn event complement follows the exact event, not a pasted old question
+PASS negative independence or disjointness statements are not positive assumptions
+PASS complements and symmetric intersections cannot contain contradictory values
+PASS equivalent duplicate fractions and arithmetic probability parameters remain valid
+PASS Bayes with no requested branch asks rather than silently picking H1
+PASS exact frequency-table fractions retain their lexemes across persistence
+PASS scientific reuse retains the exact probability fraction
+PASS underflow cannot turn a positive exact variance into a verified zero deviation
+PASS underflowed binomial tails are approximate and do not gain a fake verification badge
+PASS normal moment follow-ups never reuse an old discrete law
+PASS unrepresentable saved law or generating-polynomial size fails safely
+PASS probability context validation rejects corrupt saved models and nonfinite visual bins
+PASS unrelated engines are not inherited after probability and statistics turns
+PASS a mixture updates the B binding rather than reusing a different old event B
+PASS ordered conditional urn events expose coherent target and condition bindings
+PASS statistics preserve positive tiny deviation without saving underflowed variance as zero
+
+Probability regression: 108 passed, 0 failed
+PASS the exact Syrian textbook question solves both named demands without clarification
+PASS the school method explains modulus and quadrant before writing the exponential
+PASS deduction uses conjugacy only after comparing both given real and imaginary parts
+PASS a nonconjugate target is solved without inventing a conjugate relation
+PASS a semicolon in the reference frame is not a separate unanswered question
+PASS Arabic frame separators and whitespace in LaTeX subscripts remain valid
+PASS separately numbered demands share the same given data without solving the preamble
+PASS plain text and Unicode OCR-style roots do not concatenate into an unsupported isqrt function
+PASS adjacent LaTeX fractions and standard unbraced single-token roots keep multiplication
+PASS Greek pi and escaped trig functions stay separate from an adjacent imaginary unit
+PASS safe mathematical typography includes italic letters, actual subscripts and copied bidi marks
+PASS a requested name wins over the first given point or a stale current number
+PASS the exponential form is distinct from the algebraic and trigonometric forms
+PASS multiple explicitly named form targets are all solved and no implicit current target is chosen
+PASS missing named data still asks rather than reusing the first point or a stale number
+PASS an unsupported root or undefined coefficient still fails closed
+PASS the real number zero has no fabricated principal angle in an exponential demand
+PASS a coordinate frame does not make an ordinary three-dimensional geometry question complex
+PASS equivalent dialect demand: بدي اكتب z_A بالشكل الأسي
+PASS equivalent dialect demand: بدي حوللي z_A للصيغة الأسية
+PASS equivalent dialect demand: اكتبلي z_A بالصيغة الأسية
+PASS equivalent dialect demand: عايز z_A بالصورة الأسية
+PASS equivalent dialect demand: عاوز اكتب z_A في الشكل الأسي
+PASS equivalent dialect demand: عاوزة اكتب z_A بالشكل الأسي
+PASS equivalent dialect demand: أبغى z_A بالشكل الأسي
+PASS equivalent dialect demand: ابي اكتب z_A بالصيغة الأسية
+PASS equivalent dialect demand: أبغا حول لي z_A للشكل الأسي
+PASS equivalent dialect demand: بغيت نكتب z_A بالصيغة الأسية
+PASS equivalent dialect demand: بغيت نحول z_A للشكل الأسي
+PASS equivalent dialect demand: نحب نحسب z_A بالشكل الأسي
+PASS spoken Syrian number words and a root retain the same complex value
+PASS dialect aliases also work for scientific arithmetic and calculus
+PASS whole-word dialect cleanup preserves mathematical names and distinct given labels
+PASS the reviewed OCR preview renders subscripts and radicals but never evaluates the text
+PASS Markdown cleanup and the LaTeX decoder preserve nested fractions without raw markup operators
+PASS a stale invalid derivation hint never invalidates a correctly specified target
+PASS pi coefficients keep TeX control words separate from i and the exponential base
+
+Textbook regression: 37 passed, 0 failed
+PASS exact real-field arithmetic preserves decimals, radicals, division and sign
+PASS polynomial analysis proves linearity and sphere shape instead of sampling two points
+PASS the directed vector and point distance update with actual point coordinates
+PASS radical coordinates, exact fractional distances and Arabic digits are not rounded away
+PASS spatial basis vectors are not mistaken for the imaginary unit
+PASS opposite, subtraction order and scalar multiplication retain vector meaning
+PASS norm and cross product have their own valid results
+PASS two-vector dependence is exact: 1,2,3/2,4,6
+PASS two-vector dependence is exact: 1,0,0/0,1,0
+PASS two-vector dependence is exact: 0,0,0/1,2,3
+PASS two-vector dependence is exact: 1,1,0/1,1.000000000000000000001,0
+PASS three-vector dependence agrees with exact elimination: 1,1,0
+PASS three-vector dependence agrees with exact elimination: 0,0,1
+PASS three-vector dependence agrees with exact elimination: 0,0,0
+PASS linear dependence of AB/AC/AD bridges to coplanarity and the determinant matrix
+PASS three-point collinearity and repeated-point degeneracy are distinguished
+PASS coplanar and noncoplanar quadruples produce correct geometric verdicts
+PASS barycenter of 2 points checks the defining balance and grouping
+PASS barycenter of 3 points checks the defining balance and grouping
+PASS barycenter of 4 points checks the defining balance and grouping
+PASS negative weights are supported while zero total and missing weights clarify
+PASS triangle centroid concurrency is proved and collinear medians are not a unique intersection
+PASS the analytic dot product, zero vector and orthogonality have correct conditions
+PASS geometric dot respects explicit angle unit: 60 درجة
+PASS geometric dot respects explicit angle unit: pi/3 راديان
+PASS geometric dot respects explicit angle unit: 200/3 غراد
+PASS geometric dot respects explicit angle unit: 90 درجة
+PASS geometric dot respects explicit angle unit: 120 درجة
+PASS near-right exact angles never get snapped to an exact zero
+PASS a plane from three points and its normal remain reusable after persistence
+PASS a plane can pass four coplanar points even if the first three are collinear
+PASS point-normal planes and perpendicular bisectors use the actual midpoint
+PASS a line uses one shared parameter and does not silently accept a zero direction
+PASS Cartesian component and LaTeX cases line declarations accept the same single parameter
+PASS relative planes include constants: x-y=0
+PASS relative planes include constants: 2x+2y+2z=2
+PASS relative planes include constants: 2x+2y+2z=4
+PASS line-plane classification: x+y+z=3
+PASS line-plane classification: x-y=0
+PASS line-plane classification: x-y=1
+PASS line relation منطبقان
+PASS line relation متوازيان
+PASS line relation متقاطعان
+PASS line relation متخالفان
+PASS orthogonal directions on skew lines are not falsely called intersecting perpendicular lines
+PASS point-plane distance and orthogonal projection reproduce the original acceptance result
+PASS point-line distance checks a perpendicular foot instead of a planar-only formula
+PASS a named face defines the actual altitude plane of a tetrahedron
+PASS sphere center/radius, diameter, and expanded equation are consistent
+PASS radical radius and zero-radius degeneracy stay exact
+PASS volume ties the mixed product to the point-plane altitude
+PASS solid inputs produce changed results, not the previous example answer
+PASS geometry scalars bridge to scientific arithmetic without using an older probability
+PASS matrix and line-system bridges retain the source geometry model
+PASS separate textbook givens and numbered spatial demands share structured context
+PASS missing named targets, contradictory definitions and incomplete dimensions clarify
+PASS out-of-range values and corrupt saved context/visuals fail safely
+PASS new output names and reconstructed geometry do not reuse an old plane or line
+PASS projection feet and sphere centers never overwrite differently located source points
+PASS vector result aliases do not replace an input named w
+PASS a radius with an unrelated point is not enough to assume a sphere center
+PASS a plane parallel to a named source plane passes the new point without replacing the source
+PASS generated follow-up choices remain executable for distance, vectors, intersections and barycenters
+PASS a general pyramid volume can reuse a previously computed altitude without assuming a square base
+PASS a numerically unresolved tiny radius around a distant center does not gain a fake badge
+PASS a large exact barycenter is preserved while its out-of-range drawing is withheld
+PASS the actual board preview accepts normalized Arabic on reopening real geometry answers
+PASS named Greek planes retain their actual mathematical labels in formulas and the diagram
+PASS form solid, example 1: actual fields -> solver -> valid result
+PASS form solid, example 2: actual fields -> solver -> valid result
+PASS form pyramid-volume, example 1: actual fields -> solver -> valid result
+PASS form pyramid-volume, example 2: actual fields -> solver -> valid result
+PASS form tetrahedron, example 1: actual fields -> solver -> valid result
+PASS form tetrahedron, example 2: actual fields -> solver -> valid result
+PASS form parallelepiped, example 1: actual fields -> solver -> valid result
+PASS form parallelepiped, example 2: actual fields -> solver -> valid result
+PASS form vector, example 1: actual fields -> solver -> valid result
+PASS form vector, example 2: actual fields -> solver -> valid result
+PASS form opposite, example 1: actual fields -> solver -> valid result
+PASS form opposite, example 2: actual fields -> solver -> valid result
+PASS form add, example 1: actual fields -> solver -> valid result
+PASS form add, example 2: actual fields -> solver -> valid result
+PASS form subtract, example 1: actual fields -> solver -> valid result
+PASS form subtract, example 2: actual fields -> solver -> valid result
+PASS form scale, example 1: actual fields -> solver -> valid result
+PASS form scale, example 2: actual fields -> solver -> valid result
+PASS form norm, example 1: actual fields -> solver -> valid result
+PASS form norm, example 2: actual fields -> solver -> valid result
+PASS form cross, example 1: actual fields -> solver -> valid result
+PASS form cross, example 2: actual fields -> solver -> valid result
+PASS form dot, example 1: actual fields -> solver -> valid result
+PASS form dot, example 2: actual fields -> solver -> valid result
+PASS form geometric-dot, example 1: actual fields -> solver -> valid result
+PASS form geometric-dot, example 2: actual fields -> solver -> valid result
+PASS form dependence2, example 1: actual fields -> solver -> valid result
+PASS form dependence2, example 2: actual fields -> solver -> valid result
+PASS form dependence3, example 1: actual fields -> solver -> valid result
+PASS form dependence3, example 2: actual fields -> solver -> valid result
+PASS form matrix, example 1: actual fields -> solver -> valid result
+PASS form matrix, example 2: actual fields -> solver -> valid result
+PASS form distance, example 1: actual fields -> solver -> valid result
+PASS form distance, example 2: actual fields -> solver -> valid result
+PASS form collinear, example 1: actual fields -> solver -> valid result
+PASS form collinear, example 2: actual fields -> solver -> valid result
+PASS form coplanar, example 1: actual fields -> solver -> valid result
+PASS form coplanar, example 2: actual fields -> solver -> valid result
+PASS form barycenter, example 1: actual fields -> solver -> valid result
+PASS form barycenter, example 2: actual fields -> solver -> valid result
+PASS form normal, example 1: actual fields -> solver -> valid result
+PASS form normal, example 2: actual fields -> solver -> valid result
+PASS form plane-three, example 1: actual fields -> solver -> valid result
+PASS form plane-three, example 2: actual fields -> solver -> valid result
+PASS form plane-normal, example 1: actual fields -> solver -> valid result
+PASS form plane-normal, example 2: actual fields -> solver -> valid result
+PASS form bisector, example 1: actual fields -> solver -> valid result
+PASS form bisector, example 2: actual fields -> solver -> valid result
+PASS form planes, example 1: actual fields -> solver -> valid result
+PASS form planes, example 2: actual fields -> solver -> valid result
+PASS form distance-plane, example 1: actual fields -> solver -> valid result
+PASS form distance-plane, example 2: actual fields -> solver -> valid result
+PASS form line-existing, example 1: actual fields -> solver -> valid result
+PASS form line-existing, example 2: actual fields -> solver -> valid result
+PASS form line-points, example 1: actual fields -> solver -> valid result
+PASS form line-points, example 2: actual fields -> solver -> valid result
+PASS form line-direction, example 1: actual fields -> solver -> valid result
+PASS form line-direction, example 2: actual fields -> solver -> valid result
+PASS form line-plane, example 1: actual fields -> solver -> valid result
+PASS form line-plane, example 2: actual fields -> solver -> valid result
+PASS form lines, example 1: actual fields -> solver -> valid result
+PASS form lines, example 2: actual fields -> solver -> valid result
+PASS form distance-line, example 1: actual fields -> solver -> valid result
+PASS form distance-line, example 2: actual fields -> solver -> valid result
+PASS form line-system, example 1: actual fields -> solver -> valid result
+PASS form line-system, example 2: actual fields -> solver -> valid result
+PASS form sphere-center, example 1: actual fields -> solver -> valid result
+PASS form sphere-center, example 2: actual fields -> solver -> valid result
+PASS form sphere-diameter, example 1: actual fields -> solver -> valid result
+PASS form sphere-diameter, example 2: actual fields -> solver -> valid result
+PASS form sphere-equation, example 1: actual fields -> solver -> valid result
+PASS form sphere-equation, example 2: actual fields -> solver -> valid result
+
+Geometry regression: 140 passed, 0 failed

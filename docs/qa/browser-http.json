@@ -230,6 +230,118 @@
       "pass": true
     },
     {
+      "name": "spatial workbench is an on-demand conversation tool with six responsive categories",
+      "pass": true
+    },
+    {
+      "name": "spatial tabs, fields and sticky actions fit 320/360/390px screens with working focus",
+      "pass": true
+    },
+    {
+      "name": "editing a point field changes the actual Worker answer rather than a cached example",
+      "pass": true
+    },
+    {
+      "name": "loading and solving two examples yields two distinct results",
+      "pass": true
+    },
+    {
+      "name": "spatial insertion creates an editable draft and never solves before sending",
+      "pass": true
+    },
+    {
+      "name": "spatial controls reveal their fields immediately on selection",
+      "pass": true
+    },
+    {
+      "name": "invalid directions and zero barycentric weight sums block submission without fabricated results",
+      "pass": true
+    },
+    {
+      "name": "barycenter fields support four points and reopening preserves operands rather than generated G",
+      "pass": true
+    },
+    {
+      "name": "sphere radius fields and the projected surface use the current exact data",
+      "pass": true
+    },
+    {
+      "name": "the spatial diagram rotates and resets without changing the mathematical result",
+      "pass": true
+    },
+    {
+      "name": "line-plane controls distinguish containment and parallel nonintersection",
+      "pass": true
+    },
+    {
+      "name": "a specific older geometry answer reopens its own data, not the newest example",
+      "pass": true
+    },
+    {
+      "name": "spatial vector-to-matrix follow-up runs the matrix engine and can return to the named vectors",
+      "pass": true
+    },
+    {
+      "name": "a geometric distance is reused exactly in the scientific calculator",
+      "pass": true
+    },
+    {
+      "name": "spatial solids change with fields and do not save history without an explicit action",
+      "pass": true
+    },
+    {
+      "name": "line relations, plane intersections and altitude-volume answers remain narrow-screen math",
+      "pass": true
+    },
+    {
+      "name": "geometry context and 3D diagrams survive reload with the original exact coordinates",
+      "pass": true
+    },
+    {
+      "name": "the formula bank exposes spatial barycentric and projection conditions",
+      "pass": true
+    },
+    {
+      "name": "school exponential aggregate calculates the requested S rather than returning two forms",
+      "pass": true
+    },
+    {
+      "name": "quadratic roots flow by their actual z1/z2 names into the next school demand",
+      "pass": true
+    },
+    {
+      "name": "the full two-box school problem separates the new white-count experiment",
+      "pass": true
+    },
+    {
+      "name": "long school cards retain labels and fit phone widths without raw math errors",
+      "pass": true
+    },
+    {
+      "name": "school source labels, box stock and exact law survive a browser reload",
+      "pass": true
+    },
+    {
+      "name": "missing quantities yield only one visible clarification while other parts are listed pending",
+      "pass": true
+    },
+    {
+      "name": "exact numerical answers remain primary and decimal display opens only on request",
+      "pass": true
+    },
+    {
+      "name": "affine induction displays base hypothesis and transfer and refuses a false claim",
+      "pass": true
+    },
+    {
+      "name": "school uniqueness and derived integrals use actual proofs and calculus models",
+      "pass": true
+    },
+    {
+      "name": "the in-app capability guide states limits and inserts examples without auto-solving",
+      "pass": true
+    },
+    {
       "name": "the exact Syrian textbook question solves both demands with named exponentials and conjugate deduction",
       "pass": true
     },
@@ -283,6 +395,158 @@
     },
     {
       "name": "speech policy: server-only",
+      "pass": true
+    },
+    {
+      "name": "matrix board is collapsed on demand with five categories and no automatic solving",
+      "pass": true
+    },
+    {
+      "name": "matrix cards, six-column fields, keyboard tabs and Gauss title fit 320/360/390px phones",
+      "pass": true
+    },
+    {
+      "name": "editing B uses B's real determinant and Arabic label in the Worker answer",
+      "pass": true
+    },
+    {
+      "name": "reopening an older matrix answer restores its own B instead of the latest A",
+      "pass": true
+    },
+    {
+      "name": "trace has its own Arabic operation and never falls back to a determinant",
+      "pass": true
+    },
+    {
+      "name": "rectangular product examples change the actual ordered matrix result",
+      "pass": true
+    },
+    {
+      "name": "algebra controls preserve fractions and multiply every matrix element",
+      "pass": true
+    },
+    {
+      "name": "undefined dimensions stop the matrix action instead of returning a padded or stale answer",
+      "pass": true
+    },
+    {
+      "name": "Sarrus and a chosen cofactor column have different real calculation steps",
+      "pass": true
+    },
+    {
+      "name": "Gauss system fields alter the actual solution and expose verified line operations on a phone",
+      "pass": true
+    },
+    {
+      "name": "Cramer three-variable controls compute Delta_x, Delta_y and Delta_z",
+      "pass": true
+    },
+    {
+      "name": "matrix definitions and mathematical preview open only their designated details",
+      "pass": true
+    },
+    {
+      "name": "matrix rows bridge into the geometry engine without losing names or fractions",
+      "pass": true
+    },
+    {
+      "name": "matrix elements bridge to statistics as real data, with duplicates and no assumed weights",
+      "pass": true
+    },
+    {
+      "name": "numbered matrix exam-style input preserves B's trace, AB order and the following determinant",
+      "pass": true
+    },
+    {
+      "name": "fraction/radical inputs have typeset matrices and the solution stays exact",
+      "pass": true
+    },
+    {
+      "name": "matrix history remains manual and the exact named input survives reloading",
+      "pass": true
+    },
+    {
+      "name": "other tool categories are also collapsed and probability calculations need a separate explicit tap",
+      "pass": true
+    },
+    {
+      "name": "capability and formula details remain hidden until their own titles are pressed",
+      "pass": true
+    },
+    {
+      "name": "one matrix sentence binds A's determinant and B's trace in the written order",
+      "pass": true
+    },
+    {
+      "name": "Arabic LaTeX cases reach the actual Cramer Worker with all three deltas",
+      "pass": true
+    },
+    {
+      "name": "a last-column demand uses column three and an invalid column never falls back to row one",
+      "pass": true
+    },
+    {
+      "name": "the exact named factor k reopens in the board and editing it still needs an explicit solve",
+      "pass": true
+    },
+    {
+      "name": "a rectangular determinant failure leaves an independent B trace visible as a partial success",
+      "pass": true
+    },
+    {
+      "name": "a completed long geometry question scrolls its requested result into view without a reveal tap",
+      "pass": true
+    },
+    {
+      "name": "all seven solid controls retain their selected shape and solve genuinely different examples",
+      "pass": true
+    },
+    {
+      "name": "normal and parametric-line examples no longer reload the same effective givens",
+      "pass": true
+    },
+    {
+      "name": "the six geometry categories and four-point fields fit phones with readable nonzooming inputs",
+      "pass": true
+    },
+    {
+      "name": "a reopened named Q/n plane preserves its names and an edited coordinate changes its actual equation",
+      "pass": true
+    },
+    {
+      "name": "one plural coordinate request visibly solves both named arrows in source order",
+      "pass": true
+    },
+    {
+      "name": "weighted school givens and median concurrence reach real barycenter reasoning, not probability",
+      "pass": true
+    },
+    {
+      "name": "the line-system bridge opens a genuine three-equation two-unknown t/s matrix editor",
+      "pass": true
+    },
+    {
+      "name": "editing only a third equation changes Gauss to an empty solution and does not advertise stale geometry",
+      "pass": true
+    },
+    {
+      "name": "plural matrix language and two arithmetic expressions both produce their requested answers",
+      "pass": true
+    },
+    {
+      "name": "a six-row matrix returns through editable spatial vectors without silently losing the last three rows",
+      "pass": true
+    },
+    {
+      "name": "loading geometric-dot examples retains the chosen radians and only solves on the explicit action",
+      "pass": true
+    },
+    {
+      "name": "probability P(A) still belongs to events after a spatial A/B conversation",
+      "pass": true
+    },
+    {
+      "name": "a rectangular Cramer clarification retains its current equations and offers a working Gauss correction",
       "pass": true
     },
     {

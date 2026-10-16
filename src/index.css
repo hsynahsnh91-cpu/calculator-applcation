@@ -1560,3 +1560,801 @@ kbd {
   line-height: 1.9;
   margin-top: 7px;
 }
+
+/* Spatial workbench: a tool inside the conversation, never a section page. */
+.geometry-modal {
+  width: min(850px, calc(100vw - 28px));
+}
+.geometry-board {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  min-width: 0;
+}
+.space-board-intro {
+  font-size: 12px;
+  color: #94a6b7;
+  line-height: 2;
+  margin: 0;
+}
+.space-tabs {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 5px;
+  position: sticky;
+  top: -20px;
+  z-index: 3;
+  background: #151e2b;
+  border-radius: 11px;
+  padding: 5px;
+}
+.space-tabs button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #93a5b7;
+  min-height: 43px;
+  padding: 7px 5px;
+  border-radius: 8px;
+  line-height: 1.6;
+}
+.space-tabs button[aria-selected="true"] {
+  background: #2a3e46;
+  color: #c7e5df;
+}
+.space-tabs button:focus-visible,
+.space-example:focus-visible {
+  outline: 2px solid #9edacc;
+  outline-offset: 2px;
+}
+.space-board-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-width: 0;
+}
+.space-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12px;
+  color: #acbbca;
+}
+.space-field input,
+.space-field select,
+.space-coordinates input,
+.space-name input {
+  background: #101a25;
+  border: 1px solid #344456;
+  border-radius: 9px;
+  color: #d5e0e8;
+  min-height: 43px;
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  outline: none;
+}
+.space-field input:focus,
+.space-field select:focus,
+.space-coordinates input:focus,
+.space-name input:focus {
+  border-color: #94cfc5;
+}
+.space-field input,
+.space-coordinates input,
+.space-name input {
+  font-family: "Fira Code", monospace;
+  font-size: 13px;
+}
+.space-operation-row {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  min-width: 0;
+}
+.space-operation-row > .space-field {
+  flex: 1;
+}
+.space-example {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  border: 1px solid #3b5055;
+  border-radius: 9px;
+  padding: 10px 11px;
+  min-height: 43px;
+  color: #b2d5c9;
+  font-size: 11px;
+}
+.space-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.space-coordinate-card {
+  border: 1px solid #304151;
+  border-radius: 12px;
+  padding: 10px 12px 13px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.space-coordinate-card legend {
+  padding: 0 7px;
+  font-size: 12px;
+  color: #b7c6d4;
+}
+.space-coordinate-card > p {
+  font-size: 11px;
+  color: #8da3b7;
+  margin: 0;
+}
+.space-coordinates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  min-width: 0;
+  flex: 1;
+}
+.space-coordinates label,
+.space-name {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.space-coordinates label > span {
+  font-family: KaTeX_Math, serif;
+  color: #8fa7bc;
+  font-size: 14px;
+  text-align: center;
+}
+.space-name {
+  width: 54px;
+  flex-shrink: 0;
+  color: #8fa7bc;
+  font-size: 11px;
+}
+.space-point-row {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  min-width: 0;
+}
+.space-name input {
+  text-align: center;
+}
+.space-guide,
+.space-question-preview {
+  border-top: 1px solid #2f3d4b;
+  padding-top: 10px;
+  min-width: 0;
+  font-size: 12px;
+  color: #9eafbf;
+}
+.space-guide summary,
+.space-question-preview summary {
+  cursor: pointer;
+  line-height: 2.1;
+  min-height: 35px;
+}
+.space-guide summary svg {
+  display: inline;
+  vertical-align: middle;
+  margin-inline-end: 6px;
+}
+.space-guide p,
+.space-question-preview p {
+  line-height: 2;
+  overflow-wrap: anywhere;
+  margin: 9px 0 0;
+}
+.space-math {
+  font-size: 16px;
+}
+.space-input-error {
+  font-size: 12px;
+  color: #edb1aa;
+  line-height: 1.9;
+  background: #3f25283d;
+  border: 1px solid #674043;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.space-board-actions {
+  position: sticky;
+  bottom: -20px;
+  background: #151e2b;
+  box-shadow: 0 -10px 15px #151e2b;
+  z-index: 2;
+  display: flex;
+  gap: 10px;
+  padding: 12px 0 3px;
+}
+.space-board-actions button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  min-height: 43px;
+  font-size: 12px;
+}
+.space-board-actions button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.space-figure svg {
+  display: block;
+  width: 100%;
+  max-height: 360px;
+  margin: auto;
+}
+.space-figure-note {
+  font-size: 11px;
+  line-height: 1.9;
+  color: #93a8b9;
+  text-align: center;
+  margin: 8px 0;
+}
+.space-rotation {
+  font-size: 12px;
+  color: #9aafc1;
+  min-width: 0;
+}
+.space-rotation summary {
+  cursor: pointer;
+  min-height: 35px;
+  line-height: 2.2;
+}
+.space-view-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  padding: 8px 0;
+}
+.space-view-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+  min-width: 100px;
+  font-size: 11px;
+}
+.space-view-controls input {
+  width: 100%;
+  accent-color: #87cdbb;
+  min-height: 28px;
+}
+.space-view-controls button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 38px;
+}
+.space-coordinate-table {
+  max-width: 100%;
+  overflow: auto;
+}
+.space-coordinate-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.space-coordinate-table caption {
+  text-align: right;
+  padding: 8px 0;
+  color: #94a9bc;
+}
+.space-coordinate-table th,
+.space-coordinate-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #ffffff0a;
+  text-align: center;
+}
+@media (max-width: 600px) {
+  .space-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .space-tabs button {
+    font-size: 11px;
+    min-height: 54px;
+    font-weight: 600;
+  }
+  .space-operation-row {
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+  .space-operation-row > .space-field {
+    flex-basis: 100%;
+  }
+  .space-example {
+    margin-inline-start: auto;
+    min-height: 39px;
+  }
+  .space-coordinate-card {
+    padding: 8px 10px 11px;
+  }
+  .space-coordinates {
+    gap: 6px;
+  }
+  .space-coordinates input {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+  .space-point-row {
+    gap: 8px;
+  }
+  .space-name {
+    width: 44px;
+  }
+  .space-fields-grid {
+    gap: 10px;
+  }
+  .space-board-actions button {
+    flex: 1;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .space-figure svg {
+    max-height: 260px;
+  }
+}
+
+.space-board-actions {
+  flex-wrap: wrap;
+}
+.space-board-actions > .space-input-error {
+  flex: 0 0 100%;
+  margin: 0 0 4px;
+}
+
+/* School numbering is metadata, not a guessed answer or a navigation redesign. */
+.school-result-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  line-height: 2;
+  font-size: 12px;
+  color: #b5c8d5;
+  margin: 0 0 10px;
+  overflow-wrap: anywhere;
+}
+.school-request-label {
+  color: #b6e5d6;
+  font-family: "Cairo", sans-serif;
+  font-weight: 700;
+  flex-shrink: 0;
+  unicode-bidi: isolate;
+}
+.school-request-card {
+  padding: 18px 16px;
+  border: 1px solid #2b3d4b;
+  border-radius: 13px;
+  background: #131d2890;
+  min-width: 0;
+  margin-block: 16px;
+}
+.school-request-card > .solution-step {
+  margin-block: 16px;
+}
+.school-request-card > .answer-visual {
+  margin-top: 20px;
+}
+.verification-method {
+  font-size: 10px;
+  color: #8eaea4;
+  line-height: 1.9;
+  margin: 9px 0 3px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.answer-decimal {
+  font-size: 11px;
+  color: #94a6b5;
+  margin-top: 9px;
+  text-align: center;
+}
+.answer-decimal summary {
+  cursor: pointer;
+  min-height: 33px;
+  line-height: 2.5;
+}
+.school-pending {
+  font-size: 12px;
+  line-height: 2;
+  color: #acbaca;
+}
+.school-pending summary {
+  cursor: pointer;
+  padding-block: 6px;
+}
+.school-pending li {
+  padding-block: 5px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .school-request-card {
+    padding: 14px 10px;
+  }
+  .school-result-heading {
+    font-size: 11px;
+    gap: 6px;
+  }
+  .verification-method {
+    font-size: 10px;
+  }
+}
+.curriculum-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  font-size: 12px;
+  line-height: 2.1;
+  color: #acbdca;
+  min-width: 0;
+}
+.curriculum-guide section {
+  border: 1px solid #2d404c;
+  border-radius: 12px;
+  padding: 15px;
+  min-width: 0;
+}
+.curriculum-guide h3 {
+  color: #c7e8de;
+  font-size: 14px;
+  margin-bottom: 9px;
+}
+.curriculum-guide p {
+  margin: 0 0 9px;
+  overflow-wrap: anywhere;
+}
+.curriculum-guide strong {
+  font-weight: 600;
+  color: #c0d1dd;
+}
+.curriculum-guide button {
+  text-align: right;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* On-demand matrix workbench: no permanent section navigation and no GPU layers. */
+.tool-disclosure-hint {
+  color: #94a3b8;
+  font-size: 0.83rem;
+  line-height: 1.9;
+  padding: 16px 4px;
+}
+.matrix-board {
+  min-width: 0;
+  color: #e2e8f0;
+}
+.matrix-intro,
+.matrix-rule {
+  color: #a4b4c7;
+  font-size: 0.83rem;
+  line-height: 1.95;
+}
+.matrix-intro {
+  margin-bottom: 16px;
+}
+.matrix-categories {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.matrix-categories button {
+  min-height: 48px;
+  padding: 10px 8px;
+  border: 1px solid #293747;
+  background: #111d2b;
+  border-radius: 12px;
+  color: #bfccd9;
+  font-size: 0.83rem;
+  line-height: 1.7;
+}
+.matrix-categories button[aria-selected="true"] {
+  border-color: #34d399;
+  color: #a7f3d0;
+  background: #0d2a27;
+}
+.matrix-categories button:focus-visible {
+  outline: 2px solid #6ee7b7;
+  outline-offset: 2px;
+}
+.matrix-operation-panel {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.matrix-operation-row {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.matrix-operation-row > label {
+  flex: 1 1 240px;
+}
+.matrix-operation-title {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.matrix-field {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  font-size: 0.78rem;
+  color: #aebed0;
+}
+.matrix-field input,
+.matrix-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid #344357;
+  border-radius: 10px;
+  background: #101b29;
+  color: #f1f5f9;
+  padding: 8px 10px;
+}
+.matrix-field select {
+  font-family: var(--font-cairo);
+  font-size: 0.82rem;
+}
+.matrix-field input {
+  font-family: "KaTeX_Main", "Cambria Math", serif;
+  font-size: 1.15rem;
+}
+.matrix-names,
+.matrix-dimensions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.matrix-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+.matrix-card {
+  min-width: 0;
+  border: 1px solid #2a394c;
+  border-radius: 14px;
+  padding: 14px 12px;
+  background: #0d1825;
+}
+.matrix-card legend {
+  font-size: 0.8rem;
+  color: #b9cfdf;
+  padding: 0 6px;
+}
+.matrix-grid-scroll {
+  overflow-x: auto;
+  padding: 13px 4px 7px;
+  max-width: 100%;
+}
+.matrix-input-grid {
+  display: grid;
+  gap: 7px;
+  border-inline: 2px solid #91bdb8;
+  border-radius: 9px;
+  padding: 10px 8px;
+  min-width: max-content;
+}
+.matrix-input-grid input {
+  width: 100%;
+  min-width: 48px;
+  min-height: 46px;
+  text-align: center;
+  border: 1px solid #304256;
+  border-radius: 8px;
+  color: #e0faf3;
+  background: #131f2e;
+  font-family: "KaTeX_Main", "Cambria Math", serif;
+  font-size: 1.18rem;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.matrix-input-grid input:focus,
+.matrix-field input:focus,
+.matrix-field select:focus {
+  outline: 2px solid #34d399;
+  outline-offset: 1px;
+}
+.matrix-preview,
+.matrix-reference {
+  min-width: 0;
+  border: 1px solid #293b48;
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+.matrix-preview {
+  margin-top: 12px;
+}
+.matrix-preview summary,
+.matrix-reference summary {
+  padding: 10px 12px;
+  color: #b1d3ca;
+  cursor: pointer;
+  min-height: 42px;
+}
+.matrix-preview > :not(summary),
+.matrix-reference > :not(summary) {
+  padding: 8px 12px;
+}
+.matrix-preview .katex {
+  font-size: 1.2em;
+}
+.matrix-reference section {
+  border-top: 1px solid #233440;
+  line-height: 1.9;
+}
+.matrix-reference h4 {
+  color: #d4e5ec;
+  font-weight: 600;
+}
+.matrix-reference p {
+  color: #9cabbf;
+}
+.matrix-reference .katex {
+  color: #a7f3d0;
+}
+.matrix-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  position: sticky;
+  bottom: -20px;
+  margin-top: 6px;
+  padding: 12px 0 2px;
+  background: #0f172a;
+  border-top: 1px solid #273447;
+  z-index: 1;
+}
+.matrix-actions > button {
+  flex: 1 1 160px;
+  justify-content: center;
+  min-height: 44px;
+}
+.matrix-error {
+  color: #fda4af;
+  background: #301b2b;
+  border: 1px solid #713145;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  line-height: 1.9;
+  padding: 10px;
+}
+.matrix-system-grid {
+  display: grid;
+  gap: 12px;
+}
+.matrix-system-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+.matrix-answer .step-heading h4 {
+  font-size: 0.86rem;
+  line-height: 1.8;
+}
+.matrix-answer .katex {
+  font-size: 1.15em;
+}
+.matrix-answer .school-result-heading {
+  font-size: 0.88rem;
+  line-height: 1.9;
+}
+@media (max-width: 640px) {
+  .matrix-categories {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .matrix-categories button {
+    font-size: 0.76rem;
+    padding: 9px 6px;
+  }
+  .matrix-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .matrix-operation-title,
+  .matrix-answer .step-heading h4 {
+    font-size: 0.78rem;
+  }
+  .matrix-field select {
+    font-size: 0.76rem;
+  }
+  .matrix-system-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .matrix-answer .katex {
+    font-size: 1.06em;
+  }
+  .matrix-answer .step-math {
+    max-width: 100%;
+  }
+}
+.reference-entry {
+  align-self: start;
+}
+.reference-entry > summary {
+  cursor: pointer;
+  min-height: 44px;
+  line-height: 1.8;
+}
+.reference-entry > summary > .flex {
+  flex-wrap: wrap;
+}
+.curriculum-guide summary {
+  cursor: pointer;
+  min-height: 44px;
+  color: #d2e3ee;
+}
+.curriculum-guide summary h3 {
+  display: inline;
+  font-size: 0.9rem;
+  line-height: 1.9;
+}
+.curriculum-guide details[open] summary {
+  margin-bottom: 12px;
+}
+/* Constrain intrinsic fieldset/grid width; only the six-column editor may scroll. */
+.matrix-operation-panel {
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  max-width: 100%;
+}
+.matrix-card {
+  min-inline-size: 0;
+  max-width: 100%;
+  width: 100%;
+}
+.matrix-grid-scroll {
+  min-width: 0;
+  width: 100%;
+}
+
+/* Submitted results are immediately visible; only inputs/reference tools are disclosed on demand. */
+.final-answer,
+.clarification-card {
+  scroll-margin-block-start: 18px;
+}
+.space-tabs button span {
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.geometry-board input,
+.geometry-board select,
+.geometry-board button {
+  min-height: 44px;
+}
+
+.space-operation-title {
+  font-size: 13px;
+  color: #c7ded8;
+  line-height: 1.9;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .space-field input,
+  .space-field select,
+  .space-coordinates input,
+  .space-name input {
+    font-size: 16px;
+  }
+}

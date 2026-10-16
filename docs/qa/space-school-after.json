@@ -1,0 +1,384 @@
+{
+  "corpus": {
+    "total": 68,
+    "completeExpected": 59,
+    "partialExpected": 1,
+    "clarificationExpected": 8
+  },
+  "passed": 93,
+  "failed": 0,
+  "results": [
+    {
+      "name": "space S01: معلم متعامد وكتابة الإحداثيات",
+      "pass": true
+    },
+    {
+      "name": "space S02: أرقام عربية وفواصل عربية",
+      "pass": true
+    },
+    {
+      "name": "space S03: معيار بالرموز",
+      "pass": true
+    },
+    {
+      "name": "space S04: نظير شعاع مع LaTeX",
+      "pass": true
+    },
+    {
+      "name": "space S05: جمع شعاعين رمزي",
+      "pass": true
+    },
+    {
+      "name": "space S06: طرح رمزي يحفظ الترتيب",
+      "pass": true
+    },
+    {
+      "name": "space S07: تضريب رمزي كسري",
+      "pass": true
+    },
+    {
+      "name": "space S08: طول قطعة",
+      "pass": true
+    },
+    {
+      "name": "space S09: إحداثيات شعاعين في طلب",
+      "pass": true
+    },
+    {
+      "name": "space S10: طويلتا شعاعين",
+      "pass": true
+    },
+    {
+      "name": "space S11: استقلال شعاعين",
+      "pass": true
+    },
+    {
+      "name": "space S12: ارتباط ثلاثة أشعة",
+      "pass": true
+    },
+    {
+      "name": "space S13: أساس للفراغ",
+      "pass": true
+    },
+    {
+      "name": "space S14: رفض استقامة زائفة",
+      "pass": true
+    },
+    {
+      "name": "space S15: استواء أربعة رؤوس",
+      "pass": true
+    },
+    {
+      "name": "space S16: أربع نقاط غير مستوية",
+      "pass": true
+    },
+    {
+      "name": "space S17: لا تقريب للتحديد المستوي",
+      "pass": true
+    },
+    {
+      "name": "space S18: معلم غير متعامد",
+      "pass": true
+    },
+    {
+      "name": "space S19: جملة مثقلة بوزنين",
+      "pass": true
+    },
+    {
+      "name": "space S20: مجموع وزنين معدوم",
+      "pass": true
+    },
+    {
+      "name": "space S21: مركز ثلاثة بأوزان سالبة",
+      "pass": true
+    },
+    {
+      "name": "space S22: مركز ثقل رباعي الوجوه",
+      "pass": true
+    },
+    {
+      "name": "space S23: اسم صريح لمركز الأبعاد",
+      "pass": true
+    },
+    {
+      "name": "space S24: تلاقي المتوسطات بتعريف منتصفات",
+      "pass": true
+    },
+    {
+      "name": "space S25: جداء تحليلي",
+      "pass": true
+    },
+    {
+      "name": "space S26: جداء منقوط بالصيغة الرسمية",
+      "pass": true
+    },
+    {
+      "name": "space S27: تحقق من تعامد غير صحيح",
+      "pass": true
+    },
+    {
+      "name": "space S28: الصيغة الهندسية بالدرجات",
+      "pass": true
+    },
+    {
+      "name": "space S29: طولتان بمعيار LaTeX وزاوية",
+      "pass": true
+    },
+    {
+      "name": "space S30: الشعاع المعدوم والزاوية",
+      "pass": true
+    },
+    {
+      "name": "space S31: مستقيمان متعامدان متقاطعان",
+      "pass": true
+    },
+    {
+      "name": "space S32: اتجاهان متعامدان مع تخالف",
+      "pass": true
+    },
+    {
+      "name": "space S33: مركبات ناظم بدون التباس عقدي",
+      "pass": true
+    },
+    {
+      "name": "space S34: ناظم مستوي بالرمز اليوناني",
+      "pass": true
+    },
+    {
+      "name": "space S35: ثلاث نقاط في مستوي مواز للإحداثي",
+      "pass": true
+    },
+    {
+      "name": "space S36: مستوي من نقطة وناظم",
+      "pass": true
+    },
+    {
+      "name": "space S37: المستوي المنصف العمودي",
+      "pass": true
+    },
+    {
+      "name": "space S38: تمثيل وسيطي من نقطتين",
+      "pass": true
+    },
+    {
+      "name": "space S39: مستقيم من نقطة واتجاه",
+      "pass": true
+    },
+    {
+      "name": "space S40: تقاطع مستويين",
+      "pass": true
+    },
+    {
+      "name": "space S41: توازي مستويين متميزين",
+      "pass": true
+    },
+    {
+      "name": "space S42: مستويان منطبقان",
+      "pass": true
+    },
+    {
+      "name": "space S43: تقاطع مستقيم ومستوي",
+      "pass": true
+    },
+    {
+      "name": "space S44: مستقيم محتوى في مستوي",
+      "pass": true
+    },
+    {
+      "name": "space S45: مستقيم مواز دون تقاطع",
+      "pass": true
+    },
+    {
+      "name": "space S46: تقاطع مستقيمين",
+      "pass": true
+    },
+    {
+      "name": "space S47: مستقيمان متخالفان",
+      "pass": true
+    },
+    {
+      "name": "space S48: مستويان بأسماء يونانية",
+      "pass": true
+    },
+    {
+      "name": "space S49: البعد المتكرر في مسائل الارتفاع",
+      "pass": true
+    },
+    {
+      "name": "space S50: بعد نقطة عن مستقيم",
+      "pass": true
+    },
+    {
+      "name": "space S51: مسقط عمودي لا مسافة فقط",
+      "pass": true
+    },
+    {
+      "name": "space S52: كرة مركز ونصف قطر",
+      "pass": true
+    },
+    {
+      "name": "space S53: كرة من طرفي قطر",
+      "pass": true
+    },
+    {
+      "name": "space S54: كرة من معادلتها العامة",
+      "pass": true
+    },
+    {
+      "name": "space S55: كرة بمجاهيل عربية",
+      "pass": true
+    },
+    {
+      "name": "space S56: حجم رباعي الوجوه",
+      "pass": true
+    },
+    {
+      "name": "space S57: ارتفاع رأس عن وجه مسمى",
+      "pass": true
+    },
+    {
+      "name": "space S58: حجم هرم من مساحة وارتفاع",
+      "pass": true
+    },
+    {
+      "name": "space S59: ارتفاع دقيق يتبعه حجم",
+      "pass": true
+    },
+    {
+      "name": "space S60: أشعة ومصفوفة ورتبة في سؤال",
+      "pass": true
+    },
+    {
+      "name": "space S61: مصفوفة التقاطع تتبعها غاوس",
+      "pass": true
+    },
+    {
+      "name": "space S62: طلب هندسي مستقل بعد فشل غير هندسي",
+      "pass": true
+    },
+    {
+      "name": "space S63: ثلاث نقاط مستقيمة لا تعطي مستويا وحيدا",
+      "pass": true
+    },
+    {
+      "name": "space S64: مركبة ناقصة لا تستكمل بصفر",
+      "pass": true
+    },
+    {
+      "name": "space S65: وسيطان لا يمثلان مستقيم وسيط واحد",
+      "pass": true
+    },
+    {
+      "name": "space S66: نقطة لا تفترض مركز كرة",
+      "pass": true
+    },
+    {
+      "name": "space S67: لا أوزان رمزية مفترضة",
+      "pass": true
+    },
+    {
+      "name": "space S68: لا برهان عام زائف للاستواء",
+      "pass": true
+    },
+    {
+      "name": "symbolic vector operations and norms use the actual exact coordinates",
+      "pass": true
+    },
+    {
+      "name": "two requested geometric operands stay distinct and preserve their parent label",
+      "pass": true
+    },
+    {
+      "name": "plural normal requests bind each named plane instead of reusing the first",
+      "pass": true
+    },
+    {
+      "name": "weighted pairs bind weights by point name, reject duplicate points, and detect zero total weight",
+      "pass": true
+    },
+    {
+      "name": "two/three/four-point barycenters retain actual input vertices and exact weighted residuals",
+      "pass": true
+    },
+    {
+      "name": "midpoints are derived from declarations, never manufactured from a requested proof",
+      "pass": true
+    },
+    {
+      "name": "a false basis claim is refuted by rank, not disguised as a scene or an orthonormal basis",
+      "pass": true
+    },
+    {
+      "name": "dot-product notation is not a cross product and a false perpendicular claim stays visibly false",
+      "pass": true
+    },
+    {
+      "name": "the perpendicular foot satisfies its plane, normal direction and exact distance",
+      "pass": true
+    },
+    {
+      "name": "failed geometric parsing cannot leak an earlier height into a numeric follow-up",
+      "pass": true
+    },
+    {
+      "name": "an independent geometry demand survives an earlier matrix failure with all givens and source label",
+      "pass": true
+    },
+    {
+      "name": "the line-intersection bridge carries all three equations and its actual t/s solution",
+      "pass": true
+    },
+    {
+      "name": "every geometry operation has two meaningfully different solved examples",
+      "pass": true
+    },
+    {
+      "name": "loading a solid example preserves the selected solid and changes its real dimensions",
+      "pass": true
+    },
+    {
+      "name": "geometric-dot examples preserve radians/grads and their explicit unit beats the global setting",
+      "pass": true
+    },
+    {
+      "name": "reopening named plane/line/center answers preserves their output aliases as well as input data",
+      "pass": true
+    },
+    {
+      "name": "all six matrix rows can be reopened as vectors and returned without silent truncation",
+      "pass": true
+    },
+    {
+      "name": "completed submitted answers contain their final result, steps and actions immediately even with animation enabled",
+      "pass": true
+    },
+    {
+      "name": "geometry splitting stays bounded and never separates a single algebra/proof expression",
+      "pass": true
+    },
+    {
+      "name": "coordinate declarations remain geometry, not an overwrite of a previous named matrix",
+      "pass": true
+    },
+    {
+      "name": "vector/statistical bridges choose a free matrix alias and reuse it instead of erasing given M",
+      "pass": true
+    },
+    {
+      "name": "real geometry contexts keep valid guards without treating unsupported proof goals as definitions",
+      "pass": true
+    },
+    {
+      "name": "probability P(A) definitions remain event data even after a geometric A/B context",
+      "pass": true
+    },
+    {
+      "name": "geometric suggestions stop claiming an unchanged line bridge after an equation is edited",
+      "pass": true
+    },
+    {
+      "name": "a computed vector r remains explicitly addressable after switching the active vector",
+      "pass": true
+    }
+  ]
+}

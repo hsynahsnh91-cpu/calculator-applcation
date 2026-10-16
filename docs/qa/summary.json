@@ -6,26 +6,31 @@
     "complex": 52,
     "probability": 108,
     "textbook": 37,
-    "passed": 335,
-    "failed": 0
+    "geometry": 140,
+    "curriculum": 83,
+    "schoolSafety": 38,
+    "passed": 866,
+    "failed": 0,
+    "matrices": 177,
+    "spaceSchool": 93
   },
   "browser": {
     "http": {
-      "passed": 72,
+      "passed": 138,
       "failed": 0,
       "externalRequests": 0,
       "uncaughtErrors": 0
     },
     "file": {
-      "passed": 72,
+      "passed": 138,
       "failed": 0,
       "externalRequests": 0,
       "uncaughtErrors": 0
     }
   },
   "build": {
-    "htmlBytes": 16855426,
-    "sha256": "269a91ec0d5199135116ef12b84537f4bf7dc4cd2059633fe52b74fd5a86601b",
+    "htmlBytes": 17131833,
+    "sha256": "422f705bf34668dfd8b1436ef50f843368a3b7797dd3c5daa13bcb0daeb6ca01",
     "separateRuntimeFiles": 0,
     "embeddedLicenseNotices": 48
   },
@@ -39,7 +44,22 @@
     "Exact rational arithmetic is bounded; binomial and normal distributions use finite-precision approximations. Underflow does not imply a mathematically impossible event or a verified zero variance.",
     "Independent numerical checks are not proofs; unsupported or ambiguous cases ask for clarification.",
     "Textbook and dialect support is rule-based and bounded, not a guarantee for all wording or dialects. Missing or ambiguous data still requires clarification.",
-    "Textbook image test uses real local OCR followed by explicit human review/correction. The radical was recognized as Vv3 in the printed fixture; mathematical OCR is not assumed infallible."
+    "Textbook image test uses real local OCR followed by explicit human review/correction. The radical was recognized as Vv3 in the printed fixture; mathematical OCR is not assumed infallible.",
+    "Spatial geometry assumes an orthonormal frame for metric formulas; a nonorthonormal frame without Gram data is not silently treated as orthonormal.",
+    "Spatial algebra is bounded: at most three radical primes/eight terms; finite inputs up to 1e9; drawing values up to 1e12. Unsupported nested radicals and excess expression complexity require clarification.",
+    "Spatial diagrams are projections, not geometric proofs. Vector/matrix bridges preserve the bounded exact coordinate models; approximate eigenvalues remain supplemental and unverified.",
+    "Curriculum conformity is not certified: official catalog access did not provide a complete verified ministry textbook edition.",
+    "School proofs are bounded: affine closed-form induction, selected geometric criteria, and polynomial IVT/monotonicity. Not a general proof or full function-study engine.",
+    "School corpus includes 18 expected clarifications and one partial success; passing these tests does not imply support for their unsupported mathematical topics.",
+    "Matrix input: dimensions 1–6, up to 12 named matrices, 500 characters/cell. Matrix expressions: 300 characters, 120 tokens, nesting 20, powers −1…12. Exact rational/simple-radical arithmetic is bounded, not a general symbolic matrix algebra system.",
+    "Matrix school-style methods do not certify that these topics occur in an unverified official ministry textbook edition. The 92-case matrix corpus expects 14 clarifications.",
+    "All tool categories and reference details start collapsed. Examples/editing do not solve; a probability preview has its own explicit calculation action and is invalidated when its inputs change.",
+    "A named real factor k requires an explicit bounded exact numeric value; free symbolic-parameter matrices are not a newly supported general algebra system.",
+    "Only bounded independent named unary lists and unassigned arithmetic expression lists are expanded at conjunctions. Ambiguous compound proof/assignment demands require separate complete statements instead of guessed dependencies.",
+    "Submitted final results and solution steps do not wait for a reveal control; input categories, references and optional numerical approximations remain deliberate disclosures. Editing/loading examples does not submit a solution.",
+    "Gauss systems are bounded to 2–6 equations and 2/3 unknowns from x,y,z,t,s; Cramer requires a square coefficient matrix. Every equation is checked; free-family directions are verified algebraically.",
+    "The 68-case authored space corpus expects 59 full responses, one partial response and 8 clarifications. General synthetic proofs, free symbolic-parameter geometry and arbitrary compound vector norms are not claimed as supported.",
+    "The same live probability comparison regression now explicitly waits for preview invalidation before requesting its new calculation, avoiding a React-effect race in the test harness."
   ],
   "environment": {
     "node": "22.22.3",
@@ -49,6 +69,42 @@
   },
   "supplementaryDocumentationSmoke": {
     "passed": 23,
+    "geometryPassed": 27,
+    "curriculumExamplesPassed": 11,
+    "failed": 0,
+    "matrixExamplesPassed": 23,
+    "geometryMatrixExamplesPassed": 53,
+    "note": "The 23/27/11 counts in passed/geometryPassed/curriculumExamplesPassed refer to retained earlier-release logs; the current full guide sweep is geometryMatrixExamplesPassed."
+  },
+  "schoolBaseline": {
+    "questions": 83,
+    "passed": 54,
+    "failed": 29,
+    "originalNodeTestsPassed": 475
+  },
+  "schoolCorpus": {
+    "questions": 83,
+    "solvedCompletelyExpected": 64,
+    "partialSuccessExpected": 1,
+    "clarificationExpected": 18,
+    "passed": 83,
     "failed": 0
+  },
+  "matrixCorpus": {
+    "questions": 92,
+    "completeExpected": 78,
+    "clarificationExpected": 14,
+    "suitePassed": 177,
+    "suiteFailed": 0,
+    "provenance": "Original authored cases; not official examination questions."
+  },
+  "spaceSchoolCorpus": {
+    "questions": 68,
+    "completeExpected": 59,
+    "partialExpected": 1,
+    "clarificationExpected": 8,
+    "suitePassed": 93,
+    "suiteFailed": 0,
+    "provenance": "Original authored school-style spatial questions; not ministry/examination reproductions or curriculum certification."
   }
 }

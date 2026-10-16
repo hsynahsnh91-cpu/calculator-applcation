@@ -1,0 +1,5035 @@
+{
+  "date": "2026-10-16",
+  "baselineCommit": "157b9e892d066795112764ee20961fd4154cfcf7",
+  "kind": "Diagnostic observations, including working controls and expected rejections; NOT assertion-suite counts or official examination questions.",
+  "before": {
+    "kind": "Diagnostic observations, not assertion-suite results",
+    "cases": 76,
+    "passed": 49,
+    "failed": 27,
+    "results": [
+      {
+        "id": "S01",
+        "title": "معلم متعامد وكتابة الإحداثيات",
+        "question": "في معلم متعامد متجانس (O;\\vec{i},\\vec{j},\\vec{k})، A(1;2;3) وB(4;6;3)، عين إحداثيات الشعاع AB",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "3",
+          "4"
+        ],
+        "normalized": "في معلم متعامد متجانس (O;\\vec{i},\\vec{j},\\vec{k})، A(1;2;3) وB(4;6;3)، عين احداثيات الشعاع AB",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "إحداثيات شعاع وطويلته",
+            "final": "\\begin{aligned}\\overrightarrow{AB}=\\left(3,\\,4,\\,0\\right)\\\\[5pt]\\|\\overrightarrow{AB}\\|=5\\end{aligned}",
+            "verified": true,
+            "operation": "vector",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [
+                "AB"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "طرح الإحداثيات بالترتيب",
+              "فيثاغورس في الفضاء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S02",
+        "title": "أرقام عربية وفواصل عربية",
+        "question": "لتكن النقطتان A(١،٢،٣) وB(١؛٢؛٥)، احسب المسافة بينهما",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=2"
+        ],
+        "normalized": "لتكن النقطتان A(1،2،3) وB(1؛2؛5)، احسب المسافة بينهما",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المسافة بين نقطتين في الفراغ",
+            "final": "d(A,B)=2",
+            "verified": true,
+            "operation": "distance",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "طرح الإحداثيات بالترتيب",
+              "فيثاغورس في الفضاء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S03",
+        "title": "معيار بالرموز",
+        "question": "u=(2,-3,6)، احسب ‖u‖",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=7"
+        ],
+        "normalized": "u=(2,-3,6)، احسب ‖u‖",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "حدّد المطلوب الهندسي: شعاع، بعد، ارتباط، مركز أبعاد، مستوٍ، مستقيم أو كرة."
+          }
+        ]
+      },
+      {
+        "id": "S04",
+        "title": "نظير شعاع مع LaTeX",
+        "question": "جد نظير الشعاع \\vec{u}=(1,-2,3)",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "-1",
+          "2",
+          "-3"
+        ],
+        "normalized": "جد نظير الشعاع \\vec{u}=(1,-2,3)",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "العمليات على الأشعة في الفراغ",
+            "final": "\\vec{w}=\\left(-1,\\,2,\\,-3\\right)",
+            "verified": true,
+            "operation": "vector-arithmetic",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "العمل مركبةً مركبة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S05",
+        "title": "جمع شعاعين رمزي",
+        "question": "u=(1,2,3)، v=(2,-1,0)، احسب u+v",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "3",
+          "1",
+          "3"
+        ],
+        "normalized": "u=(1,2,3)، v=(2,-1,0)، احسب u+v",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "حدّد المطلوب الهندسي: شعاع، بعد، ارتباط، مركز أبعاد، مستوٍ، مستقيم أو كرة."
+          }
+        ]
+      },
+      {
+        "id": "S06",
+        "title": "طرح رمزي يحفظ الترتيب",
+        "question": "u=(1,2,3)، v=(2,-1,0)، احسب u-v",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "-1",
+          "3"
+        ],
+        "normalized": "u=(1,2,3)، v=(2,-1,0)، احسب u-v",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "حدّد المطلوب الهندسي: شعاع، بعد، ارتباط، مركز أبعاد، مستوٍ، مستقيم أو كرة."
+          }
+        ]
+      },
+      {
+        "id": "S07",
+        "title": "تضريب رمزي كسري",
+        "question": "u=(1,2,3)، احسب (1/2)*u",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\frac{1}{2}",
+          "\\frac{3}{2}"
+        ],
+        "normalized": "u=(1,2,3)، احسب (1/2)*u",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "حدّد المطلوب الهندسي: شعاع، بعد، ارتباط، مركز أبعاد، مستوٍ، مستقيم أو كرة."
+          }
+        ]
+      },
+      {
+        "id": "S08",
+        "title": "طول قطعة",
+        "question": "A(1,2,3)، B(1,2,5)، احسب طول القطعة AB",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=2"
+        ],
+        "normalized": "A(1,2,3)، B(1,2,5)، احسب طول القطعة AB",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "message": "هل تريد حساب قيمة، أم حل معادلة، أم دراسة دالة؟ لا توجد معطيات كافية لاختيار حل موثوق."
+          }
+        ]
+      },
+      {
+        "id": "S09",
+        "title": "إحداثيات شعاعين في طلب",
+        "question": "A(0,0,0)، B(1,0,0)، C(0,1,0)، احسب إحداثيات الشعاعين AB وAC",
+        "expect": "answer",
+        "resultCount": 2,
+        "contains": [
+          "AB",
+          "AC"
+        ],
+        "normalized": "A(0,0,0)، B(1,0,0)، C(0,1,0)، احسب احداثيات الشعاعين AB وAC",
+        "pass": false,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "إحداثيات شعاع وطويلته",
+            "final": "\\begin{aligned}\\overrightarrow{AB}=\\left(1,\\,0,\\,0\\right)\\\\[5pt]\\|\\overrightarrow{AB}\\|=1\\end{aligned}",
+            "verified": true,
+            "operation": "vector",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C"
+              ],
+              "vectors": [
+                "AB",
+                "AC"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "طرح الإحداثيات بالترتيب",
+              "فيثاغورس في الفضاء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S10",
+        "title": "طويلتا شعاعين",
+        "question": "u=(3,4,0)، v=(0,0,2)، احسب طويلتي الشعاعين u وv",
+        "expect": "answer",
+        "resultCount": 2,
+        "contains": [
+          "=5",
+          "=2"
+        ],
+        "normalized": "u=(3,4,0)، v=(0,0,2)، احسب طويلتي الشعاعين u وv",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "حدّد المطلوب الهندسي: شعاع، بعد، ارتباط، مركز أبعاد، مستوٍ، مستقيم أو كرة."
+          }
+        ]
+      },
+      {
+        "id": "S11",
+        "title": "استقلال شعاعين",
+        "question": "تحقق من استقلال الشعاعين u=(1,0,0) وv=(0,1,0) خطيا",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "مستقلة"
+        ],
+        "normalized": "تحقق من استقلال الشعاعين u=(1,0,0) وv=(0,1,0) خطيا",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأشعة مستقلة خطيًا",
+            "final": "\\text{الأشعة مستقلة خطيًا}",
+            "verified": true,
+            "operation": "dependence",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "اختبار شعاعين",
+              "الرتبة وتفسير النتيجة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S12",
+        "title": "ارتباط ثلاثة أشعة",
+        "question": "برهن أن الأشعة u=(1,0,0) وv=(0,1,0) وw=(1,1,0) مرتبطة خطيا",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "مرتبطة"
+        ],
+        "normalized": "برهن ان الاشعة u=(1,0,0) وv=(0,1,0) وw=(1,1,0) مرتبطة خطيا",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأشعة مرتبطة خطيًا",
+            "final": "\\text{الأشعة مرتبطة خطيًا}",
+            "verified": true,
+            "operation": "dependence",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v",
+                "w"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "الجداء المختلط",
+              "الرتبة وتفسير النتيجة",
+              "علاقة خطية غير تافهة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S13",
+        "title": "أساس للفراغ",
+        "question": "تحقق أن الأشعة u=(1,0,0) وv=(0,1,0) وw=(0,0,1) تشكل أساسا للفراغ",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "مستقلة"
+        ],
+        "normalized": "تحقق ان الاشعة u=(1,0,0) وv=(0,1,0) وw=(0,0,1) تشكل اساسا للفراغ",
+        "pass": false,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المعطيات الهندسية في الفراغ",
+            "final": "\\text{تمثيل المعطيات في إسقاط ثنائي الأبعاد}",
+            "verified": false,
+            "operation": "plot",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v",
+                "w"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "حدود الرسم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S14",
+        "title": "رفض استقامة زائفة",
+        "question": "بين هل النقاط A(0,0,0) وB(1,2,3) وC(2,4,7) على استقامة واحدة",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "ليست"
+        ],
+        "normalized": "بين هل النقاط A(0,0,0) وB(1,2,3) وC(2,4,7) علي استقامة 1",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "النقاط ليست على استقامة واحدة",
+            "final": "\\text{النقاط ليست على استقامة واحدة}",
+            "verified": true,
+            "operation": "collinear",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "اختبار شعاعين",
+              "الرتبة وتفسير النتيجة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S15",
+        "title": "استواء أربعة رؤوس",
+        "question": "برهن أن النقاط A(0,0,0) وB(1,0,0) وC(0,1,0) وD(1,1,0) تقع في مستو واحد",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "مستو"
+        ],
+        "normalized": "برهن ان النقاط A(0,0,0) وB(1,0,0) وC(0,1,0) وD(1,1,0) تقع في مستو 1",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "message": "هذا البرهان ليس ضمن مسارات الاستدلال المدرسية المدعومة؛ هل تريد حساب المقدار أو صياغة المطلوب المحدد بدل اعتبار النتيجة المعطاة معطى جديدًا؟"
+          }
+        ]
+      },
+      {
+        "id": "S16",
+        "title": "أربع نقاط غير مستوية",
+        "question": "هل النقاط A(0,0,0) وB(1,0,0) وC(0,1,0) وD(0,0,1) مستوية؟",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "غير مستوية"
+        ],
+        "normalized": "هل النقاط A(0,0,0) وB(1,0,0) وC(0,1,0) وD(0,0,1) مستوية؟",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "النقاط الأربع غير مستوية",
+            "final": "\\text{النقاط الأربع غير مستوية}",
+            "verified": true,
+            "operation": "coplanar",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "الجداء المختلط",
+              "الرتبة وتفسير النتيجة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S17",
+        "title": "لا تقريب للتحديد المستوي",
+        "question": "A(0,0,0)، B(1,0,0)، C(0,1,0)، D(0,0,1/1000000000)، ادرس استواء النقاط الأربع",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "غير مستوية"
+        ],
+        "normalized": "A(0,0,0)، B(1,0,0)، C(0,1,0)، D(0,0,1/1000000000)، ادرس استواء النقاط الاربع",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "النقاط الأربع غير مستوية",
+            "final": "\\text{النقاط الأربع غير مستوية}",
+            "verified": true,
+            "operation": "coplanar",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "الجداء المختلط",
+              "الرتبة وتفسير النتيجة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S18",
+        "title": "معلم غير متعامد",
+        "question": "في معلم غير متعامد في الفراغ، جد المسافة بين A(0,0,0) وB(1,1,0)",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "في معلم غير متعامد في الفراغ، جد المسافة بين A(0,0,0) وB(1,1,0)",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "في المعلم غير المتعامد نحتاج جداءات أشعة الأساس أو مصفوفة غرام للصيغ المترية؛ لا أفترضها متعامدة."
+          }
+        ]
+      },
+      {
+        "id": "S19",
+        "title": "جملة مثقلة بوزنين",
+        "question": "A(0,0,0)، B(3,0,0)، عين مركز الأبعاد المتناسبة للجملة المثقلة {(A,2),(B,-1)}",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "-3"
+        ],
+        "normalized": "A(0,0,0)، B(3,0,0)، عين مركز الابعاد المتناسبة للجملة المثقلة {(A,2),(B,-1)}",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "اكتب أوزان النقاط مثل الأوزان=[1,2,3]، أو حدّد أن المطلوب مركز الثقل بأوزان متساوية."
+          }
+        ]
+      },
+      {
+        "id": "S20",
+        "title": "مجموع وزنين معدوم",
+        "question": "A(0,0,0)، B(3,0,0)، جد مرجح الجملة المثقلة {(A,1),(B,-1)}",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "A(0,0,0)، B(3,0,0)، جد مرجح الجملة المثقلة {(A,1),(B,-1)}",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "equationSolver",
+            "message": "اكتب معادلتين أو ثلاث معادلات خطية، كل واحدة في سطر مستقل."
+          }
+        ]
+      },
+      {
+        "id": "S21",
+        "title": "مركز ثلاثة بأوزان سالبة",
+        "question": "A(0,0,0)، B(3,0,0)، C(0,3,0)، جد مركز الأبعاد المتناسبة، الأوزان=[2,1,-1]",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\frac{3}{2}",
+          "-\\frac{3}{2}"
+        ],
+        "normalized": "A(0,0,0)، B(3,0,0)، C(0,3,0)، جد مركز الابعاد المتناسبة، الاوزان=[2,1,-1]",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "مركز الأبعاد المتناسبة",
+            "final": "G\\left(\\frac{3}{2},\\,-\\frac{3}{2},\\,0\\right)",
+            "verified": true,
+            "operation": "barycenter",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "شرط الوجود",
+              "الإحداثيات الموزونة",
+              "خاصية مركز الأبعاد",
+              "تجميع النقاط المقابلة للرأس B",
+              "تجميع النقاط المقابلة للرأس C",
+              "تفسير التلاقي"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S22",
+        "title": "مركز ثقل رباعي الوجوه",
+        "question": "A(0,0,0)، B(4,0,0)، C(0,4,0)، D(0,0,4)، جد مركز ثقل رباعي الوجوه ABCD",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "G",
+          "1"
+        ],
+        "normalized": "A(0,0,0)، B(4,0,0)، C(0,4,0)، D(0,0,4)، جد مركز ثقل رباعي الوجوه ABCD",
+        "pass": false,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "حجم رباعي الوجوه",
+            "final": "V=\\frac{32}{3}",
+            "verified": true,
+            "operation": "tetrahedron",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الجداء المختلط",
+              "الحجم",
+              "الارتفاع وقانون الهرم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S23",
+        "title": "اسم صريح لمركز الأبعاد",
+        "question": "A(0,0,0)، B(3,0,0)، C(0,3,0)، عين إحداثيات مركز الأبعاد المتناسبة G للجملة المثقلة {(A,1),(B,1),(C,1)}",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "G",
+          "1"
+        ],
+        "normalized": "A(0,0,0)، B(3,0,0)، C(0,3,0)، عين احداثيات مركز الابعاد المتناسبة G للجملة المثقلة {(A,1),(B,1),(C,1)}",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "ما معطيات G؟ عرّفه بدل استعمال أول عنصر معطى أو نتيجة قديمة."
+          }
+        ]
+      },
+      {
+        "id": "S24",
+        "title": "تلاقي المتوسطات بتعريف منتصفات",
+        "question": "A(0,0,0)، B(6,0,0)، C(0,6,0)، لتكن I منتصف BC وJ منتصف CA وK منتصف AB، برهن تلاقي متوسطات المثلث ABC",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "G",
+          "2"
+        ],
+        "normalized": "A(0,0,0)، B(6,0,0)، C(0,6,0)، لتكن I منتصف BC وJ منتصف CA وK منتصف AB، برهن تلاقي متوسطات المثلث ABC",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "probabilityEngine",
+            "message": "اكتب البيانات أو جدول القيم والتكرارات."
+          },
+          {
+            "engine": "complexEngine",
+            "message": "ما العدد العقدي الذي تريد العمل عليه؟ اكتب z=3+4i مثلًا."
+          }
+        ]
+      },
+      {
+        "id": "S25",
+        "title": "جداء تحليلي",
+        "question": "احسب الجداء السلمي للشعاعين u=(1,2,3) وv=(2,-1,0)",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=0"
+        ],
+        "normalized": "احسب الجداء السلمي للشعاعين u=(1,2,3) وv=(2,-1,0)",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الجداء السلمي والتعامد",
+            "final": "\\vec{u}\\cdot\\vec{v}=0",
+            "verified": true,
+            "operation": "dot",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الصيغة التحليلية",
+              "الطويلتان",
+              "اختبار التعامد"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S26",
+        "title": "جداء منقوط بالصيغة الرسمية",
+        "question": "u=(1,2,3)، v=(2,-1,0)، احسب \\vec{u}\\cdot\\vec{v}",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=0"
+        ],
+        "normalized": "u=(1,2,3)، v=(2,-1,0)، احسب \\vec{u}*\\vec{v}",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "حدّد المطلوب الهندسي: شعاع، بعد، ارتباط، مركز أبعاد، مستوٍ، مستقيم أو كرة."
+          }
+        ]
+      },
+      {
+        "id": "S27",
+        "title": "تحقق من تعامد غير صحيح",
+        "question": "A(0,0,0)، B(1,0,0)، C(1,1,0)، تحقق أن \\overrightarrow{AB}\\perp\\overrightarrow{AC}",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=1"
+        ],
+        "normalized": "A(0,0,0)، B(1,0,0)، C(1,1,0)، تحقق ان \\overrightarrow{AB}\\perp\\overrightarrow{AC}",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "complexEngine",
+            "message": "ما العدد العقدي الذي تريد العمل عليه؟ اكتب z=3+4i مثلًا."
+          }
+        ]
+      },
+      {
+        "id": "S28",
+        "title": "الصيغة الهندسية بالدرجات",
+        "question": "احسب الجداء السلمي بالصيغة الهندسية، الطويلتان=[3,4]، theta=60 درجة",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=6"
+        ],
+        "normalized": "احسب الجداء السلمي بالصيغة الهندسية، الطويلتان=[3,4]، theta=60 درجة",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الجداء السلمي بالصيغة الهندسية",
+            "final": "\\vec u\\cdot\\vec v=6",
+            "verified": false,
+            "operation": "geometric-dot",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الصيغة الهندسية"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S29",
+        "title": "طولتان بمعيار LaTeX وزاوية",
+        "question": "احسب الجداء السلمي في الفراغ إذا كان \\Vert u\\Vert=3 و\\Vert v\\Vert=4 وtheta=pi/3 راديان",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=6"
+        ],
+        "normalized": "احسب الجداء السلمي في الفراغ اذا كان \\Vert u\\Vert=3 و\\Vert v\\Vert=4 وtheta=pi/3 راديان",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "ما معطيات u؟ عرّفه بدل استعمال أول عنصر معطى أو نتيجة قديمة."
+          }
+        ]
+      },
+      {
+        "id": "S30",
+        "title": "الشعاع المعدوم والزاوية",
+        "question": "احسب الجداء السلمي وزاوية الشعاعين u=(0,0,0) وv=(1,0,0)",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=0"
+        ],
+        "normalized": "احسب الجداء السلمي وزاوية الشعاعين u=(0,0,0) وv=(1,0,0)",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الجداء السلمي والتعامد",
+            "final": "\\vec{u}\\cdot\\vec{v}=0",
+            "verified": true,
+            "operation": "dot",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الصيغة التحليلية",
+              "الطويلتان",
+              "الشعاع المعدوم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S31",
+        "title": "مستقيمان متعامدان متقاطعان",
+        "question": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,0)+s*(0,1,0)، تحقق من تعامد المستقيمين",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "متقاطع"
+        ],
+        "normalized": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,0)+s*(0,1,0)، تحقق من تعامد المستقيمين",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "حدّد الشعاع المطلوب ومعطياته صراحةً."
+          }
+        ]
+      },
+      {
+        "id": "S32",
+        "title": "اتجاهان متعامدان مع تخالف",
+        "question": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,1)+s*(0,1,0)، ادرس الوضع النسبي والتعامد بين المستقيمين",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "متخالف"
+        ],
+        "normalized": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,1)+s*(0,1,0)، ادرس الوضع النسبي والتعامد بين المستقيمين",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستقيمين في الفراغ",
+            "final": "\\text{المستقيمان متخالفان}",
+            "verified": true,
+            "operation": "lines",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D1",
+                "D2"
+              ],
+              "planes": []
+            },
+            "stepTitles": [
+              "الاتجاهان",
+              "شرط الاستواء",
+              "التعامد والتقاطع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S33",
+        "title": "مركبات ناظم بدون التباس عقدي",
+        "question": "P: 2x-y+2z-5=0، عين مركبات شعاع ناظم للمستوي P",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "2",
+          "-1"
+        ],
+        "normalized": "P: 2x-y+2z-5=0، عين عقديات شعاع ناظم للمستوي P",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "complexEngine",
+            "message": "ما العدد العقدي الذي تريد العمل عليه؟ اكتب z=3+4i مثلًا."
+          }
+        ]
+      },
+      {
+        "id": "S34",
+        "title": "ناظم مستوي بالرمز اليوناني",
+        "question": "جد شعاعا ناظما للمستوي \\Pi_1: x-2y+3z+4=0",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "1",
+          "-2",
+          "3"
+        ],
+        "normalized": "جد شعاعا ناظما للمستوي \\Pi_1: x-2y+3z+4=0",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المستوي وشعاعه الناظم",
+            "final": "\\vec n=\\left(1,\\,-2,\\,3\\right)",
+            "verified": true,
+            "operation": "normal",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P1"
+              ]
+            },
+            "stepTitles": [
+              "الناظم غير المعدوم",
+              "شرط الانتماء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S35",
+        "title": "ثلاث نقاط في مستوي مواز للإحداثي",
+        "question": "A(0,0,2)، B(1,0,2)، C(0,1,2)، اكتب معادلة المستوي المار بهذه النقاط",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "z",
+          "2"
+        ],
+        "normalized": "A(0,0,2)، B(1,0,2)، C(0,1,2)، اكتب معادلة المستوي المار بهذه النقاط",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المستوي المار بالنقاط المعطاة",
+            "final": "P:\\quad z-2=0",
+            "verified": true,
+            "operation": "plane",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الناظم غير المعدوم",
+              "شرط الانتماء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S36",
+        "title": "مستوي من نقطة وناظم",
+        "question": "A(1,2,3)، n=(1,0,0)، اكتب المعادلة الديكارتية للمستوي المار بالنقطة A وناظمه n",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "x",
+          "1"
+        ],
+        "normalized": "A(1,2,3)، n=(1,0,0)، اكتب المعادلة الديكارتية للمستوي المار بالنقطة A وناظمه n",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "معادلة مستوٍ من نقطة وناظم",
+            "final": "P:\\quad x-1=0",
+            "verified": true,
+            "operation": "plane",
+            "inputs": {
+              "points": [
+                "A"
+              ],
+              "vectors": [
+                "n"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الناظم غير المعدوم",
+              "شرط الانتماء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S37",
+        "title": "المستوي المنصف العمودي",
+        "question": "A(0,0,0)، B(2,0,0)، اكتب معادلة المستوي المنصف العمودي للقطعة AB",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "x",
+          "2"
+        ],
+        "normalized": "A(0,0,0)، B(2,0,0)، اكتب معادلة المستوي المنصف العمودي للقطعة AB",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المستوي المنصف العمودي",
+            "final": "P:\\quad 2x-2=0",
+            "verified": true,
+            "operation": "bisector",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [
+                "AB"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الناظم غير المعدوم",
+              "شرط الانتماء",
+              "مركز القطعة وبعد الطرفين"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S38",
+        "title": "تمثيل وسيطي من نقطتين",
+        "question": "A(1,2,3)، B(2,4,6)، اكتب التمثيل الوسيطي للمستقيم AB",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "t"
+        ],
+        "normalized": "A(1,2,3)، B(2,4,6)، اكتب التمثيل الوسيطي للمستقيم AB",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "التمثيل البارامتري للمستقيم",
+            "final": "\\begin{cases}x=1+t\\\\y=2+2t\\\\z=3+3t\\end{cases},\\quad t\\in\\mathbb R",
+            "verified": true,
+            "operation": "line",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [
+                "AB"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "نقطة وشعاع توجيه",
+              "اتجاه غير معدوم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S39",
+        "title": "مستقيم من نقطة واتجاه",
+        "question": "A(1,2,3)، u=(0,1,0)، اكتب التمثيل البارامتري للمستقيم المار من A وشعاع توجيهه u",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "t"
+        ],
+        "normalized": "A(1,2,3)، u=(0,1,0)، اكتب التمثيل البارامتري للمستقيم المار من A وشعاع توجيهه u",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "التمثيل البارامتري للمستقيم",
+            "final": "\\begin{cases}x=1\\\\y=2+t\\\\z=3\\end{cases},\\quad t\\in\\mathbb R",
+            "verified": true,
+            "operation": "line",
+            "inputs": {
+              "points": [
+                "A"
+              ],
+              "vectors": [
+                "u"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "نقطة وشعاع توجيه",
+              "اتجاه غير معدوم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S40",
+        "title": "تقاطع مستويين",
+        "question": "P: z=0، Q: x=0، جد تقاطع المستويين P وQ",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "t"
+        ],
+        "normalized": "P: z=0، Q: x=0، جد تقاطع المستويين P وQ",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستويين",
+            "final": "P\\cap Q=D,\\qquad \\begin{cases}x=0\\\\y=t\\\\z=0\\end{cases},\\quad t\\in\\mathbb R",
+            "verified": true,
+            "operation": "planes",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P",
+                "Q"
+              ]
+            },
+            "stepTitles": [
+              "اتجاه التقاطع",
+              "حل المعادلتين لاختيار نقطة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S41",
+        "title": "توازي مستويين متميزين",
+        "question": "P: z=0، Q: z=1، ادرس الوضع النسبي للمستويين P وQ",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "متوازي"
+        ],
+        "normalized": "P: z=0، Q: z=1، ادرس الوضع النسبي للمستويين P وQ",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستويين",
+            "final": "\\text{المستويان متوازيان ومتمايزان}",
+            "verified": true,
+            "operation": "planes",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P",
+                "Q"
+              ]
+            },
+            "stepTitles": [
+              "تناسب الناظمين",
+              "مقارنة الحد الثابت"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S42",
+        "title": "مستويان منطبقان",
+        "question": "P: x+y+z=1، Q: 2x+2y+2z=2، ادرس الوضع النسبي للمستويين P وQ",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "منطبق"
+        ],
+        "normalized": "P: x+y+z=1، Q: 2x+2y+2z=2، ادرس الوضع النسبي للمستويين P وQ",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستويين",
+            "final": "\\text{المستويان منطبقان}",
+            "verified": true,
+            "operation": "planes",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P",
+                "Q"
+              ]
+            },
+            "stepTitles": [
+              "تناسب الناظمين",
+              "مقارنة الحد الثابت"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S43",
+        "title": "تقاطع مستقيم ومستوي",
+        "question": "D: (x,y,z)=(0,0,0)+t*(1,1,1)، P: x+y+z-3=0، جد تقاطع المستقيم D مع المستوي P",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "1"
+        ],
+        "normalized": "D: (x,y,z)=(0,0,0)+t*(1,1,1)، P: x+y+z-3=0، جد تقاطع المستقيم D مع المستوي P",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "وضع مستقيم بالنسبة إلى مستوٍ",
+            "final": "D\\cap P=\\{I\\left(1,\\,1,\\,1\\right)\\},\\quad t=1",
+            "verified": true,
+            "operation": "line-plane",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D"
+              ],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "التعويض بالوسيط",
+              "إحداثيات نقطة التقاطع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S44",
+        "title": "مستقيم محتوى في مستوي",
+        "question": "D: (x,y,z)=(0,0,0)+t*(1,0,0)، P: z=0، ادرس وضع المستقيم D بالنسبة إلى المستوي P",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "محتو"
+        ],
+        "normalized": "D: (x,y,z)=(0,0,0)+t*(1,0,0)، P: z=0، ادرس وضع المستقيم D بالنسبة الي المستوي P",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "وضع مستقيم بالنسبة إلى مستوٍ",
+            "final": "\\text{المستقيم محتوى في المستوي}",
+            "verified": true,
+            "operation": "line-plane",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D"
+              ],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "التعويض بالوسيط"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S45",
+        "title": "مستقيم مواز دون تقاطع",
+        "question": "D: (x,y,z)=(0,1,0)+t*(1,0,0)، P: y=0، ادرس الوضع النسبي بين المستقيم D والمستوي P",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "مواز"
+        ],
+        "normalized": "D: (x,y,z)=(0,1,0)+t*(1,0,0)، P: y=0، ادرس الوضع النسبي بين المستقيم D والمستوي P",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "وضع مستقيم بالنسبة إلى مستوٍ",
+            "final": "\\text{المستقيم موازٍ للمستوي ولا يقطعه}",
+            "verified": true,
+            "operation": "line-plane",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D"
+              ],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "التعويض بالوسيط"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S46",
+        "title": "تقاطع مستقيمين",
+        "question": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,0)+s*(0,1,0)، جد تقاطع المستقيمين D1 وD2",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "متقاطع"
+        ],
+        "normalized": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,0)+s*(0,1,0)، جد تقاطع المستقيمين D1 وD2",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستقيمين في الفراغ",
+            "final": "\\text{المستقيمان متقاطعان}\\quad I\\left(0,\\,0,\\,0\\right)",
+            "verified": true,
+            "operation": "lines",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D1",
+                "D2"
+              ],
+              "planes": []
+            },
+            "stepTitles": [
+              "الاتجاهان",
+              "شرط الاستواء",
+              "حل الوسيطين والتحقق",
+              "التعامد والتقاطع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S47",
+        "title": "مستقيمان متخالفان",
+        "question": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,1)+s*(0,1,0)، ادرس الوضع النسبي للمستقيمين D1 وD2",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "متخالف"
+        ],
+        "normalized": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,1)+s*(0,1,0)، ادرس الوضع النسبي للمستقيمين D1 وD2",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستقيمين في الفراغ",
+            "final": "\\text{المستقيمان متخالفان}",
+            "verified": true,
+            "operation": "lines",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D1",
+                "D2"
+              ],
+              "planes": []
+            },
+            "stepTitles": [
+              "الاتجاهان",
+              "شرط الاستواء",
+              "التعامد والتقاطع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S48",
+        "title": "مستويان بأسماء يونانية",
+        "question": "جد تقاطع المستويين \\alpha: x+y+z=1، \\beta: x-y=0",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\alpha",
+          "\\beta"
+        ],
+        "normalized": "جد تقاطع المستويين \\alpha: x+y+z=1، \\beta: x-y=0",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستويين",
+            "final": "\\alpha\\cap \\beta=D,\\qquad \\begin{cases}x=\\frac{1}{2}+t\\\\y=\\frac{1}{2}+t\\\\z=-2t\\end{cases},\\quad t\\in\\mathbb R",
+            "verified": true,
+            "operation": "planes",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "alpha",
+                "beta"
+              ]
+            },
+            "stepTitles": [
+              "اتجاه التقاطع",
+              "حل المعادلتين لاختيار نقطة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S49",
+        "title": "البعد المتكرر في مسائل الارتفاع",
+        "question": "M(1,2,3)، P: 2x-y+2z-5=0، احسب بعد النقطة M عن المستوي P",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\frac{1}{3}"
+        ],
+        "normalized": "M(1,2,3)، P: 2x-y+2z-5=0، احسب بعد النقطة M عن المستوي P",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "بعد نقطة عن مستوٍ ومسقطها العمودي",
+            "final": "\\begin{aligned}d(M,P)=\\frac{1}{3}\\\\[5pt]H\\left(\\frac{7}{9},\\,\\frac{19}{9},\\,\\frac{25}{9}\\right)\\end{aligned}",
+            "verified": true,
+            "operation": "distance-plane",
+            "inputs": {
+              "points": [
+                "M"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "الناظم والمعطيات",
+              "قانون البعد",
+              "الإسقاط العمودي"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S50",
+        "title": "بعد نقطة عن مستقيم",
+        "question": "M(0,1,1)، D: (x,y,z)=(0,0,0)+t*(1,0,0)، احسب بعد M عن المستقيم D",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\sqrt{2}"
+        ],
+        "normalized": "M(0,1,1)، D: (x,y,z)=(0,0,0)+t*(1,0,0)، احسب بعد M عن المستقيم D",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "بعد نقطة عن مستقيم",
+            "final": "\\begin{aligned}d(M,D)=\\sqrt{2}\\\\[5pt]H\\left(0,\\,0,\\,0\\right)\\end{aligned}",
+            "verified": true,
+            "operation": "distance-line",
+            "inputs": {
+              "points": [
+                "M"
+              ],
+              "vectors": [],
+              "lines": [
+                "D"
+              ],
+              "planes": []
+            },
+            "stepTitles": [
+              "قانون البعد",
+              "المسقط من شرط التعامد"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S51",
+        "title": "مسقط عمودي لا مسافة فقط",
+        "question": "M(1,2,3)، P: 2x-y+2z-5=0، عين المسقط العمودي للنقطة M على المستوي P",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\frac{7}{9}",
+          "\\frac{19}{9}",
+          "\\frac{25}{9}"
+        ],
+        "normalized": "M(1,2,3)، P: 2x-y+2z-5=0، عين المسقط العمودي للنقطة M علي المستوي P",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "بعد نقطة عن مستوٍ ومسقطها العمودي",
+            "final": "\\begin{aligned}d(M,P)=\\frac{1}{3}\\\\[5pt]H\\left(\\frac{7}{9},\\,\\frac{19}{9},\\,\\frac{25}{9}\\right)\\end{aligned}",
+            "verified": true,
+            "operation": "distance-plane",
+            "inputs": {
+              "points": [
+                "M"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "الناظم والمعطيات",
+              "قانون البعد",
+              "الإسقاط العمودي"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S52",
+        "title": "كرة مركز ونصف قطر",
+        "question": "جد معادلة الكرة مركزها K(1,2,3) ونصف قطرها r=2",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=4"
+        ],
+        "normalized": "جد معادلة الكرة مركزها K(1,2,3) ونصف قطرها r=2",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المعادلة الديكارتية للكرة",
+            "final": "\\left(x-1\\right)^2+\\left(y-2\\right)^2+\\left(z-3\\right)^2=4",
+            "verified": true,
+            "operation": "sphere",
+            "inputs": {
+              "points": [
+                "K"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "المركز ونصف القطر",
+              "المعادلة القياسية",
+              "الشكل الموسع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S53",
+        "title": "كرة من طرفي قطر",
+        "question": "A(0,0,0)، B(2,0,0)، عين المعادلة الديكارتية للكرة ذات القطر AB",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=1"
+        ],
+        "normalized": "A(0,0,0)، B(2,0,0)، عين المعادلة الديكارتية للكرة ذات القطر AB",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المعادلة الديكارتية للكرة",
+            "final": "\\left(x-1\\right)^2+y^2+z^2=1",
+            "verified": true,
+            "operation": "sphere-diameter",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [
+                "AB"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "المركز ونصف القطر",
+              "خاصية القطر",
+              "الشكل الموسع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S54",
+        "title": "كرة من معادلتها العامة",
+        "question": "جد مركز ونصف قطر الكرة x^2+y^2+z^2-2x-4y-6z+10=0",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "2",
+          "4"
+        ],
+        "normalized": "جد مركز ونصف قطر الكرة x^2+y^2+z^2-2x-4y-6z+10=0",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المعادلة الديكارتية للكرة",
+            "final": "\\left(x-1\\right)^2+\\left(y-2\\right)^2+\\left(z-3\\right)^2=4",
+            "verified": true,
+            "operation": "sphere-equation",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "المركز ونصف القطر",
+              "المعادلة القياسية",
+              "الشكل الموسع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S55",
+        "title": "كرة بمجاهيل عربية",
+        "question": "استخرج مركز ونصف قطر الكرة س^2+ص^2+ع^2-2س-4ص-6ع+10=0",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "2",
+          "4"
+        ],
+        "normalized": "استخرج مركز ونصف قطر الكرة س^2+ص^2+ع^2-2س-4ص-6ع+10=0",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "اكتب مركز الكرة ونصف قطرها، أو طرفي قطر، أو معادلة الكرة كاملة."
+          }
+        ]
+      },
+      {
+        "id": "S56",
+        "title": "حجم رباعي الوجوه",
+        "question": "A(0,0,0)، B(1,0,0)، C(0,1,0)، D(0,0,1)، احسب حجم رباعي الوجوه ABCD",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\frac{1}{6}"
+        ],
+        "normalized": "A(0,0,0)، B(1,0,0)، C(0,1,0)، D(0,0,1)، احسب حجم رباعي الوجوه ABCD",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "حجم رباعي الوجوه",
+            "final": "V=\\frac{1}{6}",
+            "verified": true,
+            "operation": "tetrahedron",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الجداء المختلط",
+              "الحجم",
+              "الارتفاع وقانون الهرم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S57",
+        "title": "ارتفاع رأس عن وجه مسمى",
+        "question": "A(0,0,0)، B(1,0,0)، C(0,1,0)، D(0,0,2)، جد بعد D عن المستوي ABC",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=2"
+        ],
+        "normalized": "A(0,0,0)، B(1,0,0)، C(0,1,0)، D(0,0,2)، جد بعد D عن المستوي ABC",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "بعد نقطة عن مستوٍ ومسقطها العمودي",
+            "final": "\\begin{aligned}d(D,P)=2\\\\[5pt]H\\left(0,\\,0,\\,0\\right)\\end{aligned}",
+            "verified": true,
+            "operation": "distance-plane",
+            "inputs": {
+              "points": [
+                "D"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "الناظم والمعطيات",
+              "قانون البعد",
+              "الإسقاط العمودي"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S58",
+        "title": "حجم هرم من مساحة وارتفاع",
+        "question": "احسب حجم هرم مساحة القاعدة area=6 والارتفاع h=3",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=6"
+        ],
+        "normalized": "احسب حجم هرم مساحة القاعدة area=6 والارتفاع h=3",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryTools",
+            "title": "حجم هرم من مساحة قاعدته وارتفاعه",
+            "final": "V=\\frac13 S_{\\text{قاعدة}}h=6",
+            "verified": false,
+            "operation": "pyramid-volume",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "تمييز المعطيات",
+              "قانون حجم الهرم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S59",
+        "title": "ارتفاع دقيق يتبعه حجم",
+        "question": "M(0,0,1/3)، P: z=0، احسب بعد M عن المستوي P ثم احسب حجم هرم مساحة القاعدة area=9 وارتفاعه البعد السابق",
+        "expect": "answer",
+        "resultCount": 2,
+        "contains": [
+          "\\frac{1}{3}",
+          "=1"
+        ],
+        "normalized": "M(0,0,1/3)، P: z=0، احسب بعد M عن المستوي P ثم احسب حجم هرم مساحة القاعدة area=9 وارتفاعه البعد السابق",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "بعد نقطة عن مستوٍ ومسقطها العمودي",
+            "final": "\\begin{aligned}d(M,P)=\\frac{1}{3}\\\\[5pt]H\\left(0,\\,0,\\,0\\right)\\end{aligned}",
+            "verified": true,
+            "operation": "distance-plane",
+            "inputs": {
+              "points": [
+                "M"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "الناظم والمعطيات",
+              "قانون البعد",
+              "الإسقاط العمودي"
+            ]
+          },
+          {
+            "engine": "geometryEngine",
+            "title": "حجم هرم من مساحة قاعدته وارتفاعه",
+            "final": "V=\\frac13 S_{\\text{قاعدة}}h=1",
+            "verified": false,
+            "operation": "pyramid-volume",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "تمييز المعطيات",
+              "قانون حجم الهرم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S60",
+        "title": "أشعة ومصفوفة ورتبة في سؤال",
+        "question": "u=(1,0,0)، v=(0,1,0)، w=(1,1,0)، ادرس الارتباط الخطي للأشعة u وv وw ثم حول الأشعة u وv وw إلى مصفوفة ثم احسب رتبة المصفوفة M",
+        "expect": "answer",
+        "resultCount": 3,
+        "contains": [
+          "مرتبطة",
+          "M",
+          "2"
+        ],
+        "normalized": "u=(1,0,0)، v=(0,1,0)، w=(1,1,0)، ادرس الارتباط الخطي للاشعة u وv وw ثم حول الاشعة u وv وw الي مصفوفة ثم احسب رتبة المصفوفة M",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأشعة مرتبطة خطيًا",
+            "final": "\\text{الأشعة مرتبطة خطيًا}",
+            "verified": true,
+            "operation": "dependence",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v",
+                "w"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "الجداء المختلط",
+              "الرتبة وتفسير النتيجة",
+              "علاقة خطية غير تافهة"
+            ]
+          },
+          {
+            "engine": "geometryEngine",
+            "title": "الإحداثيات كصفوف مصفوفة",
+            "final": "M=\\begin{pmatrix}1&0&0\\\\0&1&0\\\\1&1&0\\end{pmatrix}",
+            "verified": false,
+            "operation": "matrix",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v",
+                "w"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "جسر إلى محرك المصفوفات"
+            ]
+          },
+          {
+            "engine": "matricesEngine",
+            "title": "الرتبة الجبرية للمصفوفة M",
+            "final": "\\operatorname{rank}(M)=2\\quad\\text{وقياسها }3\\times3",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة M والمعطيات",
+              "تصفير عنصر بعملية سطرية",
+              "تصفير عنصر بعملية سطرية",
+              "المحاور والرتبة الجبرية"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S61",
+        "title": "مصفوفة التقاطع تتبعها غاوس",
+        "question": "D1: (x,y,z)=(0,0,0)+t*(1,1,1)، D2: (x,y,z)=(1,0,1)+s*(0,1,0)، اكتب جملة التقاطع للمستقيمين D1 وD2 ثم حل الجملة السابقة بطريقة غاوس",
+        "expect": "answer",
+        "resultCount": 2,
+        "contains": [
+          "t=1",
+          "s=1"
+        ],
+        "normalized": "D1: (x,y,z)=(0,0,0)+t*(1,1,1)، D2: (x,y,z)=(1,0,1)+s*(0,1,0)، اكتب جملة التقاطع للمستقيمين D1 وD2 ثم حل الجملة السابقة بطريقة غاوس",
+        "pass": false,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "جملة الوسيطين ومصفوفتها الموسعة",
+            "final": "\\begin{cases}t=1\\\\t-s=0\\\\t=1\\end{cases}",
+            "verified": false,
+            "operation": "line-system",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D1",
+                "D2"
+              ],
+              "planes": []
+            },
+            "stepTitles": [
+              "جسر إلى محرك المصفوفات"
+            ]
+          }
+        ],
+        "unsolved": [
+          {
+            "engine": "matricesEngine",
+            "message": "لحل جملة من مصفوفة موسعة نحتاج مقاس 2×3 أو3×4، وآخر عمود هو الطرف الأيمن."
+          }
+        ]
+      },
+      {
+        "id": "S62",
+        "title": "طلب هندسي مستقل بعد فشل غير هندسي",
+        "question": "السؤال الأول (10 درجات)\nA(0,0,0)، B(0,0,2)\nالمطلوب:\nأ) احسب محدد المصفوفة Z\nب) احسب المسافة بين النقطتين A وB",
+        "expect": "partial",
+        "resultCount": 1,
+        "contains": [
+          "=2"
+        ],
+        "normalized": "السؤال الاول (10 درجات)\nA(0,0,0)، B(0,0,2)\nالمطلوب:\nا) احسب محدد المصفوفة Z\nب) احسب المسافة بين النقطتين A وB",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "matricesEngine",
+            "message": "ما عناصر المصفوفة Z؟ اكتبها مثل Z=[[1,2],[3,4]]."
+          },
+          {
+            "engine": "geometryEngine",
+            "message": "ما معطيات A؟ عرّفه بدل استعمال أول عنصر معطى أو نتيجة قديمة."
+          }
+        ]
+      },
+      {
+        "id": "S63",
+        "title": "ثلاث نقاط مستقيمة لا تعطي مستويا وحيدا",
+        "question": "A(0,0,0)، B(1,1,1)، C(2,2,2)، جد معادلة المستوي المار بالنقاط",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "A(0,0,0)، B(1,1,1)، C(2,2,2)، جد معادلة المستوي المار بالنقاط",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "النقاط مستقيمة أو متطابقة؛ لا تعرّف مستويًا وحيدًا."
+          }
+        ]
+      },
+      {
+        "id": "S64",
+        "title": "مركبة ناقصة لا تستكمل بصفر",
+        "question": "جد الشعاع AB حيث A(1,2) وB(3,4,5)",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "جد الشعاع AB حيث A(1,2) وB(3,4,5)",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "ما معطيات AB؟ عرّفه بدل استعمال أول عنصر معطى أو نتيجة قديمة."
+          }
+        ]
+      },
+      {
+        "id": "S65",
+        "title": "وسيطان لا يمثلان مستقيم وسيط واحد",
+        "question": "D: x=t، y=s، z=t، اكتب التمثيل البارامتري للمستقيم D",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "D: x=t، y=s، z=t، اكتب التمثيل البارامتري للمستقيم D",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "استعمل وسيطًا واحدًا مشتركًا للمركبات الثلاث، واتجاهًا غير معدوم."
+          }
+        ]
+      },
+      {
+        "id": "S66",
+        "title": "نقطة لا تفترض مركز كرة",
+        "question": "A(1,2,3)، جد معادلة كرة نصف قطرها r=2",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "A(1,2,3)، جد معادلة كرة نصف قطرها r=2",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "حدّد مركز الكرة صراحةً؛ النقطة المعطاة لا تُفترض مركزًا لمجرد وجود نصف قطر."
+          }
+        ]
+      },
+      {
+        "id": "S67",
+        "title": "لا أوزان رمزية مفترضة",
+        "question": "A(0,0,0)، B(1,0,0)، جد مركز الأبعاد المتناسبة، الأوزان=[k,1]",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "A(0,0,0)، B(1,0,0)، جد مركز الابعاد المتناسبة، الاوزان=[k,1]",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "اكتب أعدادًا وكسورًا وجذورًا حقيقية بسيطة، دون رموز مجهولة أو أوامر."
+          }
+        ]
+      },
+      {
+        "id": "S68",
+        "title": "لا برهان عام زائف للاستواء",
+        "question": "أثبت أن أي أربع نقاط في الفراغ تقع في مستو واحد",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "اثبت ان اي 4 نقاط في الفراغ تقع في مستو 1",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "message": "هذا البرهان ليس ضمن مسارات الاستدلال المدرسية المدعومة؛ هل تريد حساب المقدار أو صياغة المطلوب المحدد بدل اعتبار النتيجة المعطاة معطى جديدًا؟"
+          }
+        ]
+      },
+      {
+        "id": "X1",
+        "title": "جمع المحددين بالجمع اللغوي",
+        "question": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب محددي المصفوفتين A وB",
+        "resultCount": 2,
+        "expect": "answer",
+        "contains": [
+          "A=-2",
+          "B=1"
+        ],
+        "normalized": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب محددي المصفوفتين A وB",
+        "pass": false,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "محدد المصفوفة A",
+            "final": "\\text{محدد المصفوفة }A=-2",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "محدد المصفوفة A"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "X2",
+        "title": "أثرا المصفوفتين",
+        "question": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب أثري المصفوفتين A وB",
+        "resultCount": 2,
+        "expect": "answer",
+        "contains": [
+          "A=5",
+          "B=8"
+        ],
+        "normalized": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب اثري المصفوفتين A وB",
+        "pass": false,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "أثر المصفوفة A",
+            "final": "\\text{أثر المصفوفة }A=5",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "أثر المصفوفة A"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "X3",
+        "title": "منقولا مصفوفتين",
+        "question": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، جد منقولي المصفوفتين A وB",
+        "resultCount": 2,
+        "expect": "answer",
+        "contains": [
+          "A^T",
+          "B^T"
+        ],
+        "normalized": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، جد منقولي المصفوفتين A وB",
+        "pass": false,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "منقول المصفوفة A",
+            "final": "A^T=\\begin{pmatrix}1&3\\\\2&4\\end{pmatrix}",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "منقول المصفوفة A"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "X4",
+        "title": "طلبان حسابيان مستقلان",
+        "question": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب A+B وA-B",
+        "resultCount": 2,
+        "expect": "answer",
+        "contains": [
+          "A+B",
+          "A-B"
+        ],
+        "normalized": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب A+B وA-B",
+        "pass": false,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "قيمة العبارة المصفوفية",
+            "final": "A+B=\\begin{pmatrix}2&4\\\\6&11\\end{pmatrix}",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "العبارة المطلوبة وشروط الأبعاد"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "X5",
+        "title": "أسطر بفاصلة منقوطة",
+        "question": "لتكن A=(1,2;3,4)، جد معكوس المصفوفة A",
+        "resultCount": 1,
+        "expect": "answer",
+        "contains": [
+          "A^{-1}",
+          "-2"
+        ],
+        "normalized": "لتكن A=(1,2;3,4)، جد معكوس المصفوفة A",
+        "pass": true,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "معكوس المصفوفة A",
+            "final": "A^{-1}=\\begin{pmatrix}-2&1\\\\\\frac{3}{2}&-\\frac{1}{2}\\end{pmatrix}",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "العوامل المرافقة ثم المصفوفة الملحقة",
+              "شرط معكوس المصفوفة A وقانونه"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "X6",
+        "title": "رتبة ومحدد في جملة",
+        "question": "لتكن A=[[1,2],[3,4]]، جد رتبة A ومحدد A",
+        "resultCount": 2,
+        "expect": "answer",
+        "contains": [
+          "2",
+          "A=-2"
+        ],
+        "normalized": "لتكن A=[[1,2],[3,4]]، جد رتبة A ومحدد A",
+        "pass": true,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "الرتبة الجبرية للمصفوفة A",
+            "final": "\\operatorname{rank}(A)=2\\quad\\text{وقياسها }2\\times2",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "تصفير عنصر بعملية سطرية",
+              "جعل العنصر المحوري واحدًا",
+              "تصفير عنصر بعملية سطرية",
+              "المحاور والرتبة الجبرية"
+            ]
+          },
+          {
+            "engine": "matricesEngine",
+            "title": "محدد المصفوفة A",
+            "final": "\\text{محدد المصفوفة }A=-2",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "محدد المصفوفة A"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "X7",
+        "title": "ثلاث معادلات في مجهولين",
+        "question": "حل الجملة بطريقة غاوس: x+y=3، x-y=1، 2x=4",
+        "resultCount": 1,
+        "expect": "answer",
+        "contains": [
+          "x=2",
+          "y=1"
+        ],
+        "normalized": "حل الجملة بطريقة غاوس: x+y=3، x-y=1، 2x=4",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "matricesEngine",
+            "message": "عدد المعادلات يساوي عدد المجاهيل: اثنان أو ثلاثة. لا نضيف مجهولًا أو معادلة افتراضية."
+          }
+        ]
+      },
+      {
+        "id": "X8",
+        "title": "مجهولا التقاطع بالرمز",
+        "question": "حل الجملة بالحذف الغاوسي: \\begin{cases}t=1\\\\t-s=0\\\\t=1\\end{cases}",
+        "resultCount": 1,
+        "expect": "answer",
+        "contains": [
+          "t=1",
+          "s=1"
+        ],
+        "normalized": "حل الجملة بالحذف الغاوسي: \\begin{cases}t=1\\\\t-s=0\\\\t=1\\end{cases}",
+        "pass": false,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "matricesEngine",
+            "message": "طريقة غاوس وكرامر هنا لجمل خطية في x وy وz فقط؛ الجملة المدخلة ليست خطية."
+          }
+        ]
+      }
+    ]
+  },
+  "after": {
+    "kind": "Diagnostic observations, not assertion-suite results",
+    "cases": 76,
+    "passed": 76,
+    "failed": 0,
+    "results": [
+      {
+        "id": "S01",
+        "title": "معلم متعامد وكتابة الإحداثيات",
+        "question": "في معلم متعامد متجانس (O;\\vec{i},\\vec{j},\\vec{k})، A(1;2;3) وB(4;6;3)، عين إحداثيات الشعاع AB",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "3",
+          "4"
+        ],
+        "normalized": "في معلم متعامد متجانس (O;\\vec{i},\\vec{j},\\vec{k})، A(1;2;3) وB(4;6;3)، عين احداثيات الشعاع AB",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "إحداثيات شعاع وطويلته",
+            "final": "\\begin{aligned}\\overrightarrow{AB}=\\left(3,\\,4,\\,0\\right)\\\\[5pt]\\|\\overrightarrow{AB}\\|=5\\end{aligned}",
+            "verified": true,
+            "operation": "vector",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [
+                "AB"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "طرح الإحداثيات بالترتيب",
+              "فيثاغورس في الفضاء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S02",
+        "title": "أرقام عربية وفواصل عربية",
+        "question": "لتكن النقطتان A(١،٢،٣) وB(١؛٢؛٥)، احسب المسافة بينهما",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=2"
+        ],
+        "normalized": "لتكن النقطتان A(1،2،3) وB(1؛2؛5)، احسب المسافة بينهما",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المسافة بين نقطتين في الفراغ",
+            "final": "d(A,B)=2",
+            "verified": true,
+            "operation": "distance",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "طرح الإحداثيات بالترتيب",
+              "فيثاغورس في الفضاء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S03",
+        "title": "معيار بالرموز",
+        "question": "u=(2,-3,6)، احسب ‖u‖",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=7"
+        ],
+        "normalized": "u=(2,-3,6)، احسب ‖u‖",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "طويلة شعاع في الفراغ",
+            "final": "\\|\\vec{u}\\|=7",
+            "verified": true,
+            "operation": "norm",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "فيثاغورس للمركبات"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S04",
+        "title": "نظير شعاع مع LaTeX",
+        "question": "جد نظير الشعاع \\vec{u}=(1,-2,3)",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "-1",
+          "2",
+          "-3"
+        ],
+        "normalized": "جد نظير الشعاع \\vec{u}=(1,-2,3)",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "العمليات على الأشعة في الفراغ",
+            "final": "\\vec{w}=\\left(-1,\\,2,\\,-3\\right)",
+            "verified": true,
+            "operation": "vector-arithmetic",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "العمل مركبةً مركبة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S05",
+        "title": "جمع شعاعين رمزي",
+        "question": "u=(1,2,3)، v=(2,-1,0)، احسب u+v",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "3",
+          "1",
+          "3"
+        ],
+        "normalized": "u=(1,2,3)، v=(2,-1,0)، احسب u+v",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "العمليات على الأشعة في الفراغ",
+            "final": "\\vec{w}=\\left(3,\\,1,\\,3\\right)",
+            "verified": true,
+            "operation": "vector-arithmetic",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "العمل مركبةً مركبة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S06",
+        "title": "طرح رمزي يحفظ الترتيب",
+        "question": "u=(1,2,3)، v=(2,-1,0)، احسب u-v",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "-1",
+          "3"
+        ],
+        "normalized": "u=(1,2,3)، v=(2,-1,0)، احسب u-v",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "العمليات على الأشعة في الفراغ",
+            "final": "\\vec{w}=\\left(-1,\\,3,\\,3\\right)",
+            "verified": true,
+            "operation": "vector-arithmetic",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "العمل مركبةً مركبة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S07",
+        "title": "تضريب رمزي كسري",
+        "question": "u=(1,2,3)، احسب (1/2)*u",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\frac{1}{2}",
+          "\\frac{3}{2}"
+        ],
+        "normalized": "u=(1,2,3)، احسب (1/2)*u",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "العمليات على الأشعة في الفراغ",
+            "final": "\\vec{w}=\\left(\\frac{1}{2},\\,1,\\,\\frac{3}{2}\\right)",
+            "verified": true,
+            "operation": "vector-arithmetic",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "العمل مركبةً مركبة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S08",
+        "title": "طول قطعة",
+        "question": "A(1,2,3)، B(1,2,5)، احسب طول القطعة AB",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=2"
+        ],
+        "normalized": "A(1,2,3)، B(1,2,5)، احسب طول القطعة AB",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المسافة بين نقطتين في الفراغ",
+            "final": "d(A,B)=2",
+            "verified": true,
+            "operation": "distance",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [
+                "AB"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "طرح الإحداثيات بالترتيب",
+              "فيثاغورس في الفضاء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S09",
+        "title": "إحداثيات شعاعين في طلب",
+        "question": "A(0,0,0)، B(1,0,0)، C(0,1,0)، احسب إحداثيات الشعاعين AB وAC",
+        "expect": "answer",
+        "resultCount": 2,
+        "contains": [
+          "AB",
+          "AC"
+        ],
+        "normalized": "A(0,0,0)، B(1,0,0)، C(0,1,0)، احسب احداثيات الشعاعين AB وAC",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "إحداثيات شعاع وطويلته",
+            "final": "\\begin{aligned}\\overrightarrow{AB}=\\left(1,\\,0,\\,0\\right)\\\\[5pt]\\|\\overrightarrow{AB}\\|=1\\end{aligned}",
+            "verified": true,
+            "operation": "vector",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [
+                "AB"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "طرح الإحداثيات بالترتيب",
+              "فيثاغورس في الفضاء"
+            ]
+          },
+          {
+            "engine": "geometryEngine",
+            "title": "إحداثيات شعاع وطويلته",
+            "final": "\\begin{aligned}\\overrightarrow{AC}=\\left(0,\\,1,\\,0\\right)\\\\[5pt]\\|\\overrightarrow{AC}\\|=1\\end{aligned}",
+            "verified": true,
+            "operation": "vector",
+            "inputs": {
+              "points": [
+                "A",
+                "C"
+              ],
+              "vectors": [
+                "AC"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "طرح الإحداثيات بالترتيب",
+              "فيثاغورس في الفضاء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S10",
+        "title": "طويلتا شعاعين",
+        "question": "u=(3,4,0)، v=(0,0,2)، احسب طويلتي الشعاعين u وv",
+        "expect": "answer",
+        "resultCount": 2,
+        "contains": [
+          "=5",
+          "=2"
+        ],
+        "normalized": "u=(3,4,0)، v=(0,0,2)، احسب طويلتي الشعاعين u وv",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "طويلة شعاع في الفراغ",
+            "final": "\\|\\vec{u}\\|=5",
+            "verified": true,
+            "operation": "norm",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "فيثاغورس للمركبات"
+            ]
+          },
+          {
+            "engine": "geometryEngine",
+            "title": "طويلة شعاع في الفراغ",
+            "final": "\\|\\vec{v}\\|=2",
+            "verified": true,
+            "operation": "norm",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "v"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "فيثاغورس للمركبات"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S11",
+        "title": "استقلال شعاعين",
+        "question": "تحقق من استقلال الشعاعين u=(1,0,0) وv=(0,1,0) خطيا",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "مستقلة"
+        ],
+        "normalized": "تحقق من استقلال الشعاعين u=(1,0,0) وv=(0,1,0) خطيا",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأشعة مستقلة خطيًا",
+            "final": "\\text{الأشعة مستقلة خطيًا}",
+            "verified": true,
+            "operation": "dependence",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "اختبار شعاعين",
+              "الرتبة وتفسير النتيجة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S12",
+        "title": "ارتباط ثلاثة أشعة",
+        "question": "برهن أن الأشعة u=(1,0,0) وv=(0,1,0) وw=(1,1,0) مرتبطة خطيا",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "مرتبطة"
+        ],
+        "normalized": "برهن ان الاشعة u=(1,0,0) وv=(0,1,0) وw=(1,1,0) مرتبطة خطيا",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأشعة مرتبطة خطيًا",
+            "final": "\\text{الأشعة مرتبطة خطيًا}",
+            "verified": true,
+            "operation": "dependence",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v",
+                "w"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "الجداء المختلط",
+              "الرتبة وتفسير النتيجة",
+              "دلالة الرتبة في فضاء ثلاثي الأبعاد",
+              "علاقة خطية غير تافهة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S13",
+        "title": "أساس للفراغ",
+        "question": "تحقق أن الأشعة u=(1,0,0) وv=(0,1,0) وw=(0,0,1) تشكل أساسا للفراغ",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "مستقلة"
+        ],
+        "normalized": "تحقق ان الاشعة u=(1,0,0) وv=(0,1,0) وw=(0,0,1) تشكل اساسا للفراغ",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأشعة مستقلة خطيًا",
+            "final": "\\text{الأشعة مستقلة خطيًا}",
+            "verified": true,
+            "operation": "dependence",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v",
+                "w"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "الجداء المختلط",
+              "الرتبة وتفسير النتيجة",
+              "دلالة الرتبة في فضاء ثلاثي الأبعاد"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S14",
+        "title": "رفض استقامة زائفة",
+        "question": "بين هل النقاط A(0,0,0) وB(1,2,3) وC(2,4,7) على استقامة واحدة",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "ليست"
+        ],
+        "normalized": "بين هل النقاط A(0,0,0) وB(1,2,3) وC(2,4,7) علي استقامة 1",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "النقاط ليست على استقامة واحدة",
+            "final": "\\text{النقاط ليست على استقامة واحدة}",
+            "verified": true,
+            "operation": "collinear",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "اختبار شعاعين",
+              "الرتبة وتفسير النتيجة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S15",
+        "title": "استواء أربعة رؤوس",
+        "question": "برهن أن النقاط A(0,0,0) وB(1,0,0) وC(0,1,0) وD(1,1,0) تقع في مستو واحد",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "مستو"
+        ],
+        "normalized": "برهن ان النقاط A(0,0,0) وB(1,0,0) وC(0,1,0) وD(1,1,0) تقع في مستو 1",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "النقاط الأربع تقع في مستوٍ واحد",
+            "final": "\\text{النقاط الأربع تقع في مستوٍ واحد}",
+            "verified": true,
+            "operation": "coplanar",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "الجداء المختلط",
+              "الرتبة وتفسير النتيجة",
+              "علاقة خطية غير تافهة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S16",
+        "title": "أربع نقاط غير مستوية",
+        "question": "هل النقاط A(0,0,0) وB(1,0,0) وC(0,1,0) وD(0,0,1) مستوية؟",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "غير مستوية"
+        ],
+        "normalized": "هل النقاط A(0,0,0) وB(1,0,0) وC(0,1,0) وD(0,0,1) مستوية؟",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "النقاط الأربع غير مستوية",
+            "final": "\\text{النقاط الأربع غير مستوية}",
+            "verified": true,
+            "operation": "coplanar",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "الجداء المختلط",
+              "الرتبة وتفسير النتيجة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S17",
+        "title": "لا تقريب للتحديد المستوي",
+        "question": "A(0,0,0)، B(1,0,0)، C(0,1,0)، D(0,0,1/1000000000)، ادرس استواء النقاط الأربع",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "غير مستوية"
+        ],
+        "normalized": "A(0,0,0)، B(1,0,0)، C(0,1,0)، D(0,0,1/1000000000)، ادرس استواء النقاط الاربع",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "النقاط الأربع غير مستوية",
+            "final": "\\text{النقاط الأربع غير مستوية}",
+            "verified": true,
+            "operation": "coplanar",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "الجداء المختلط",
+              "الرتبة وتفسير النتيجة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S18",
+        "title": "معلم غير متعامد",
+        "question": "في معلم غير متعامد في الفراغ، جد المسافة بين A(0,0,0) وB(1,1,0)",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "في معلم غير متعامد في الفراغ، جد المسافة بين A(0,0,0) وB(1,1,0)",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "في المعلم غير المتعامد نحتاج جداءات أشعة الأساس أو مصفوفة غرام للصيغ المترية؛ لا أفترضها متعامدة."
+          }
+        ]
+      },
+      {
+        "id": "S19",
+        "title": "جملة مثقلة بوزنين",
+        "question": "A(0,0,0)، B(3,0,0)، عين مركز الأبعاد المتناسبة للجملة المثقلة {(A,2),(B,-1)}",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "-3"
+        ],
+        "normalized": "A(0,0,0)، B(3,0,0)، عين مركز الابعاد المتناسبة للجملة المثقلة {(A,2),(B,-1)}",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "مركز الأبعاد المتناسبة",
+            "final": "G\\left(-3,\\,0,\\,0\\right)",
+            "verified": true,
+            "operation": "barycenter",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "شرط الوجود",
+              "الإحداثيات الموزونة",
+              "خاصية مركز الأبعاد",
+              "استقامة المركز والنقطتين"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S20",
+        "title": "مجموع وزنين معدوم",
+        "question": "A(0,0,0)، B(3,0,0)، جد مرجح الجملة المثقلة {(A,1),(B,-1)}",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "A(0,0,0)، B(3,0,0)، جد مرجح الجملة المثقلة {(A,1),(B,-1)}",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "مجموع الأوزان صفر؛ مركز الأبعاد المتناسبة غير معرّف بهذه الصيغة."
+          }
+        ]
+      },
+      {
+        "id": "S21",
+        "title": "مركز ثلاثة بأوزان سالبة",
+        "question": "A(0,0,0)، B(3,0,0)، C(0,3,0)، جد مركز الأبعاد المتناسبة، الأوزان=[2,1,-1]",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\frac{3}{2}",
+          "-\\frac{3}{2}"
+        ],
+        "normalized": "A(0,0,0)، B(3,0,0)، C(0,3,0)، جد مركز الابعاد المتناسبة، الاوزان=[2,1,-1]",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "مركز الأبعاد المتناسبة",
+            "final": "G\\left(\\frac{3}{2},\\,-\\frac{3}{2},\\,0\\right)",
+            "verified": true,
+            "operation": "barycenter",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "شرط الوجود",
+              "الإحداثيات الموزونة",
+              "خاصية مركز الأبعاد",
+              "تجميع النقاط المقابلة للرأس B",
+              "تجميع النقاط المقابلة للرأس C",
+              "تفسير التلاقي"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S22",
+        "title": "مركز ثقل رباعي الوجوه",
+        "question": "A(0,0,0)، B(4,0,0)، C(0,4,0)، D(0,0,4)، جد مركز ثقل رباعي الوجوه ABCD",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "G",
+          "1"
+        ],
+        "normalized": "A(0,0,0)، B(4,0,0)، C(0,4,0)، D(0,0,4)، جد مركز ثقل رباعي الوجوه ABCD",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "مركز الأبعاد المتناسبة",
+            "final": "G\\left(1,\\,1,\\,1\\right)",
+            "verified": true,
+            "operation": "barycenter",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "شرط الوجود",
+              "الإحداثيات الموزونة",
+              "خاصية مركز الأبعاد",
+              "تجميع النقاط المقابلة للرأس A",
+              "تجميع النقاط المقابلة للرأس B",
+              "تجميع النقاط المقابلة للرأس C",
+              "تجميع النقاط المقابلة للرأس D",
+              "تفسير التلاقي"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S23",
+        "title": "اسم صريح لمركز الأبعاد",
+        "question": "A(0,0,0)، B(3,0,0)، C(0,3,0)، عين إحداثيات مركز الأبعاد المتناسبة G للجملة المثقلة {(A,1),(B,1),(C,1)}",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "G",
+          "1"
+        ],
+        "normalized": "A(0,0,0)، B(3,0,0)، C(0,3,0)، عين احداثيات مركز الابعاد المتناسبة G للجملة المثقلة {(A,1),(B,1),(C,1)}",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "مركز الأبعاد المتناسبة",
+            "final": "G\\left(1,\\,1,\\,0\\right)",
+            "verified": true,
+            "operation": "barycenter",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "شرط الوجود",
+              "الإحداثيات الموزونة",
+              "خاصية مركز الأبعاد",
+              "تجميع النقاط المقابلة للرأس A",
+              "تجميع النقاط المقابلة للرأس B",
+              "تجميع النقاط المقابلة للرأس C",
+              "تفسير التلاقي"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S24",
+        "title": "تلاقي المتوسطات بتعريف منتصفات",
+        "question": "A(0,0,0)، B(6,0,0)، C(0,6,0)، لتكن I منتصف BC وJ منتصف CA وK منتصف AB، برهن تلاقي متوسطات المثلث ABC",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "G",
+          "2"
+        ],
+        "normalized": "A(0,0,0)، B(6,0,0)، C(0,6,0)، لتكن I منتصف BC وJ منتصف CA وK منتصف AB، برهن تلاقي متوسطات المثلث ABC",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "مركز الأبعاد المتناسبة",
+            "final": "G\\left(2,\\,2,\\,0\\right)",
+            "verified": true,
+            "operation": "barycenter",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "شرط الوجود",
+              "الإحداثيات الموزونة",
+              "خاصية مركز الأبعاد",
+              "تجميع النقاط المقابلة للرأس A",
+              "تجميع النقاط المقابلة للرأس B",
+              "تجميع النقاط المقابلة للرأس C",
+              "تفسير التلاقي"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S25",
+        "title": "جداء تحليلي",
+        "question": "احسب الجداء السلمي للشعاعين u=(1,2,3) وv=(2,-1,0)",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=0"
+        ],
+        "normalized": "احسب الجداء السلمي للشعاعين u=(1,2,3) وv=(2,-1,0)",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الجداء السلمي والتعامد",
+            "final": "\\begin{aligned}\\vec{u}\\cdot\\vec{v}=0\\\\[5pt]\\text{الشعاعان متعامدان}\\end{aligned}",
+            "verified": true,
+            "operation": "dot",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الصيغة التحليلية",
+              "الطويلتان",
+              "اختبار التعامد"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S26",
+        "title": "جداء منقوط بالصيغة الرسمية",
+        "question": "u=(1,2,3)، v=(2,-1,0)، احسب \\vec{u}\\cdot\\vec{v}",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=0"
+        ],
+        "normalized": "u=(1,2,3)، v=(2,-1,0)، احسب الجداء السلمي للشعاعين u وv",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الجداء السلمي والتعامد",
+            "final": "\\begin{aligned}\\vec{u}\\cdot\\vec{v}=0\\\\[5pt]\\text{الشعاعان متعامدان}\\end{aligned}",
+            "verified": true,
+            "operation": "dot",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الصيغة التحليلية",
+              "الطويلتان",
+              "اختبار التعامد"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S27",
+        "title": "تحقق من تعامد غير صحيح",
+        "question": "A(0,0,0)، B(1,0,0)، C(1,1,0)، تحقق أن \\overrightarrow{AB}\\perp\\overrightarrow{AC}",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=1"
+        ],
+        "normalized": "A(0,0,0)، B(1,0,0)، C(1,1,0)، تحقق ان \\overrightarrow{AB}\\perp\\overrightarrow{AC}",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الجداء السلمي والتعامد",
+            "final": "\\begin{aligned}\\overrightarrow{AB}\\cdot\\overrightarrow{AC}=1\\\\[5pt]\\text{الشعاعان غير متعامدين}\\end{aligned}",
+            "verified": true,
+            "operation": "dot",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C"
+              ],
+              "vectors": [
+                "AB",
+                "AC"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الصيغة التحليلية",
+              "الطويلتان",
+              "اختبار التعامد"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S28",
+        "title": "الصيغة الهندسية بالدرجات",
+        "question": "احسب الجداء السلمي بالصيغة الهندسية، الطويلتان=[3,4]، theta=60 درجة",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=6"
+        ],
+        "normalized": "احسب الجداء السلمي بالصيغة الهندسية، الطويلتان=[3,4]، theta=60 درجة",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الجداء السلمي بالصيغة الهندسية",
+            "final": "\\vec u\\cdot\\vec v=6",
+            "verified": false,
+            "operation": "geometric-dot",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الصيغة الهندسية"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S29",
+        "title": "طولتان بمعيار LaTeX وزاوية",
+        "question": "احسب الجداء السلمي في الفراغ إذا كان \\Vert u\\Vert=3 و\\Vert v\\Vert=4 وtheta=pi/3 راديان",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=6"
+        ],
+        "normalized": "احسب الجداء السلمي في الفراغ اذا كان \\Vert u\\Vert=3 و\\Vert v\\Vert=4 وtheta=pi/3 راديان",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الجداء السلمي بالصيغة الهندسية",
+            "final": "\\vec u\\cdot\\vec v=6",
+            "verified": false,
+            "operation": "geometric-dot",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الصيغة الهندسية"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S30",
+        "title": "الشعاع المعدوم والزاوية",
+        "question": "احسب الجداء السلمي وزاوية الشعاعين u=(0,0,0) وv=(1,0,0)",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=0"
+        ],
+        "normalized": "احسب الجداء السلمي وزاوية الشعاعين u=(0,0,0) وv=(1,0,0)",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الجداء السلمي والتعامد",
+            "final": "\\vec{u}\\cdot\\vec{v}=0",
+            "verified": true,
+            "operation": "dot",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الصيغة التحليلية",
+              "الطويلتان",
+              "الشعاع المعدوم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S31",
+        "title": "مستقيمان متعامدان متقاطعان",
+        "question": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,0)+s*(0,1,0)، تحقق من تعامد المستقيمين",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "متقاطع"
+        ],
+        "normalized": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,0)+s*(0,1,0)، تحقق من تعامد المستقيمين",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستقيمين في الفراغ",
+            "final": "\\text{المستقيمان متقاطعان}\\quad I\\left(0,\\,0,\\,0\\right)",
+            "verified": true,
+            "operation": "lines",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D1",
+                "D2"
+              ],
+              "planes": []
+            },
+            "stepTitles": [
+              "الاتجاهان",
+              "شرط الاستواء",
+              "حل الوسيطين والتحقق",
+              "التعامد والتقاطع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S32",
+        "title": "اتجاهان متعامدان مع تخالف",
+        "question": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,1)+s*(0,1,0)، ادرس الوضع النسبي والتعامد بين المستقيمين",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "متخالف"
+        ],
+        "normalized": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,1)+s*(0,1,0)، ادرس الوضع النسبي والتعامد بين المستقيمين",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستقيمين في الفراغ",
+            "final": "\\text{المستقيمان متخالفان}",
+            "verified": true,
+            "operation": "lines",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D1",
+                "D2"
+              ],
+              "planes": []
+            },
+            "stepTitles": [
+              "الاتجاهان",
+              "شرط الاستواء",
+              "التعامد والتقاطع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S33",
+        "title": "مركبات ناظم بدون التباس عقدي",
+        "question": "P: 2x-y+2z-5=0، عين مركبات شعاع ناظم للمستوي P",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "2",
+          "-1"
+        ],
+        "normalized": "P: 2x-y+2z-5=0، عين مركبات شعاع ناظم للمستوي P",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المستوي وشعاعه الناظم",
+            "final": "\\vec n=\\left(2,\\,-1,\\,2\\right)",
+            "verified": true,
+            "operation": "normal",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "الناظم غير المعدوم",
+              "شرط الانتماء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S34",
+        "title": "ناظم مستوي بالرمز اليوناني",
+        "question": "جد شعاعا ناظما للمستوي \\Pi_1: x-2y+3z+4=0",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "1",
+          "-2",
+          "3"
+        ],
+        "normalized": "جد شعاعا ناظما للمستوي \\Pi_1: x-2y+3z+4=0",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المستوي وشعاعه الناظم",
+            "final": "\\vec n=\\left(1,\\,-2,\\,3\\right)",
+            "verified": true,
+            "operation": "normal",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P1"
+              ]
+            },
+            "stepTitles": [
+              "الناظم غير المعدوم",
+              "شرط الانتماء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S35",
+        "title": "ثلاث نقاط في مستوي مواز للإحداثي",
+        "question": "A(0,0,2)، B(1,0,2)، C(0,1,2)، اكتب معادلة المستوي المار بهذه النقاط",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "z",
+          "2"
+        ],
+        "normalized": "A(0,0,2)، B(1,0,2)، C(0,1,2)، اكتب معادلة المستوي المار بهذه النقاط",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المستوي المار بالنقاط المعطاة",
+            "final": "P:\\quad z-2=0",
+            "verified": true,
+            "operation": "plane",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الناظم غير المعدوم",
+              "شرط الانتماء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S36",
+        "title": "مستوي من نقطة وناظم",
+        "question": "A(1,2,3)، n=(1,0,0)، اكتب المعادلة الديكارتية للمستوي المار بالنقطة A وناظمه n",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "x",
+          "1"
+        ],
+        "normalized": "A(1,2,3)، n=(1,0,0)، اكتب المعادلة الديكارتية للمستوي المار بالنقطة A وناظمه n",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "معادلة مستوٍ من نقطة وناظم",
+            "final": "P:\\quad x-1=0",
+            "verified": true,
+            "operation": "plane",
+            "inputs": {
+              "points": [
+                "A"
+              ],
+              "vectors": [
+                "n"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الناظم غير المعدوم",
+              "شرط الانتماء"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S37",
+        "title": "المستوي المنصف العمودي",
+        "question": "A(0,0,0)، B(2,0,0)، اكتب معادلة المستوي المنصف العمودي للقطعة AB",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "x",
+          "2"
+        ],
+        "normalized": "A(0,0,0)، B(2,0,0)، اكتب معادلة المستوي المنصف العمودي للقطعة AB",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المستوي المنصف العمودي",
+            "final": "P:\\quad 2x-2=0",
+            "verified": true,
+            "operation": "bisector",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [
+                "AB"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الناظم غير المعدوم",
+              "شرط الانتماء",
+              "مركز القطعة وبعد الطرفين"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S38",
+        "title": "تمثيل وسيطي من نقطتين",
+        "question": "A(1,2,3)، B(2,4,6)، اكتب التمثيل الوسيطي للمستقيم AB",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "t"
+        ],
+        "normalized": "A(1,2,3)، B(2,4,6)، اكتب التمثيل الوسيطي للمستقيم AB",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "التمثيل البارامتري للمستقيم",
+            "final": "D:\\quad \\begin{cases}x=1+t\\\\y=2+2t\\\\z=3+3t\\end{cases},\\quad t\\in\\mathbb R",
+            "verified": true,
+            "operation": "line",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [
+                "AB"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "نقطة وشعاع توجيه",
+              "اتجاه غير معدوم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S39",
+        "title": "مستقيم من نقطة واتجاه",
+        "question": "A(1,2,3)، u=(0,1,0)، اكتب التمثيل البارامتري للمستقيم المار من A وشعاع توجيهه u",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "t"
+        ],
+        "normalized": "A(1,2,3)، u=(0,1,0)، اكتب التمثيل البارامتري للمستقيم المار من A وشعاع توجيهه u",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "التمثيل البارامتري للمستقيم",
+            "final": "D:\\quad \\begin{cases}x=1\\\\y=2+t\\\\z=3\\end{cases},\\quad t\\in\\mathbb R",
+            "verified": true,
+            "operation": "line",
+            "inputs": {
+              "points": [
+                "A"
+              ],
+              "vectors": [
+                "u"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "نقطة وشعاع توجيه",
+              "اتجاه غير معدوم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S40",
+        "title": "تقاطع مستويين",
+        "question": "P: z=0، Q: x=0، جد تقاطع المستويين P وQ",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "t"
+        ],
+        "normalized": "P: z=0، Q: x=0، جد تقاطع المستويين P وQ",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستويين",
+            "final": "P\\cap Q=D,\\qquad \\begin{cases}x=0\\\\y=t\\\\z=0\\end{cases},\\quad t\\in\\mathbb R",
+            "verified": true,
+            "operation": "planes",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P",
+                "Q"
+              ]
+            },
+            "stepTitles": [
+              "اتجاه التقاطع",
+              "حل المعادلتين لاختيار نقطة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S41",
+        "title": "توازي مستويين متميزين",
+        "question": "P: z=0، Q: z=1، ادرس الوضع النسبي للمستويين P وQ",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "متوازي"
+        ],
+        "normalized": "P: z=0، Q: z=1، ادرس الوضع النسبي للمستويين P وQ",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستويين",
+            "final": "\\text{المستويان متوازيان ومتمايزان}",
+            "verified": true,
+            "operation": "planes",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P",
+                "Q"
+              ]
+            },
+            "stepTitles": [
+              "تناسب الناظمين",
+              "مقارنة الحد الثابت"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S42",
+        "title": "مستويان منطبقان",
+        "question": "P: x+y+z=1، Q: 2x+2y+2z=2، ادرس الوضع النسبي للمستويين P وQ",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "منطبق"
+        ],
+        "normalized": "P: x+y+z=1، Q: 2x+2y+2z=2، ادرس الوضع النسبي للمستويين P وQ",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستويين",
+            "final": "\\text{المستويان منطبقان}",
+            "verified": true,
+            "operation": "planes",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P",
+                "Q"
+              ]
+            },
+            "stepTitles": [
+              "تناسب الناظمين",
+              "مقارنة الحد الثابت"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S43",
+        "title": "تقاطع مستقيم ومستوي",
+        "question": "D: (x,y,z)=(0,0,0)+t*(1,1,1)، P: x+y+z-3=0، جد تقاطع المستقيم D مع المستوي P",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "1"
+        ],
+        "normalized": "D: (x,y,z)=(0,0,0)+t*(1,1,1)، P: x+y+z-3=0، جد تقاطع المستقيم D مع المستوي P",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "وضع مستقيم بالنسبة إلى مستوٍ",
+            "final": "D\\cap P=\\{I\\left(1,\\,1,\\,1\\right)\\},\\quad t=1",
+            "verified": true,
+            "operation": "line-plane",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D"
+              ],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "التعويض بالوسيط",
+              "إحداثيات نقطة التقاطع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S44",
+        "title": "مستقيم محتوى في مستوي",
+        "question": "D: (x,y,z)=(0,0,0)+t*(1,0,0)، P: z=0، ادرس وضع المستقيم D بالنسبة إلى المستوي P",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "محتو"
+        ],
+        "normalized": "D: (x,y,z)=(0,0,0)+t*(1,0,0)، P: z=0، ادرس وضع المستقيم D بالنسبة الي المستوي P",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "وضع مستقيم بالنسبة إلى مستوٍ",
+            "final": "\\text{المستقيم محتوى في المستوي}",
+            "verified": true,
+            "operation": "line-plane",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D"
+              ],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "التعويض بالوسيط"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S45",
+        "title": "مستقيم مواز دون تقاطع",
+        "question": "D: (x,y,z)=(0,1,0)+t*(1,0,0)، P: y=0، ادرس الوضع النسبي بين المستقيم D والمستوي P",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "مواز"
+        ],
+        "normalized": "D: (x,y,z)=(0,1,0)+t*(1,0,0)، P: y=0، ادرس الوضع النسبي بين المستقيم D والمستوي P",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "وضع مستقيم بالنسبة إلى مستوٍ",
+            "final": "\\text{المستقيم موازٍ للمستوي ولا يقطعه}",
+            "verified": true,
+            "operation": "line-plane",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D"
+              ],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "التعويض بالوسيط"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S46",
+        "title": "تقاطع مستقيمين",
+        "question": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,0)+s*(0,1,0)، جد تقاطع المستقيمين D1 وD2",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "متقاطع"
+        ],
+        "normalized": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,0)+s*(0,1,0)، جد تقاطع المستقيمين D1 وD2",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستقيمين في الفراغ",
+            "final": "\\text{المستقيمان متقاطعان}\\quad I\\left(0,\\,0,\\,0\\right)",
+            "verified": true,
+            "operation": "lines",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D1",
+                "D2"
+              ],
+              "planes": []
+            },
+            "stepTitles": [
+              "الاتجاهان",
+              "شرط الاستواء",
+              "حل الوسيطين والتحقق",
+              "التعامد والتقاطع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S47",
+        "title": "مستقيمان متخالفان",
+        "question": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,1)+s*(0,1,0)، ادرس الوضع النسبي للمستقيمين D1 وD2",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "متخالف"
+        ],
+        "normalized": "D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,0,1)+s*(0,1,0)، ادرس الوضع النسبي للمستقيمين D1 وD2",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستقيمين في الفراغ",
+            "final": "\\text{المستقيمان متخالفان}",
+            "verified": true,
+            "operation": "lines",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D1",
+                "D2"
+              ],
+              "planes": []
+            },
+            "stepTitles": [
+              "الاتجاهان",
+              "شرط الاستواء",
+              "التعامد والتقاطع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S48",
+        "title": "مستويان بأسماء يونانية",
+        "question": "جد تقاطع المستويين \\alpha: x+y+z=1، \\beta: x-y=0",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\alpha",
+          "\\beta"
+        ],
+        "normalized": "جد تقاطع المستويين \\alpha: x+y+z=1، \\beta: x-y=0",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأوضاع النسبية لمستويين",
+            "final": "\\alpha\\cap \\beta=D,\\qquad \\begin{cases}x=\\frac{1}{2}+t\\\\y=\\frac{1}{2}+t\\\\z=-2t\\end{cases},\\quad t\\in\\mathbb R",
+            "verified": true,
+            "operation": "planes",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "alpha",
+                "beta"
+              ]
+            },
+            "stepTitles": [
+              "اتجاه التقاطع",
+              "حل المعادلتين لاختيار نقطة"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S49",
+        "title": "البعد المتكرر في مسائل الارتفاع",
+        "question": "M(1,2,3)، P: 2x-y+2z-5=0، احسب بعد النقطة M عن المستوي P",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\frac{1}{3}"
+        ],
+        "normalized": "M(1,2,3)، P: 2x-y+2z-5=0، احسب بعد النقطة M عن المستوي P",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "بعد نقطة عن مستوٍ ومسقطها العمودي",
+            "final": "\\begin{aligned}d(M,P)=\\frac{1}{3}\\\\[5pt]H\\left(\\frac{7}{9},\\,\\frac{19}{9},\\,\\frac{25}{9}\\right)\\end{aligned}",
+            "verified": true,
+            "operation": "distance-plane",
+            "inputs": {
+              "points": [
+                "M"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "الناظم والمعطيات",
+              "قانون البعد",
+              "الإسقاط العمودي"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S50",
+        "title": "بعد نقطة عن مستقيم",
+        "question": "M(0,1,1)، D: (x,y,z)=(0,0,0)+t*(1,0,0)، احسب بعد M عن المستقيم D",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\sqrt{2}"
+        ],
+        "normalized": "M(0,1,1)، D: (x,y,z)=(0,0,0)+t*(1,0,0)، احسب بعد M عن المستقيم D",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "بعد نقطة عن مستقيم",
+            "final": "\\begin{aligned}d(M,D)=\\sqrt{2}\\\\[5pt]H\\left(0,\\,0,\\,0\\right)\\end{aligned}",
+            "verified": true,
+            "operation": "distance-line",
+            "inputs": {
+              "points": [
+                "M"
+              ],
+              "vectors": [],
+              "lines": [
+                "D"
+              ],
+              "planes": []
+            },
+            "stepTitles": [
+              "قانون البعد",
+              "المسقط من شرط التعامد"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S51",
+        "title": "مسقط عمودي لا مسافة فقط",
+        "question": "M(1,2,3)، P: 2x-y+2z-5=0، عين المسقط العمودي للنقطة M على المستوي P",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\frac{7}{9}",
+          "\\frac{19}{9}",
+          "\\frac{25}{9}"
+        ],
+        "normalized": "M(1,2,3)، P: 2x-y+2z-5=0، عين المسقط العمودي للنقطة M علي المستوي P",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "بعد نقطة عن مستوٍ ومسقطها العمودي",
+            "final": "\\begin{aligned}d(M,P)=\\frac{1}{3}\\\\[5pt]H\\left(\\frac{7}{9},\\,\\frac{19}{9},\\,\\frac{25}{9}\\right)\\end{aligned}",
+            "verified": true,
+            "operation": "distance-plane",
+            "inputs": {
+              "points": [
+                "M"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "الناظم والمعطيات",
+              "قانون البعد",
+              "الإسقاط العمودي"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S52",
+        "title": "كرة مركز ونصف قطر",
+        "question": "جد معادلة الكرة مركزها K(1,2,3) ونصف قطرها r=2",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=4"
+        ],
+        "normalized": "جد معادلة الكرة مركزها K(1,2,3) ونصف قطرها r=2",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المعادلة الديكارتية للكرة",
+            "final": "\\left(x-1\\right)^2+\\left(y-2\\right)^2+\\left(z-3\\right)^2=4",
+            "verified": true,
+            "operation": "sphere",
+            "inputs": {
+              "points": [
+                "K"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "المركز ونصف القطر",
+              "المعادلة القياسية",
+              "الشكل الموسع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S53",
+        "title": "كرة من طرفي قطر",
+        "question": "A(0,0,0)، B(2,0,0)، عين المعادلة الديكارتية للكرة ذات القطر AB",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=1"
+        ],
+        "normalized": "A(0,0,0)، B(2,0,0)، عين المعادلة الديكارتية للكرة ذات القطر AB",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المعادلة الديكارتية للكرة",
+            "final": "\\left(x-1\\right)^2+y^2+z^2=1",
+            "verified": true,
+            "operation": "sphere-diameter",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [
+                "AB"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "المركز ونصف القطر",
+              "خاصية القطر",
+              "الشكل الموسع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S54",
+        "title": "كرة من معادلتها العامة",
+        "question": "جد مركز ونصف قطر الكرة x^2+y^2+z^2-2x-4y-6z+10=0",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "2",
+          "4"
+        ],
+        "normalized": "جد مركز ونصف قطر الكرة x^2+y^2+z^2-2x-4y-6z+10=0",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المعادلة الديكارتية للكرة",
+            "final": "\\left(x-1\\right)^2+\\left(y-2\\right)^2+\\left(z-3\\right)^2=4",
+            "verified": true,
+            "operation": "sphere-equation",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "المركز ونصف القطر",
+              "المعادلة القياسية",
+              "الشكل الموسع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S55",
+        "title": "كرة بمجاهيل عربية",
+        "question": "استخرج مركز ونصف قطر الكرة س^2+ص^2+ع^2-2س-4ص-6ع+10=0",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "2",
+          "4"
+        ],
+        "normalized": "استخرج مركز ونصف قطر الكرة س^2+ص^2+ع^2-2س-4ص-6ع+10=0",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المعادلة الديكارتية للكرة",
+            "final": "\\left(x-1\\right)^2+\\left(y-2\\right)^2+\\left(z-3\\right)^2=4",
+            "verified": true,
+            "operation": "sphere-equation",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "المركز ونصف القطر",
+              "المعادلة القياسية",
+              "الشكل الموسع"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S56",
+        "title": "حجم رباعي الوجوه",
+        "question": "A(0,0,0)، B(1,0,0)، C(0,1,0)، D(0,0,1)، احسب حجم رباعي الوجوه ABCD",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "\\frac{1}{6}"
+        ],
+        "normalized": "A(0,0,0)، B(1,0,0)، C(0,1,0)، D(0,0,1)، احسب حجم رباعي الوجوه ABCD",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "حجم رباعي الوجوه",
+            "final": "V=\\frac{1}{6}",
+            "verified": true,
+            "operation": "tetrahedron",
+            "inputs": {
+              "points": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الجداء المختلط",
+              "الحجم",
+              "الارتفاع وقانون الهرم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S57",
+        "title": "ارتفاع رأس عن وجه مسمى",
+        "question": "A(0,0,0)، B(1,0,0)، C(0,1,0)، D(0,0,2)، جد بعد D عن المستوي ABC",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=2"
+        ],
+        "normalized": "A(0,0,0)، B(1,0,0)، C(0,1,0)، D(0,0,2)، جد بعد D عن المستوي ABC",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "بعد نقطة عن مستوٍ ومسقطها العمودي",
+            "final": "\\begin{aligned}d(D,P)=2\\\\[5pt]H\\left(0,\\,0,\\,0\\right)\\end{aligned}",
+            "verified": true,
+            "operation": "distance-plane",
+            "inputs": {
+              "points": [
+                "D"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "الناظم والمعطيات",
+              "قانون البعد",
+              "الإسقاط العمودي"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S58",
+        "title": "حجم هرم من مساحة وارتفاع",
+        "question": "احسب حجم هرم مساحة القاعدة area=6 والارتفاع h=3",
+        "expect": "answer",
+        "resultCount": 1,
+        "contains": [
+          "=6"
+        ],
+        "normalized": "احسب حجم هرم مساحة القاعدة area=6 والارتفاع h=3",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryTools",
+            "title": "حجم هرم من مساحة قاعدته وارتفاعه",
+            "final": "V=\\frac13 S_{\\text{قاعدة}}h=6",
+            "verified": false,
+            "operation": "pyramid-volume",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "تمييز المعطيات",
+              "قانون حجم الهرم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S59",
+        "title": "ارتفاع دقيق يتبعه حجم",
+        "question": "M(0,0,1/3)، P: z=0، احسب بعد M عن المستوي P ثم احسب حجم هرم مساحة القاعدة area=9 وارتفاعه البعد السابق",
+        "expect": "answer",
+        "resultCount": 2,
+        "contains": [
+          "\\frac{1}{3}",
+          "=1"
+        ],
+        "normalized": "M(0,0,1/3)، P: z=0، احسب بعد M عن المستوي P ثم احسب حجم هرم مساحة القاعدة area=9 وارتفاعه البعد السابق",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "بعد نقطة عن مستوٍ ومسقطها العمودي",
+            "final": "\\begin{aligned}d(M,P)=\\frac{1}{3}\\\\[5pt]H\\left(0,\\,0,\\,0\\right)\\end{aligned}",
+            "verified": true,
+            "operation": "distance-plane",
+            "inputs": {
+              "points": [
+                "M"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": [
+                "P"
+              ]
+            },
+            "stepTitles": [
+              "الناظم والمعطيات",
+              "قانون البعد",
+              "الإسقاط العمودي"
+            ]
+          },
+          {
+            "engine": "geometryEngine",
+            "title": "حجم هرم من مساحة قاعدته وارتفاعه",
+            "final": "V=\\frac13 S_{\\text{قاعدة}}h=1",
+            "verified": false,
+            "operation": "pyramid-volume",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "تمييز المعطيات",
+              "قانون حجم الهرم"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S60",
+        "title": "أشعة ومصفوفة ورتبة في سؤال",
+        "question": "u=(1,0,0)، v=(0,1,0)، w=(1,1,0)، ادرس الارتباط الخطي للأشعة u وv وw ثم حول الأشعة u وv وw إلى مصفوفة ثم احسب رتبة المصفوفة M",
+        "expect": "answer",
+        "resultCount": 3,
+        "contains": [
+          "مرتبطة",
+          "M",
+          "2"
+        ],
+        "normalized": "u=(1,0,0)، v=(0,1,0)، w=(1,1,0)، ادرس الارتباط الخطي للاشعة u وv وw ثم حول الاشعة u وv وw الي مصفوفة ثم احسب رتبة المصفوفة M",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "الأشعة مرتبطة خطيًا",
+            "final": "\\text{الأشعة مرتبطة خطيًا}",
+            "verified": true,
+            "operation": "dependence",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v",
+                "w"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "الأشعة الواصلة من أصل مشترك",
+              "الجداء المختلط",
+              "الرتبة وتفسير النتيجة",
+              "دلالة الرتبة في فضاء ثلاثي الأبعاد",
+              "علاقة خطية غير تافهة"
+            ]
+          },
+          {
+            "engine": "geometryEngine",
+            "title": "الإحداثيات كصفوف مصفوفة",
+            "final": "M=\\begin{pmatrix}1&0&0\\\\0&1&0\\\\1&1&0\\end{pmatrix}",
+            "verified": false,
+            "operation": "matrix",
+            "inputs": {
+              "points": [],
+              "vectors": [
+                "u",
+                "v",
+                "w"
+              ],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "جسر إلى محرك المصفوفات"
+            ]
+          },
+          {
+            "engine": "matricesEngine",
+            "title": "الرتبة الجبرية للمصفوفة M",
+            "final": "\\operatorname{rank}(M)=2\\quad\\text{وقياسها }3\\times3",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة M والمعطيات",
+              "تصفير عنصر بعملية سطرية",
+              "تصفير عنصر بعملية سطرية",
+              "المحاور والرتبة الجبرية"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S61",
+        "title": "مصفوفة التقاطع تتبعها غاوس",
+        "question": "D1: (x,y,z)=(0,0,0)+t*(1,1,1)، D2: (x,y,z)=(1,0,1)+s*(0,1,0)، اكتب جملة التقاطع للمستقيمين D1 وD2 ثم حل الجملة السابقة بطريقة غاوس",
+        "expect": "answer",
+        "resultCount": 2,
+        "contains": [
+          "t=1",
+          "s=1"
+        ],
+        "normalized": "D1: (x,y,z)=(0,0,0)+t*(1,1,1)، D2: (x,y,z)=(1,0,1)+s*(0,1,0)، اكتب جملة التقاطع للمستقيمين D1 وD2 ثم حل الجملة السابقة بطريقة غاوس",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "جملة الوسيطين ومصفوفتها الموسعة",
+            "final": "\\begin{cases}t=1\\\\t-s=0\\\\t=1\\end{cases}",
+            "verified": false,
+            "operation": "line-system",
+            "inputs": {
+              "points": [],
+              "vectors": [],
+              "lines": [
+                "D1",
+                "D2"
+              ],
+              "planes": []
+            },
+            "stepTitles": [
+              "جسر إلى محرك المصفوفات"
+            ]
+          },
+          {
+            "engine": "matricesEngine",
+            "title": "حل الجملة بطريقة غاوس",
+            "final": "t=1\\qquad s=1",
+            "verified": true,
+            "stepTitles": [
+              "تمثيل الجملة بمصفوفة موسعة",
+              "تصفير عنصر بعملية سطرية",
+              "تصفير عنصر بعملية سطرية",
+              "جعل العنصر المحوري واحدًا",
+              "غاوس — قراءة الحل"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "S62",
+        "title": "طلب هندسي مستقل بعد فشل غير هندسي",
+        "question": "السؤال الأول (10 درجات)\nA(0,0,0)، B(0,0,2)\nالمطلوب:\nأ) احسب محدد المصفوفة Z\nب) احسب المسافة بين النقطتين A وB",
+        "expect": "partial",
+        "resultCount": 1,
+        "contains": [
+          "=2"
+        ],
+        "normalized": "السؤال الاول (10 درجات)\nA(0,0,0)، B(0,0,2)\nالمطلوب:\nا) احسب محدد المصفوفة Z\nب) احسب المسافة بين النقطتين A وB",
+        "pass": true,
+        "results": [
+          {
+            "engine": "geometryEngine",
+            "title": "المسافة بين نقطتين في الفراغ",
+            "final": "d(A,B)=2",
+            "verified": true,
+            "operation": "distance",
+            "inputs": {
+              "points": [
+                "A",
+                "B"
+              ],
+              "vectors": [],
+              "lines": [],
+              "planes": []
+            },
+            "stepTitles": [
+              "طرح الإحداثيات بالترتيب",
+              "فيثاغورس في الفضاء"
+            ]
+          }
+        ],
+        "unsolved": [
+          {
+            "engine": "matricesEngine",
+            "message": "ما عناصر المصفوفة Z؟ اكتبها مثل Z=[[1,2],[3,4]]."
+          }
+        ]
+      },
+      {
+        "id": "S63",
+        "title": "ثلاث نقاط مستقيمة لا تعطي مستويا وحيدا",
+        "question": "A(0,0,0)، B(1,1,1)، C(2,2,2)، جد معادلة المستوي المار بالنقاط",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "A(0,0,0)، B(1,1,1)، C(2,2,2)، جد معادلة المستوي المار بالنقاط",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "النقاط مستقيمة أو متطابقة؛ لا تعرّف مستويًا وحيدًا."
+          }
+        ]
+      },
+      {
+        "id": "S64",
+        "title": "مركبة ناقصة لا تستكمل بصفر",
+        "question": "جد الشعاع AB حيث A(1,2) وB(3,4,5)",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "جد الشعاع AB حيث A(1,2) وB(3,4,5)",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "ما معطيات AB؟ عرّفه بدل استعمال أول عنصر معطى أو نتيجة قديمة."
+          }
+        ]
+      },
+      {
+        "id": "S65",
+        "title": "وسيطان لا يمثلان مستقيم وسيط واحد",
+        "question": "D: x=t، y=s، z=t، اكتب التمثيل البارامتري للمستقيم D",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "D: x=t، y=s، z=t، اكتب التمثيل البارامتري للمستقيم D",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "message": "استعمل وسيطًا واحدًا مشتركًا للمركبات الثلاث، واتجاهًا غير معدوم."
+          }
+        ]
+      },
+      {
+        "id": "S66",
+        "title": "نقطة لا تفترض مركز كرة",
+        "question": "A(1,2,3)، جد معادلة كرة نصف قطرها r=2",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "A(1,2,3)، جد معادلة كرة نصف قطرها r=2",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "حدّد مركز الكرة صراحةً؛ النقطة المعطاة لا تُفترض مركزًا لمجرد وجود نصف قطر."
+          }
+        ]
+      },
+      {
+        "id": "S67",
+        "title": "لا أوزان رمزية مفترضة",
+        "question": "A(0,0,0)، B(1,0,0)، جد مركز الأبعاد المتناسبة، الأوزان=[k,1]",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "A(0,0,0)، B(1,0,0)، جد مركز الابعاد المتناسبة، الاوزان=[k,1]",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "اكتب أعدادًا وكسورًا وجذورًا حقيقية بسيطة، دون رموز مجهولة أو أوامر."
+          }
+        ]
+      },
+      {
+        "id": "S68",
+        "title": "لا برهان عام زائف للاستواء",
+        "question": "أثبت أن أي أربع نقاط في الفراغ تقع في مستو واحد",
+        "expect": "clarify",
+        "resultCount": 0,
+        "contains": [],
+        "normalized": "اثبت ان اي 4 نقاط في الفراغ تقع في مستو 1",
+        "pass": true,
+        "results": [],
+        "unsolved": [
+          {
+            "engine": "geometryEngine",
+            "message": "حدّد النقطة المطلوب ومعطياته صراحةً."
+          }
+        ]
+      },
+      {
+        "id": "X1",
+        "title": "جمع المحددين بالجمع اللغوي",
+        "question": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب محددي المصفوفتين A وB",
+        "resultCount": 2,
+        "expect": "answer",
+        "contains": [
+          "A=-2",
+          "B=1"
+        ],
+        "normalized": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب محددي المصفوفتين A وB",
+        "pass": true,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "محدد المصفوفة A",
+            "final": "\\text{محدد المصفوفة }A=-2",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "محدد المصفوفة A"
+            ]
+          },
+          {
+            "engine": "matricesEngine",
+            "title": "محدد المصفوفة B",
+            "final": "\\text{محدد المصفوفة }B=1",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة B والمعطيات",
+              "محدد المصفوفة B"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "X2",
+        "title": "أثرا المصفوفتين",
+        "question": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب أثري المصفوفتين A وB",
+        "resultCount": 2,
+        "expect": "answer",
+        "contains": [
+          "A=5",
+          "B=8"
+        ],
+        "normalized": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب اثري المصفوفتين A وB",
+        "pass": true,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "أثر المصفوفة A",
+            "final": "\\text{أثر المصفوفة }A=5",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "أثر المصفوفة A"
+            ]
+          },
+          {
+            "engine": "matricesEngine",
+            "title": "أثر المصفوفة B",
+            "final": "\\text{أثر المصفوفة }B=8",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة B والمعطيات",
+              "أثر المصفوفة B"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "X3",
+        "title": "منقولا مصفوفتين",
+        "question": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، جد منقولي المصفوفتين A وB",
+        "resultCount": 2,
+        "expect": "answer",
+        "contains": [
+          "A^T",
+          "B^T"
+        ],
+        "normalized": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، جد منقولي المصفوفتين A وB",
+        "pass": true,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "منقول المصفوفة A",
+            "final": "A^T=\\begin{pmatrix}1&3\\\\2&4\\end{pmatrix}",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "منقول المصفوفة A"
+            ]
+          },
+          {
+            "engine": "matricesEngine",
+            "title": "منقول المصفوفة B",
+            "final": "B^T=\\begin{pmatrix}1&3\\\\2&7\\end{pmatrix}",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة B والمعطيات",
+              "منقول المصفوفة B"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "X4",
+        "title": "طلبان حسابيان مستقلان",
+        "question": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب A+B وA-B",
+        "resultCount": 2,
+        "expect": "answer",
+        "contains": [
+          "A+B",
+          "A-B"
+        ],
+        "normalized": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب A+B وA-B",
+        "pass": true,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "قيمة العبارة المصفوفية",
+            "final": "A+B=\\begin{pmatrix}2&4\\\\6&11\\end{pmatrix}",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "العبارة المطلوبة وشروط الأبعاد"
+            ]
+          },
+          {
+            "engine": "matricesEngine",
+            "title": "قيمة العبارة المصفوفية",
+            "final": "A-B=\\begin{pmatrix}0&0\\\\0&-3\\end{pmatrix}",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "العبارة المطلوبة وشروط الأبعاد"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "X5",
+        "title": "أسطر بفاصلة منقوطة",
+        "question": "لتكن A=(1,2;3,4)، جد معكوس المصفوفة A",
+        "resultCount": 1,
+        "expect": "answer",
+        "contains": [
+          "A^{-1}",
+          "-2"
+        ],
+        "normalized": "لتكن A=(1,2;3,4)، جد معكوس المصفوفة A",
+        "pass": true,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "معكوس المصفوفة A",
+            "final": "A^{-1}=\\begin{pmatrix}-2&1\\\\\\frac{3}{2}&-\\frac{1}{2}\\end{pmatrix}",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "العوامل المرافقة ثم المصفوفة الملحقة",
+              "شرط معكوس المصفوفة A وقانونه"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "X6",
+        "title": "رتبة ومحدد في جملة",
+        "question": "لتكن A=[[1,2],[3,4]]، جد رتبة A ومحدد A",
+        "resultCount": 2,
+        "expect": "answer",
+        "contains": [
+          "2",
+          "A=-2"
+        ],
+        "normalized": "لتكن A=[[1,2],[3,4]]، جد رتبة A ومحدد A",
+        "pass": true,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "الرتبة الجبرية للمصفوفة A",
+            "final": "\\operatorname{rank}(A)=2\\quad\\text{وقياسها }2\\times2",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "تصفير عنصر بعملية سطرية",
+              "جعل العنصر المحوري واحدًا",
+              "تصفير عنصر بعملية سطرية",
+              "المحاور والرتبة الجبرية"
+            ]
+          },
+          {
+            "engine": "matricesEngine",
+            "title": "محدد المصفوفة A",
+            "final": "\\text{محدد المصفوفة }A=-2",
+            "verified": true,
+            "stepTitles": [
+              "المصفوفة A والمعطيات",
+              "محدد المصفوفة A"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "X7",
+        "title": "ثلاث معادلات في مجهولين",
+        "question": "حل الجملة بطريقة غاوس: x+y=3، x-y=1، 2x=4",
+        "resultCount": 1,
+        "expect": "answer",
+        "contains": [
+          "x=2",
+          "y=1"
+        ],
+        "normalized": "حل الجملة بطريقة غاوس: x+y=3، x-y=1، 2x=4",
+        "pass": true,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "حل الجملة بطريقة غاوس",
+            "final": "x=2\\qquad y=1",
+            "verified": true,
+            "stepTitles": [
+              "تمثيل الجملة بمصفوفة موسعة",
+              "تصفير عنصر بعملية سطرية",
+              "تصفير عنصر بعملية سطرية",
+              "تصفير عنصر بعملية سطرية",
+              "جعل العنصر المحوري واحدًا",
+              "تصفير عنصر بعملية سطرية",
+              "غاوس — قراءة الحل"
+            ]
+          }
+        ],
+        "unsolved": []
+      },
+      {
+        "id": "X8",
+        "title": "مجهولا التقاطع بالرمز",
+        "question": "حل الجملة بالحذف الغاوسي: \\begin{cases}t=1\\\\t-s=0\\\\t=1\\end{cases}",
+        "resultCount": 1,
+        "expect": "answer",
+        "contains": [
+          "t=1",
+          "s=1"
+        ],
+        "normalized": "حل الجملة بالحذف الغاوسي: \\begin{cases}t=1\\\\t-s=0\\\\t=1\\end{cases}",
+        "pass": true,
+        "results": [
+          {
+            "engine": "matricesEngine",
+            "title": "حل الجملة بطريقة غاوس",
+            "final": "t=1\\qquad s=1",
+            "verified": true,
+            "stepTitles": [
+              "تمثيل الجملة بمصفوفة موسعة",
+              "تصفير عنصر بعملية سطرية",
+              "تصفير عنصر بعملية سطرية",
+              "جعل العنصر المحوري واحدًا",
+              "غاوس — قراءة الحل"
+            ]
+          }
+        ],
+        "unsolved": []
+      }
+    ]
+  }
+}

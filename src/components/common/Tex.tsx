@@ -32,7 +32,7 @@ export const Tex: React.FC<{
   className?: string;
   display?: boolean;
 }> = ({ math, className = "", display = false }) => {
-  const html = useMemo(() => {
+  const { html, failed } = useMemo(() => {
     try {
       const sanitized = cleanMathLatex(math);
       const rendered = katex.renderToString(sanitized, {
@@ -43,21 +43,29 @@ export const Tex: React.FC<{
         maxExpand: 1000,
         maxSize: 20,
       });
-      return rendered.includes('class="katex-error"')
-        ? katex.renderToString("\\text{تعذّر عرض الصيغة الرياضية}", {
-            strict: false,
-          })
-        : rendered;
+      const failed = rendered.includes('class="katex-error"');
+      return {
+        html: failed
+          ? katex.renderToString("\\text{تعذّر عرض الصيغة الرياضية}", {
+              strict: false,
+            })
+          : rendered,
+        failed,
+      };
     } catch {
-      return katex.renderToString("\\text{تعذّر عرض الصيغة الرياضية}", {
-        strict: false,
-      });
+      return {
+        html: katex.renderToString("\\text{تعذّر عرض الصيغة الرياضية}", {
+          strict: false,
+        }),
+        failed: true,
+      };
     }
   }, [math, display]);
 
   return (
     <span
       dir="ltr"
+      data-math-error={failed || undefined}
       className={`${display ? "block overflow-x-auto max-w-full py-1" : "inline-block align-middle max-w-full overflow-x-auto"} ${className}`}
       style={{ unicodeBidi: "isolate", direction: "ltr" }}
       dangerouslySetInnerHTML={{ __html: html }}
@@ -69,6 +77,10 @@ export const Tex: React.FC<{
 function plainMathLatex(value: string): string {
   let text = value
     .trim()
+    .replace(/[٠-٩۰-۹]/g, (c) =>
+      String(c.charCodeAt(0) - (c <= "٩" ? 0x660 : 0x6f0)),
+    )
+    .replace(/٫/g, ".")
     .replace(/[−–]/g, "-")
     .replace(/(?<![\\a-zA-Z])theta(?![a-zA-Z])/g, "\\theta")
     .replace(/(?<![\\a-zA-Z])omega(?![a-zA-Z])/g, "\\omega")
@@ -107,27 +119,31 @@ function plainMathLatex(value: string): string {
       text.slice(end);
     offset++;
   }
-  if (/^\[\s*\[[\s\S]*\]\s*\]$/.test(text))
-    try {
-      const rows: unknown = JSON.parse(text);
-      if (
-        Array.isArray(rows) &&
-        rows.length <= 6 &&
-        rows.every(
-          (row: unknown) =>
-            Array.isArray(row) &&
-            row.length <= 6 &&
-            row.every(
-              (cell: unknown) =>
-                typeof cell === "number" && Number.isFinite(cell),
-            ),
-        )
-      ) {
-        text = `\\begin{bmatrix}${rows.map((row: number[]) => row.join("&")).join("\\\\")}\\end{bmatrix}`;
-      }
-    } catch {
-      /* Keep mathematical notation rather than inventing matrix cells. */
-    }
+  text = text.replace(/\[\s*\[[\s\S]*?\]\s*\]/g, (literal) => {
+    const rows = literal
+      .replace(/^\[\s*\[/, "")
+      .replace(/\]\s*\]$/, "")
+      .split(/\]\s*[,،]\s*\[/)
+      .map((r) => r.split(/[,،]/).map((c) => c.trim()));
+    if (
+      !rows.length ||
+      rows.length > 6 ||
+      !rows[0].length ||
+      rows[0].length > 6 ||
+      rows.some(
+        (r) =>
+          r.length !== rows[0].length ||
+          r.some(
+            (c) =>
+              !c ||
+              c.length > 500 ||
+              !/^[0-9+*/^().{}\\\s-]+$/.test(c.replace(/sqrt|frac/g, "")),
+          ),
+      )
+    )
+      return literal;
+    return `\\begin{pmatrix}${rows.map((r) => r.map((c) => c.replace(/(?<![\w.])(-?\d+)\/(\d+)(?![\w.])/g, "\\frac{$1}{$2}")).join("&")).join("\\\\")}\\end{pmatrix}`;
+  });
   return text;
 }
 function plainParts(text: string, autoMath: boolean): React.ReactNode {
@@ -136,7 +152,7 @@ function plainParts(text: string, autoMath: boolean): React.ReactNode {
   const parts: React.ReactNode[] = [];
   let end = 0;
   for (const match of clean.matchAll(
-    /[A-Za-z0-9√π∞\\\[][A-Za-z0-9_+\-*/^=()[\]{},.!|°π√∞\\ \t]*/g,
+    /[A-Za-z0-9٠-٩۰-۹√π∞\\\[][A-Za-z0-9٠-٩۰-۹_+\-*/^=()[\]{},.!|°π√∞\\ \t]*/g,
   )) {
     const value = match[0];
     parts.push(clean.slice(end, match.index));
@@ -154,18 +170,26 @@ function plainParts(text: string, autoMath: boolean): React.ReactNode {
   parts.push(clean.slice(end));
   return parts;
 }
+const latexTokens = new RegExp(
+  String.raw`(\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$[^$\n]+?\$|` +
+    ["cases", "aligned", "pmatrix", "bmatrix", "matrix", "vmatrix", "Vmatrix"]
+      .map((name) => String.raw`\\begin\{${name}\}[\s\S]*?\\end\{${name}\}`)
+      .join("|") +
+    ")",
+  "g",
+);
 // Both standard LaTeX delimiters and dollar delimiters, isolated from RTL prose.
 export const RichText: React.FC<{
   text: string;
   className?: string;
   autoMath?: boolean;
 }> = ({ text, className = "", autoMath = false }) => {
-  const tokens = text.split(
-    /(\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$[^$\n]+?\$)/g,
-  );
+  const tokens = text.split(latexTokens);
   return (
     <span className={className}>
       {tokens.map((part, index) => {
+        if (part.startsWith("\\begin{"))
+          return <Tex key={index} math={part} display />;
         if (part.startsWith("\\[") && part.endsWith("\\]"))
           return <Tex key={index} math={part.slice(2, -2)} display />;
         if (part.startsWith("\\(") && part.endsWith("\\)"))

@@ -1,3 +1,4 @@
+import { read } from "../utils/spaceGeometryMath";
 import {
   ENGINE_LABELS,
   type Candidate,
@@ -6,6 +7,33 @@ import {
   type SolverResult,
   type UnsolvedPart,
 } from "./types";
+/** A geometric follow-up is offered only while every saved row still describes those two lines. */
+function geometricSystemMatches(context: SolverContext): boolean {
+  const sys = context.matrices?.system,
+    g = context.geometry;
+  if (
+    !sys ||
+    !g ||
+    g.operation !== "line-system" ||
+    g.active.lines.length !== 2 ||
+    sys.variables.join(",") !== "t,s" ||
+    sys.coefficients.length !== 3
+  )
+    return false;
+  const [a, b] = g.active.lines.map((n) => g.lines[n]);
+  if (!a || !b) return false;
+  try {
+    return sys.coefficients.every(
+      (row, i) =>
+        row.length === 2 &&
+        read(row[0]).eq(read(a.direction[i])) &&
+        read(row[1]).eq(read(b.direction[i]).neg()) &&
+        read(sys.constants[i]).eq(read(b.point[i]).sub(read(a.point[i]))),
+    );
+  } catch {
+    return false;
+  }
+}
 const samples: Record<string, string> = {
   mathEngine: "احسب sin(30°)+√2",
   equationSolver: "حل المعادلة 2x^2-5x+3=0",
@@ -148,6 +176,68 @@ export function composeAnswer(
         "اشرح قواعد الاحتمال الشرطي",
       );
   }
+  if (results.some((r) => r.mode === "geometry") && context.geometry) {
+    const g = context.geometry,
+      p = g.active.points,
+      v = g.active.vectors,
+      q = g.active.planes,
+      l = g.active.lines;
+    const follow: string[] = [];
+    if (q.length) {
+      follow.push(`جد ناظم المستوي ${q[0]}`);
+      if (p.length) follow.push(`جد بعد ${p[0]} عن المستوي ${q[0]}`);
+    }
+    if (v.length >= 2)
+      follow.push(
+        `ادرس الارتباط الخطي للأشعة ${v.slice(0, 3).join(" و")}`,
+        `حول الأشعة ${v.slice(0, 3).join(" و")} إلى مصفوفة`,
+      );
+    if (g.operation === "barycenter" && p.length >= 3)
+      follow.push("اشرح التجميع ومركز الأبعاد المتناسبة");
+    if (g.operation === "line-plane" && l.length && q.length)
+      follow.push(`جد بعد نقطة التقاطع عن المستوي ${q[0]}`);
+    if (l.length >= 2)
+      follow.push(`اكتب جملة التقاطع للمستقيمين ${l.slice(0, 2).join(" و")}`);
+    if (g.lastScalar !== undefined)
+      follow.push("احسب النتيجة الهندسية السابقة * 2");
+    follow.push("ارسم المعطيات الهندسية السابقة");
+    suggestions.unshift(...follow);
+  }
+  if (results.some((r) => r.mode === "matrices") && context.matrices) {
+    const m = context.matrices,
+      n = m.active;
+    const follow: string[] = [];
+    if (m.lastScalar) follow.push("احسب النتيجة السابقة * 2");
+    if (m.system) {
+      if (m.system.coefficients.length === m.system.variables.length)
+        follow.push("حل الجملة السابقة بطريقة كرامر");
+      follow.push("حل الجملة السابقة بطريقة غاوس");
+      if (context.geometry && geometricSystemMatches(context))
+        follow.unshift(
+          `جد تقاطع المستقيمين ${context.geometry.active.lines.join(" و")}`,
+        );
+    }
+    if (n && m.values[n]) {
+      const a = m.values[n];
+      follow.push(`جد منقول المصفوفة ${n}`);
+      if (a.length === a[0].length)
+        follow.push(`احسب أثر المصفوفة ${n}`, `احسب محدد المصفوفة ${n}`);
+      if (a[0].length === 3) follow.push(`حول أسطر المصفوفة ${n} إلى أشعة`);
+    }
+    if (results.some((r) => r.contextPatch?.geometry)) {
+      const v = context.geometry?.active.vectors || [];
+      if (v.length >= 2)
+        follow.unshift(
+          `ادرس الارتباط الخطي للأشعة ${v.slice(0, 3).join(" و")}`,
+        );
+      if (v.length) follow.unshift(`احسب طويلة الشعاع ${v[0]}`);
+    }
+    if (
+      results.some((r) => r.contextPatch?.probability?.active === "statistics")
+    )
+      follow.unshift("احسب المتوسط فقط", "احسب التباين فقط");
+    suggestions.unshift(...follow);
+  }
   if (results.length) suggestions.push("اشرح الخطوات بتفصيل أكثر");
   const intro = results.length
     ? unsolved.length
@@ -172,13 +262,15 @@ export function answerAsText(answer: SolverAnswer): string {
   return [
     answer.intro,
     ...answer.results.flatMap((result) => [
-      `${ENGINE_LABELS[result.engine]} — ${result.title}`,
+      `${result.school?.label || ""} ${result.school?.label ? result.school.title : ENGINE_LABELS[result.engine] + " — " + result.title}`,
       String.raw`\[${result.finalLatex}\]`,
       ...result.steps.map(
         (step) =>
           `${step.title}: ${step.text ?? ""}\n${String.raw`\[${step.latex}\]`}`,
       ),
     ]),
-    ...answer.unsolved.map((part) => part.message),
+    ...answer.unsolved.map(
+      (part) => `${part.school?.label || ""} ${part.message}`,
+    ),
   ].join("\n\n");
 }

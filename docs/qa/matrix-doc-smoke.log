@@ -1,0 +1,25 @@
+{"question":"صنف المصفوفة I=[[1,0],[0,1]]","engines":["matricesEngine"],"final":["\\begin{gathered}\\text{مصفوفة مربعة}\\\\[4pt]\\text{مصفوفة واحدية (مصفوفة الوحدة)}\\\\[4pt]\\text{مثلثية عليا — ما تحت القطر أصفار}\\\\[4pt]\\text{مثلثية سفلى — ما فوق القطر أصفار}\\\\[4pt]\\text{مصفوفة قطرية}\\\\[4pt]\\text{مصفوفة متماثلة}\\end{gathered}"],"unsolved":[]}
+{"question":"جد منقول المصفوفة A=[[1,2,3],[4,5,6]]","engines":["matricesEngine"],"final":["A^T=\\begin{pmatrix}1&4\\\\2&5\\\\3&6\\end{pmatrix}"],"unsolved":[]}
+{"question":"احسب AB حيث A=[[1,2,3],[4,5,6]] وB=[[1,2],[3,4],[5,6]]","engines":["matricesEngine"],"final":["A\\,B=\\begin{pmatrix}22&28\\\\49&64\\end{pmatrix}"],"unsolved":[]}
+{"question":"احسب أثر المصفوفة B=[[1,2],[3,7]]","engines":["matricesEngine"],"final":["\\text{أثر المصفوفة }B=8"],"unsolved":[]}
+{"question":"لتكن A=[[1,2],[3,4]]\nالمطلوب:\n1) احسب A^2\n2) تحقق أن A^2-5A-2I=0","engines":["matricesEngine","matricesEngine"],"final":["\\left(A\\right)^{2}=\\begin{pmatrix}7&10\\\\15&22\\end{pmatrix}","\\text{العبارة صحيحة}\\qquad \\left(A\\right)^{2}-5\\,A-2\\,I=0"],"unsolved":[]}
+{"question":"احسب محدد المصفوفة A=[[1,2],[3,4]]","engines":["matricesEngine"],"final":["\\text{محدد المصفوفة }A=-2"],"unsolved":[]}
+{"question":"احسب محدد المصفوفة A=[[1,2,3],[0,4,5],[1,0,6]] بطريقة ساروس","engines":["matricesEngine"],"final":["\\text{محدد المصفوفة }A=22"],"unsolved":[]}
+{"question":"احسب محدد المصفوفة A=[[1,2,3],[0,4,5],[1,0,6]] بالنشر حسب العمود 2","engines":["matricesEngine"],"final":["\\text{محدد المصفوفة }A=22"],"unsolved":[]}
+{"question":"جد معكوس المصفوفة A=[[1/2,1/3],[0,2]]","engines":["matricesEngine"],"final":["A^{-1}=\\begin{pmatrix}2&-\\frac{1}{3}\\\\0&\\frac{1}{2}\\end{pmatrix}"],"unsolved":[]}
+{"question":"حل الجملة بطريقة غاوس: x+y=3، x-y=1","engines":["matricesEngine"],"final":["x=2\\qquad y=1"],"unsolved":[]}
+{"question":"حل الجملة بطريقة كرأمر: x+y=3، x-y=1","engines":["matricesEngine"],"final":["x=2\\qquad y=1"],"unsolved":[]}
+{"question":"A=[[1,1],[1,-1]]، B=[[3],[1]]، حل AX=B بطريقة كرأمر","engines":["matricesEngine"],"final":["x=2\\qquad y=1"],"unsolved":[]}
+{"question":"لتكن المصفوفة A=[[1,0,0],[0,1,0]]، حول أسطر المصفوفة A إلى أشعة","engines":["matricesEngine"],"final":["\\begin{aligned}\\vec{u}=\\left(1,0,0\\right)\\\\[6pt]\\vec{v}=\\left(0,1,0\\right)\\end{aligned}"],"unsolved":[]}
+{"question":"احسب الجداء السلمي للشعاعين u وv","engines":["geometryEngine"],"final":["\\begin{aligned}\\vec{u}\\cdot\\vec{v}=0\\\\[5pt]\\text{الشعاعان متعامدان}\\end{aligned}"],"unsolved":[]}
+{"question":"لتكن المصفوفة A=[[1,2],[3,4]]، حول كل عناصر المصفوفة A إلى بيانات إحصائية","engines":["matricesEngine"],"final":["x_i\\in\\left\\{1,2,3,4\\right\\}"],"unsolved":[]}
+{"question":"احسب متوسط البيانات السابقة","engines":["probabilityEngine"],"final":["\\overline x=\\frac{5}{2}"],"unsolved":[]}
+{"question":"لتكن A=[[1,2,3],[0,4,5],[1,0,6]]\nالمطلوب:\n1) احسب محدد المصفوفة A بطريقة ساروس\n2) احسب محدد المصفوفة A بالنشر حسب العمود 2","engines":["matricesEngine","matricesEngine"],"final":["\\text{محدد المصفوفة }A=22","\\text{محدد المصفوفة }A=22"],"unsolved":[]}
+{"question":"لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب أثر المصفوفة B ومحدد المصفوفة A","engines":["matricesEngine","matricesEngine"],"final":["\\text{أثر المصفوفة }B=8","\\text{محدد المصفوفة }A=-2"],"unsolved":[]}
+{"question":"حل الجملة بطريقة كرامر: \\begin{cases}x+y=3\\\\x-y=1\\end{cases}","engines":["matricesEngine"],"final":["x=2\\qquad y=1"],"unsolved":[]}
+{"question":"حل الجملة بالحذف الغاوسي: x+y=3، x-y=1","engines":["matricesEngine"],"final":["x=2\\qquad y=1"],"unsolved":[]}
+{"question":"لتكن A=[[1,2],[3,4]] وk=1/3، احسب k*A","engines":["matricesEngine"],"final":["\\left(\\left(\\frac{1}{3}\\right)\\right)\\,A=\\begin{pmatrix}\\frac{1}{3}&\\frac{2}{3}\\\\1&\\frac{4}{3}\\end{pmatrix}"],"unsolved":[]}
+{"question":"احسب k*A","engines":["matricesEngine"],"final":["\\left(\\left(\\frac{1}{3}\\right)\\right)\\,A=\\begin{pmatrix}\\frac{1}{3}&\\frac{2}{3}\\\\1&\\frac{4}{3}\\end{pmatrix}"],"unsolved":[]}
+{"question":"احسب محدد A=[[1,2,3],[0,4,5],[1,0,6]] بالنشر حسب العمود الأخير","engines":["matricesEngine"],"final":["\\text{محدد المصفوفة }A=22"],"unsolved":[]}
+
+Matrix documentation smoke: 23 passed, 0 failed
