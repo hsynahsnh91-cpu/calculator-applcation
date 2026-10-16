@@ -189,7 +189,7 @@ export function pairLatex(a: Pair): string {
   const imag = tex(a.i),
     negative = evaluateScalar(a.i) < 0;
   const magnitude = negative ? tex(scalar(`-(${a.i})`)) : imag;
-  const term = `${magnitude === "1" ? "" : magnitude}i`;
+  const term = `${magnitude === "1" ? "" : /\\[A-Za-z]+$/.test(magnitude) ? magnitude + " " : magnitude}i`;
   return zero(a.r)
     ? `${negative ? "-" : ""}${term}`
     : `${tex(a.r)} ${negative ? "-" : "+"} ${term}`;

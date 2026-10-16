@@ -4,12 +4,12 @@
 
 vite v7.3.2 building client environment for production...
 transforming...
-✓ 1970 modules transformed.
+✓ 1971 modules transformed.
 rendering chunks...
 [plugin vite:singlefile] 
 
-[plugin vite:singlefile] Inlining: index-BTZswL3Q.js
-[plugin vite:singlefile] Inlining: style-BiMsFuBv.css
+[plugin vite:singlefile] Inlining: index-BGwik275.js
+[plugin vite:singlefile] Inlining: style-w_9i-RWW.css
 computing gzip size...
-dist/index.html  16,845.85 kB │ gzip: 6,912.58 kB
-✓ built in 12.77s
+dist/index.html  16,855.43 kB │ gzip: 6,916.24 kB
+✓ built in 12.56s

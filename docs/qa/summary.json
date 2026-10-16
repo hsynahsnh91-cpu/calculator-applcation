@@ -5,26 +5,27 @@
     "chat": 46,
     "complex": 52,
     "probability": 108,
-    "passed": 298,
+    "textbook": 37,
+    "passed": 335,
     "failed": 0
   },
   "browser": {
     "http": {
-      "passed": 68,
+      "passed": 72,
       "failed": 0,
       "externalRequests": 0,
       "uncaughtErrors": 0
     },
     "file": {
-      "passed": 68,
+      "passed": 72,
       "failed": 0,
       "externalRequests": 0,
       "uncaughtErrors": 0
     }
   },
   "build": {
-    "htmlBytes": 16845847,
-    "sha256": "7b1f25b3f05a06f4cb7841b3b492e8b8ca5ee2dbb8e9b90b1ae08ce968ed63d1",
+    "htmlBytes": 16855426,
+    "sha256": "269a91ec0d5199135116ef12b84537f4bf7dc4cd2059633fe52b74fd5a86601b",
     "separateRuntimeFiles": 0,
     "embeddedLicenseNotices": 48
   },
@@ -36,7 +37,9 @@
     "Complex integer powers |n|<=10^12; roots n<=32; trigonometric identities n<=12.",
     "Probability workbench is bounded: urn draws<=32, colors<=8, discrete-law values<=100, joint law<=10x10, mixtures<=8 branches.",
     "Exact rational arithmetic is bounded; binomial and normal distributions use finite-precision approximations. Underflow does not imply a mathematically impossible event or a verified zero variance.",
-    "Independent numerical checks are not proofs; unsupported or ambiguous cases ask for clarification."
+    "Independent numerical checks are not proofs; unsupported or ambiguous cases ask for clarification.",
+    "Textbook and dialect support is rule-based and bounded, not a guarantee for all wording or dialects. Missing or ambiguous data still requires clarification.",
+    "Textbook image test uses real local OCR followed by explicit human review/correction. The radical was recognized as Vv3 in the printed fixture; mathematical OCR is not assumed infallible."
   ],
   "environment": {
     "node": "22.22.3",

@@ -1,7 +1,7 @@
 // Optional browser QA: supply PLAYWRIGHT_MODULE and CHROMIUM_EXECUTABLE, or install
 // playwright-core and @sparticuz/chromium locally without changing package.json.
 import assert from "node:assert/strict";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
 const { chromium } = await import(
@@ -1347,6 +1347,146 @@ await test("probability board tabs, focus and floating layout work at narrow pho
   await cleanMath();
   await page.keyboard.press("Escape");
   assert.equal(await page.getByRole("dialog").count(), 0);
+});
+
+// Verbatim Syrian textbook statement, copied formatting and reviewed image input.
+const textbookQuestion = JSON.parse(
+  await readFile(
+    new URL("./fixtures/syrian-complex.json", import.meta.url),
+    "utf8",
+  ),
+).question;
+await test("the exact Syrian textbook question solves both demands with named exponentials and conjugate deduction", async () => {
+  await fresh();
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const turn = await solve(textbookQuestion);
+  await completeAnswer();
+  assert.equal(turn.answer.unsolved.length, 0);
+  assert.equal(turn.answer.results.length, 2);
+  const [a, c] = turn.answer.results;
+  assert(a.finalLatex.includes("z_{A}=2e^{i"));
+  assert(c.finalLatex.includes("z_{C}=2e^{-i"));
+  assert(a.finalLatex.includes("\\frac{\\pi}{3}"));
+  assert(c.steps.some((s) => s.latex.includes("\\overline{z_{A}}")));
+  assert(a.verification.passed && c.verification.passed);
+  await cleanMath();
+  await page.screenshot({
+    path: fileURLToPath(new URL("syrian-complex-desktop.png", output)),
+    fullPage: true,
+  });
+  for (const width of [320, 360, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    assert(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth + 1,
+      ),
+    );
+  }
+  await page.screenshot({
+    path: fileURLToPath(new URL("syrian-complex-mobile.png", output)),
+    fullPage: true,
+  });
+});
+await test("textbook definitions persist across reload and a named follow-up selects B rather than the last C", async () => {
+  await page.reload({ waitUntil: "networkidle" });
+  await page.locator(".assistant-message .final-answer").waitFor();
+  const turn = await solve("اكتب الشكل الأسي للعدد z_B");
+  await completeAnswer();
+  assert.equal(turn.answer.unsolved.length, 0);
+  assert.equal(turn.answer.results.length, 1);
+  assert(turn.answer.results[0].finalLatex.includes("z_{B}=2e^{i0}"));
+  assert(
+    turn.answer.context.complex.values.z_A &&
+      turn.answer.context.complex.values.z_C,
+  );
+  await cleanMath();
+});
+await test("Levantine, Egyptian, Gulf and Maghrebi form requests use the same correct Worker result", async () => {
+  for (const request of [
+    "بدي حوللي z_A للشكل الأسي",
+    "عايز z_A بالصورة الأسية",
+    "أبغى اكتب z_A بالشكل الأسي",
+    "بغيت نكتب z_A بالصيغة الأسية",
+  ]) {
+    await fresh();
+    const turn = await solve("z_A=1+i√3، " + request);
+    await completeAnswer();
+    assert.equal(turn.answer.unsolved.length, 0);
+    assert(turn.answer.results[0].finalLatex.includes("z_{A}=2e^{i"));
+    assert(turn.answer.results[0].verification.passed);
+    await cleanMath();
+  }
+});
+await test("printed complex notation is OCR-reviewed, mathematically previewed, and solved only after approval", async () => {
+  await fresh();
+  const data = await page.evaluate(async () => {
+    await document.fonts.ready;
+    const c = document.createElement("canvas");
+    c.width = 1200;
+    c.height = 430;
+    const p = c.getContext("2d");
+    p.fillStyle = "white";
+    p.fillRect(0, 0, c.width, c.height);
+    p.fillStyle = "black";
+    p.font = "38px Cairo";
+    p.direction = "rtl";
+    p.textAlign = "right";
+    p.fillText("اكتب الشكل الأسي ثم استنتج باستعمال المرافق", 1150, 70);
+    p.direction = "ltr";
+    p.textAlign = "left";
+    p.font = "48px sans-serif";
+    p.fillText("z_A = 1 + i √3", 100, 165);
+    p.fillText("z_B = 2", 100, 260);
+    p.fillText("z_C = 1 - i √3", 100, 355);
+    return c.toDataURL("image/png").split(",")[1];
+  });
+  const fixture = fileURLToPath(new URL("printed-complex-problem.png", output));
+  await writeFile(fixture, Buffer.from(data, "base64"));
+  await page
+    .locator('input[type=file][accept*="image/png"]')
+    .setInputFiles(fixture);
+  await page.locator(".ocr-review").waitFor({ timeout: 65000 });
+  const raw = await page.locator(".ocr-review").inputValue();
+  assert(raw.trim().length > 0);
+  await writeFile(
+    fileURLToPath(new URL("ocr-textbook-raw.txt", output)),
+    raw + "\n",
+  );
+  assert.equal(await page.locator(".assistant-message").count(), 0);
+  assert(
+    await page
+      .getByRole("button", { name: "إرسال المسألة", exact: true })
+      .isDisabled(),
+  );
+  // OCR is not assumed infallible: exercise the required human review/correction.
+  await page.locator(".ocr-review").fill(textbookQuestion);
+  const preview = page.getByTestId("ocr-math-preview");
+  await preview.locator(".katex").first().waitFor();
+  assert(
+    (await preview.locator("annotation").allTextContents()).some((t) =>
+      t.includes("sqrt{3}"),
+    ),
+  );
+  await cleanMath();
+  await page.screenshot({
+    path: fileURLToPath(new URL("ocr-complex-review-mobile.png", output)),
+    fullPage: true,
+  });
+  await page
+    .getByRole("button", { name: "استخدام النص في مربع السؤال", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "إرسال المسألة", exact: true })
+    .click();
+  await page.locator(".assistant-message").waitFor();
+  await completeAnswer();
+  const turn = await lastTurn();
+  assert.equal(turn.answer.unsolved.length, 0);
+  assert.equal(turn.answer.results.length, 2);
+  assert(turn.answer.results[0].finalLatex.includes("z_{A}=2e^{i"));
+  assert(turn.answer.results[1].finalLatex.includes("z_{C}=2e^{-i"));
+  assert(turn.image.startsWith("data:image/jpeg;base64,"));
+  await cleanMath();
 });
 
 await test("local OCR returns reviewable text and never solves before approval", async () => {

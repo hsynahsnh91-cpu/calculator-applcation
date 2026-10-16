@@ -323,3 +323,42 @@ PASS ordered conditional urn events expose coherent target and condition binding
 PASS statistics preserve positive tiny deviation without saving underflowed variance as zero
 
 Probability regression: 108 passed, 0 failed
+PASS the exact Syrian textbook question solves both named demands without clarification
+PASS the school method explains modulus and quadrant before writing the exponential
+PASS deduction uses conjugacy only after comparing both given real and imaginary parts
+PASS a nonconjugate target is solved without inventing a conjugate relation
+PASS a semicolon in the reference frame is not a separate unanswered question
+PASS Arabic frame separators and whitespace in LaTeX subscripts remain valid
+PASS separately numbered demands share the same given data without solving the preamble
+PASS plain text and Unicode OCR-style roots do not concatenate into an unsupported isqrt function
+PASS adjacent LaTeX fractions and standard unbraced single-token roots keep multiplication
+PASS Greek pi and escaped trig functions stay separate from an adjacent imaginary unit
+PASS safe mathematical typography includes italic letters, actual subscripts and copied bidi marks
+PASS a requested name wins over the first given point or a stale current number
+PASS the exponential form is distinct from the algebraic and trigonometric forms
+PASS multiple explicitly named form targets are all solved and no implicit current target is chosen
+PASS missing named data still asks rather than reusing the first point or a stale number
+PASS an unsupported root or undefined coefficient still fails closed
+PASS the real number zero has no fabricated principal angle in an exponential demand
+PASS a coordinate frame does not make an ordinary three-dimensional geometry question complex
+PASS equivalent dialect demand: بدي اكتب z_A بالشكل الأسي
+PASS equivalent dialect demand: بدي حوللي z_A للصيغة الأسية
+PASS equivalent dialect demand: اكتبلي z_A بالصيغة الأسية
+PASS equivalent dialect demand: عايز z_A بالصورة الأسية
+PASS equivalent dialect demand: عاوز اكتب z_A في الشكل الأسي
+PASS equivalent dialect demand: عاوزة اكتب z_A بالشكل الأسي
+PASS equivalent dialect demand: أبغى z_A بالشكل الأسي
+PASS equivalent dialect demand: ابي اكتب z_A بالصيغة الأسية
+PASS equivalent dialect demand: أبغا حول لي z_A للشكل الأسي
+PASS equivalent dialect demand: بغيت نكتب z_A بالصيغة الأسية
+PASS equivalent dialect demand: بغيت نحول z_A للشكل الأسي
+PASS equivalent dialect demand: نحب نحسب z_A بالشكل الأسي
+PASS spoken Syrian number words and a root retain the same complex value
+PASS dialect aliases also work for scientific arithmetic and calculus
+PASS whole-word dialect cleanup preserves mathematical names and distinct given labels
+PASS the reviewed OCR preview renders subscripts and radicals but never evaluates the text
+PASS Markdown cleanup and the LaTeX decoder preserve nested fractions without raw markup operators
+PASS a stale invalid derivation hint never invalidates a correctly specified target
+PASS pi coefficients keep TeX control words separate from i and the exponential base
+
+Textbook regression: 37 passed, 0 failed

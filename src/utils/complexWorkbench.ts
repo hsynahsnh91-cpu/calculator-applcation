@@ -161,12 +161,26 @@ function polar(norm: string, theta: string): ComplexValue {
     latex: pairLatex({ r, i }),
   };
 }
-function forms(out: ComplexAnswer, z: ComplexValue) {
+function complexLabel(name = "z"): string {
+  if (/^z_[A-Z]$/.test(name)) return `z_{${name.slice(2)}}`;
+  if (/^z[1-9]$/.test(name)) return `z_{${name.slice(1)}}`;
+  if (name === "omega") return T`\omega`;
+  return /^(?:z|[abcdw])$/.test(name) ? name : "z";
+}
+function coefficientTex(value: string): string {
+  return /\\[A-Za-z]+$/.test(value) ? value + "{}" : value;
+}
+function exponentialForm(z: ComplexValue): string {
+  if (!z.angleTex) return "0";
+  const angle = z.angleTex;
+  return `${z.normTex === "1" ? "" : coefficientTex(z.normTex)}e^{${angle.startsWith("-") ? "-i" + angle.slice(1) : "i" + angle}}`;
+}
+function forms(out: ComplexAnswer, z: ComplexValue, input: ComplexRequest) {
   const theta = z.angleTex ?? T`\theta`;
   out.finalLatex = aligned([
     T`z&=${z.latex}`,
     T`z&=${z.normTex}(\cos\theta+i\sin\theta)`,
-    T`z&=${z.normTex}e^{i\theta}`,
+    T`z&=${coefficientTex(z.normTex)}e^{i\theta}`,
     ...(z.angleTex ? [T`\theta&=${theta}`] : []),
   ]);
   out.steps = [
@@ -206,7 +220,7 @@ function forms(out: ComplexAnswer, z: ComplexValue) {
       { label: "المثلثي", latex: T`z=${z.normTex}(\cos\theta+i\sin\theta)` },
       {
         label: "الأسي",
-        latex: T`z=${z.normTex}e^{i\theta}`,
+        latex: T`z=${coefficientTex(z.normTex)}e^{i\theta}`,
         caption: z.angleTex
           ? T`العمدة: \(${z.angleTex}\)`
           : "العمدة غير محددة للصفر",
@@ -229,6 +243,85 @@ function forms(out: ComplexAnswer, z: ComplexValue) {
       { re: 0, im: 0 },
       "مطابقة الجزأين الحقيقي والتخيلي للعدد الصفري",
     );
+  const label = complexLabel(input.targetName);
+  if (label !== "z") {
+    out.finalLatex = out.finalLatex.replace(/\bz\b/g, label);
+    out.steps = out.steps.map((s) => ({
+      ...s,
+      latex: s.latex.replace(/\bz\b/g, label),
+    }));
+    out.visuals = out.visuals.map((v) =>
+      v.kind === "formula-cards"
+        ? {
+            ...v,
+            cards: v.cards.map((c) => ({
+              ...c,
+              latex: c.latex.replace(/\bz\b/g, label),
+            })),
+          }
+        : v,
+    );
+  }
+  if (input.form && input.form !== "all") {
+    const title =
+      input.form === "exponential"
+        ? "الشكل الأسي"
+        : input.form === "trigonometric"
+          ? "الشكل المثلثي"
+          : "الشكل الجبري";
+    const form =
+      input.form === "algebraic"
+        ? z.latex
+        : input.form === "exponential"
+          ? exponentialForm(z)
+          : !z.angleTex
+            ? "0"
+            : T`${z.normTex}(\cos(${z.angleTex})+i\sin(${z.angleTex}))`;
+    out.title = title + " للعدد العقدي";
+    out.finalLatex = `${label}=${form}`;
+    out.visuals = out.visuals.filter((v) => v.kind !== "formula-cards");
+    out.visuals.unshift({
+      kind: "formula-cards",
+      title,
+      cards: [{ label: title, latex: out.finalLatex }],
+    });
+    if (input.form === "exponential")
+      out.steps.push(step("كتابة الشكل الأسي بالراديان", out.finalLatex));
+  }
+  if (input.form === "exponential" && input.deriveFrom && input.targetName) {
+    try {
+      const source = complexValue(input.deriveFrom.expression);
+      if (
+        zero(scalar(`(${z.r})-(${source.r})`)) &&
+        zero(scalar(`(${z.i})+(${source.i})`))
+      ) {
+        const previous = complexLabel(input.deriveFrom.name);
+        out.steps = [
+          step(
+            "تمييز العدد المرافق",
+            T`${label}=${z.latex}=\overline{${previous}}`,
+            "الجزآن الحقيقيان متساويان، والجزآن التخيليان متعاكسان؛ لذا نستنتج بالاعتماد على المرافق، لا بافتراض علاقة من الرسم.",
+          ),
+          step(
+            "الاستنتاج من الشكل الأسي السابق",
+            T`${label}=\overline{${previous}}=\overline{${exponentialForm(source)}}=${exponentialForm(z)}`,
+            "مرافق العدد يملك الطويلة نفسها والعمدة المعاكسة بترديد 2π.",
+          ),
+        ];
+        const conjugateCheck = verifyPair(
+          z,
+          { re: source.re, im: -source.im },
+          "مطابقة المرافق عددياً وإعادة البناء من الطويلة والعمدة",
+        );
+        out.verification = {
+          ...conjugateCheck,
+          passed: out.verification.passed && conjugateCheck.passed,
+        };
+      }
+    } catch {
+      /* A stale optional derivation hint must not invalidate explicit current data. */
+    }
+  }
 }
 function theorem(input: ComplexRequest): ComplexAnswer {
   const euler = input.theorem === "euler",
@@ -599,6 +692,51 @@ export function solveComplexRequest(
     contextPatch(out, input, ratio);
     return out;
   }
+  if (
+    input.operation === "forms" &&
+    input.formTargets &&
+    input.formTargets.length > 1
+  ) {
+    const out = answer("الأشكال المطلوبة للأعداد العقدية"),
+      parts: ComplexAnswer[] = [];
+    const targets = input.formTargets.map((target) => ({
+      ...target,
+      value: complexValue(target.expression),
+    }));
+    for (const target of targets) {
+      const part = answer("الشكل المطلوب");
+      forms(part, target.value, {
+        ...input,
+        targetName: target.name,
+        formTargets: undefined,
+      });
+      parts.push(part);
+      out.steps.push(
+        ...part.steps.map((s) => ({
+          ...s,
+          title: `العدد ${target.name.replace(/^z_?/, "")} — ${s.title}`,
+        })),
+      );
+      out.visuals.push(...part.visuals);
+    }
+    out.finalLatex = aligned(parts.map((p) => p.finalLatex));
+    out.verification = {
+      passed: parts.every((p) => p.verification.passed),
+      samples: parts.length,
+      method:
+        "إعادة بناء مستقلة لكل عدد من طويلته وعمدته؛ لا يكفي تحقق عدد واحد.",
+    };
+    plot(
+      out,
+      targets.map((t) => ({
+        value: t.value,
+        label: t.name.replace(/^z_?/, ""),
+      })),
+    );
+    contextPatch(out, input);
+    out.contextPatch!.complex!.ambiguous = true;
+    return out;
+  }
   let z: ComplexValue;
   if (input.operation === "euler" && input.angle) {
     const angle = angleInput(input.angle, input.angleUnit ?? angleMode),
@@ -611,7 +749,7 @@ export function solveComplexRequest(
   } else z = complexValue(input.expression!);
   const out = answer("الأشكال الثلاثة للعدد العقدي");
   if (input.operation === "forms" || input.operation === "euler") {
-    forms(out, z);
+    forms(out, z, input);
     if (input.operation === "euler") {
       out.title = "حل بقانون أويلر";
       out.steps.unshift(
@@ -621,7 +759,14 @@ export function solveComplexRequest(
         ),
       );
     }
-    plot(out, [{ value: z, label: "M" }]);
+    plot(out, [
+      {
+        value: z,
+        label: input.targetName?.startsWith("z_")
+          ? input.targetName.slice(2)
+          : "M",
+      },
+    ]);
     contextPatch(out, input, z);
     return out;
   }

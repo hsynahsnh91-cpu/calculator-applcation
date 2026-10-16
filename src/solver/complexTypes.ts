@@ -18,6 +18,10 @@ export type ComplexOperation =
   | "theorem";
 export interface ComplexRequest {
   operation: ComplexOperation;
+  form?: "algebraic" | "trigonometric" | "exponential" | "all";
+  targetName?: string;
+  formTargets?: { name: string; expression: string }[];
+  deriveFrom?: { name: string; expression: string };
   expression?: string;
   second?: string;
   operator?: "+" | "-" | "*" | "/";

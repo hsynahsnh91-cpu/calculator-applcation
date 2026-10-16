@@ -230,6 +230,22 @@
       "pass": true
     },
     {
+      "name": "the exact Syrian textbook question solves both demands with named exponentials and conjugate deduction",
+      "pass": true
+    },
+    {
+      "name": "textbook definitions persist across reload and a named follow-up selects B rather than the last C",
+      "pass": true
+    },
+    {
+      "name": "Levantine, Egyptian, Gulf and Maghrebi form requests use the same correct Worker result",
+      "pass": true
+    },
+    {
+      "name": "printed complex notation is OCR-reviewed, mathematically previewed, and solved only after approval",
+      "pass": true
+    },
+    {
       "name": "local OCR returns reviewable text and never solves before approval",
       "pass": true
     },
