@@ -1,3 +1,10 @@
+import {
+  normalizeMathTypography,
+  stripPromptMarkdown,
+  normalizeMathDialect,
+  splitPromptRequests,
+  hasMathInstruction,
+} from "./textbook";
 import { emptyContext, type ParsedPrompt, type SolverContext } from "./types";
 
 export function normalizeDigits(source: string): string {
@@ -111,7 +118,7 @@ export function decodeLatex(source: string): string {
   for (let index = 0; index < text.length; ) {
     const command = text
       .slice(index)
-      .match(/^\\(dfrac|tfrac|frac|sqrt|text|mathrm|operatorname)\b/);
+      .match(/^\\(dfrac|tfrac|frac|sqrt|text|mathrm|operatorname)(?![a-zA-Z])/);
     if (!command) {
       out += text[index++];
       continue;
@@ -125,7 +132,12 @@ export function decodeLatex(source: string): string {
         next = end + 1;
       }
     }
-    const first = readGroup(text, next);
+    let first = readGroup(text, next);
+    if (!first && command[1] === "sqrt") {
+      let atom = next;
+      while (atom < text.length && /\s/.test(text[atom])) atom++;
+      if (/[A-Za-z0-9]/.test(text[atom] ?? "")) first = [text[atom], atom + 1];
+    }
     if (!first) {
       out += text[index++];
       continue;
@@ -136,14 +148,14 @@ export function decodeLatex(source: string): string {
         out += text[index++];
         continue;
       }
-      out += `((${decodeLatex(first[0])})/(${decodeLatex(second[0])}))`;
+      out += `${/[A-Za-z0-9_)\]}]$/.test(out) ? "*" : ""}((${decodeLatex(first[0])})/(${decodeLatex(second[0])}))`;
       index = second[1];
     } else {
       out +=
         command[1] === "sqrt"
           ? rootIndex === "2"
-            ? `sqrt(${decodeLatex(first[0])})`
-            : `((${decodeLatex(first[0])})^(1/(${rootIndex})))`
+            ? `${/[A-Za-z0-9_)\]}]$/.test(out) ? "*" : ""}sqrt(${decodeLatex(first[0])})`
+            : `${/[A-Za-z0-9_)\]}]$/.test(out) ? "*" : ""}((${decodeLatex(first[0])})^(1/(${rootIndex})))`
           : decodeLatex(first[0]);
       index = first[1];
     }
@@ -154,13 +166,14 @@ export function decodeLatex(source: string): string {
     .replace(/\\(?:theta|vartheta)(?![a-zA-Z])/g, "theta")
     .replace(/\\omega(?![a-zA-Z])/g, "omega")
     .replace(/\\mathbb\s*\{([CR])\}/g, "$1")
-    .replace(/\\pi(?![a-zA-Z])/g, "pi")
+    .replace(/\\pi(?![a-zA-Z])/g, " pi ")
     .replace(/\\infty(?![a-zA-Z])/g, "∞")
     .replace(/\\Omega(?![a-zA-Z])/g, "Ω")
     .replace(/\\to(?![a-zA-Z])/g, "→")
     .replace(
       /\\(?:sin|cos|tan|cot|sec|csc|sinh|cosh|tanh|arcsin|arccos|arctan|ln|log|exp|abs)(?![a-zA-Z])/g,
       (word) =>
+        " " +
         word
           .slice(1)
           .replace("arcsin", "asin")
@@ -171,10 +184,17 @@ export function decodeLatex(source: string): string {
     .replace(/\\(?:quad|qquad|enspace)\b/g, " ")
     .replace(/\\[()[\]]|\$+/g, "")
     .replace(/\^\s*\{([^{}]+)\}/g, "^($1)")
-    .replace(/_\{([^{}]+)\}/g, "_$1");
+    .replace(/_\{([^{}]+)\}/g, "_$1")
+    .replace(
+      /\bz_\s*([A-Za-z])\b/g,
+      (_, label: string) => `z_${label.toUpperCase()}`,
+    )
+    .replace(/\bz\s+([A-Z])(?=\s*=)/g, "z_$1");
 }
 export function normalizePrompt(source: string): string {
-  let text = decodeLatex(normalizeArabic(source));
+  let text = decodeLatex(
+    stripPromptMarkdown(normalizeMathTypography(normalizeArabic(source))),
+  );
   let notationSuffix = "";
   text = text
     .replace(
@@ -198,7 +218,7 @@ export function normalizePrompt(source: string): string {
     .replace(/−|–|—/g, "-")
     .replace(/×|·/g, "*")
     .replace(/÷/g, "/")
-    .replace(/π/g, "pi")
+    .replace(/π/g, " pi ")
     .replace(/θ/g, "theta")
     .replace(/ω/g, "omega")
     .replace(/\bz_\{?([1-9])\}?/g, "z$1")
@@ -207,8 +227,8 @@ export function normalizePrompt(source: string): string {
       (power) =>
         `^(${[...power].map((c) => ("⁰¹²³⁴⁵⁶⁷⁸⁹".includes(c) ? "⁰¹²³⁴⁵⁶⁷⁸⁹".indexOf(c) : "-")).join("")})`,
     )
-    .replace(/√\s*\(/g, "sqrt(")
-    .replace(/√\s*([a-zA-Z0-9.]+)/g, "sqrt($1)")
+    .replace(/√\s*\(/g, " sqrt(")
+    .replace(/√\s*([a-zA-Z0-9.]+)/g, " sqrt($1)")
     .replace(
       /(^|[^\u0600-\u06ff])(?:اكسس|اكس|سين)(?=$|[^\u0600-\u06ff])/g,
       "$1x",
@@ -239,29 +259,31 @@ export function normalizePrompt(source: string): string {
       /(^|[^\u0600-\u06ff])(?:بدي|عايز|اريد)(?=$|[^\u0600-\u06ff])/g,
       "$1جد",
     );
-  return text.replace(/\u200e|\u200f/g, "").trim();
+  return normalizeMathDialect(text).trim();
 }
 export function parsePrompt(
   source: string,
   previous: SolverContext = emptyContext(),
 ): ParsedPrompt {
-  let raw = normalizeArabic(source);
+  let raw = stripPromptMarkdown(
+    normalizeMathTypography(normalizeArabic(source)),
+  );
   if (/جملة|نظام/.test(raw))
     raw = raw.replace(/[؛;](?=\s*(?:[-+(\d]|[xyz])[^؛;\n]*=)/g, "،");
   const context: SolverContext = {
     ...previous,
     assignments: { ...previous.assignments },
   };
-  const fragments = raw
-    .split(
-      /(?:^|\r?\n)\s*(?:[ا-يa-e]|\d{1,2})\s*[).:：-]\s*|(?:^|\s)[ابجدهـ]\s*[)\]:]\s*|\s+\d{1,2}\s*[).:：-]\s*(?=[\u0600-\u06ff])|\s+ثم\s+|[؛;]\s*|\n(?=\s*(?:جد|احسب|حل|ادرس|ارسم|نظم))/,
-    )
+  const fragments = splitPromptRequests(raw)
     .map((part) => normalizePrompt(part))
     .filter(Boolean);
   // Keep probability definitions with the next question; later queries consume the
   // validated structured context. Never glue old questions onto new event conditions.
   const requests: string[] = [];
   let pendingDefinitions = "";
+  let pendingComplex = "";
+  const complexDefinition = (part: string) =>
+    /\bz(?:_[A-Z]|[1-9])?\s*=/.test(part) && !hasMathInstruction(part);
   const probabilityDefinition = (part: string) =>
     (!/(?:احسب|جد|هل|افحص|اختبر|ارسم|حول)/.test(part) &&
       /(?:P\s*\([^)]*\)\s*=|(?:^|\s)(?:[XYJpqf]|القيم|التكرارات|الالوان)\s*=\s*\[)/.test(
@@ -270,7 +292,21 @@ export function parsePrompt(
     (!/(?:احسب|جد|هل|احتمال|قانون)/.test(part) &&
       /[0-9]|كرتان|كرتين/.test(part) &&
       /كيس|صندوق|سحب|السحب/.test(part));
-  for (const part of fragments) {
+  for (let part of fragments) {
+    if (complexDefinition(part)) {
+      pendingComplex += (pendingComplex ? "\n" : "") + part;
+      continue;
+    }
+    if (pendingComplex) {
+      if (
+        /عقدي|اويلر|ديموافر|شكل|صيغة|صورة|اسي|جبري|مثلثي|مرافق|طويلة|عمدة|\bz(?:_[A-Z]|[1-9])?\b/.test(
+          part,
+        )
+      )
+        part = pendingComplex + "\n" + part;
+      else requests.push(pendingComplex);
+      pendingComplex = "";
+    }
     if (probabilityDefinition(part)) {
       pendingDefinitions += (pendingDefinitions ? "، " : "") + part;
       continue;
@@ -287,6 +323,7 @@ export function parsePrompt(
     } else requests.push(part);
   }
   if (pendingDefinitions) requests.push(pendingDefinitions);
+  if (pendingComplex) requests.push(pendingComplex);
   const text = requests.join("\n");
   const initial = requests[0] ?? text;
   const definition = initial.match(

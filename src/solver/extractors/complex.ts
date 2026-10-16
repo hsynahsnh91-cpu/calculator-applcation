@@ -1,3 +1,4 @@
+import { mathInstructionText } from "../textbook";
 import { math, canonical, parseExpression } from "../math";
 import { mathFragments } from "./index";
 import { ClarificationError, type SolverContext } from "../types";
@@ -173,6 +174,28 @@ export function extractComplexRequest(
       rest.slice(match.index! + match[0].length + value.length);
   }
   rest = rest.replace(/\b[A-Z]\s*\([^()]*,[^()]*\)/g, " ");
+  rest = mathInstructionText(rest);
+  text = rest;
+  const formNames = [
+    ...new Set(
+      [...rest.matchAll(/\b(z(?:_[A-Z]|[1-9])?|omega|[abcdw])\b/g)].map(
+        (m) => m[1],
+      ),
+    ),
+  ];
+  const requestedForm: ComplexRequest["form"] = /اشكال|الثلاث|كل.*صيغ/.test(
+    text,
+  )
+    ? "all"
+    : /(?:^|[^\p{L}])(?:ال|بال)?اسي(?:ة|ا)?(?=$|[^\p{L}])/u.test(text) ||
+        /\bexponenti(?:al|el(?:le)?)\b/i.test(text)
+      ? "exponential"
+      : /مثلثي|trigonometri/i.test(text)
+        ? "trigonometric"
+        : /جبري|algebraic/i.test(text)
+          ? "algebraic"
+          : undefined;
+
   const fragments = mathFragments(rest)
     .map(clean)
     .filter((part) => !part.includes("=") && !/^(?:n|theta|power)$/.test(part));
@@ -185,6 +208,9 @@ export function extractComplexRequest(
       fragments.push(literals[0]);
   }
   const choose = (): string | undefined =>
+    (requestedForm && formNames.length === 1
+      ? (values[formNames[0]] ?? formNames[0])
+      : undefined) ??
     (fragments[0] ? substitute(fragments[0], values) : undefined) ??
     (given.includes("z")
       ? values.z
@@ -211,7 +237,12 @@ export function extractComplexRequest(
     !parameters.theta &&
     !definitions.some((match) => match[1] === "z") &&
     (demoivre || euler || /بسط|تبسيط|وسع|خطية/.test(text));
-  const request: ComplexRequest = { operation: "forms", values, points };
+  const request: ComplexRequest = {
+    operation: "forms",
+    values,
+    points,
+    form: requestedForm,
+  };
   if (symbolicTrig) {
     request.operation = "trig";
     request.variable = /theta\b/.test(text) ? "theta" : "x";
@@ -481,12 +512,12 @@ export function extractComplexRequest(
     request.theorem = euler ? "euler" : "demoivre";
     return request;
   }
-  if (!expression && points.length) {
+  if (!expression && points.length && !context.complex?.ambiguous) {
     expression = points[0].expression;
   }
   if (!expression && context.complex?.ambiguous)
     throw new ClarificationError(
-      "للنتيجة السابقة عدة جذور؛ اكتب الجذر الذي تريد متابعة العمل عليه بدل اختيار واحد دون إذنك.",
+      "للنتيجة السابقة عدة أعداد أو جذور؛ حدّد العدد الذي تريد متابعة العمل عليه بدل اختيار واحد دون إذنك.",
     );
   if (!expression)
     throw new ClarificationError(
@@ -494,6 +525,41 @@ export function extractComplexRequest(
       ["اكتب الأشكال الثلاثة للعدد العقدي z=3+4i"],
     );
   request.expression = expression;
+  if (request.operation === "forms") {
+    request.targetName =
+      formNames.length === 1
+        ? formNames[0]
+        : given.includes("z")
+          ? "z"
+          : given.length === 1
+            ? given[0]
+            : undefined;
+    if (requestedForm && formNames.length > 1) {
+      request.formTargets = formNames.map((name) => {
+        if (!values[name])
+          throw new ClarificationError(
+            `ما قيمة ${name}؟ عرّفه قبل تحويل الشكل.`,
+          );
+        return { name, expression: values[name] };
+      });
+    }
+    if (/استنتج|استدل|اعتمادا/.test(text) && context.complex?.current) {
+      const prior = context.complex;
+      const source = Object.entries(prior.values).find(
+        ([name, value]) =>
+          name !== "z" &&
+          name !== request.targetName &&
+          value === prior.current,
+      );
+      // A freshly redefined alias must never label a stale previous value.
+      const sourceName = source?.[0] ?? "z";
+      if (!given.includes(sourceName))
+        request.deriveFrom = {
+          name: sourceName,
+          expression: prior.current!,
+        };
+    }
+  }
   request.usePoints = /نقط|نقاط|شعاع\s*[A-Z]{2}|\bz_[A-Z]\b/.test(text);
   request.angle = parameters.theta;
   if (euler) request.coefficient = parameters.r;

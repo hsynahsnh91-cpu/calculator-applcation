@@ -1,3 +1,8 @@
+import { RichText } from "../common/Tex";
+import {
+  normalizeMathTypography,
+  stripPromptMarkdown,
+} from "../../solver/textbook";
 import { useEffect, useState } from "react";
 import { Check, Image, LoaderCircle, X } from "lucide-react";
 export function ImageAttachment({
@@ -37,7 +42,7 @@ export function ImageAttachment({
           controller.signal,
         );
         if (controller.signal.aborted) return;
-        setText(answer.text);
+        setText(normalizeMathTypography(answer.text));
         setComplete(true);
         setMessage(`استخراج محلي · ثقة OCR: ${Math.round(answer.confidence)}٪`);
       } catch (value) {
@@ -114,6 +119,25 @@ export function ImageAttachment({
             rows={3}
             dir="auto"
           />
+          <details className="ocr-formula-preview" open>
+            <summary>معاينة الصيغ قبل الإرسال</summary>
+            <div
+              className="ocr-formula-preview-body"
+              data-testid="ocr-math-preview"
+            >
+              <RichText
+                text={stripPromptMarkdown(normalizeMathTypography(text)).slice(
+                  0,
+                  7000,
+                )}
+                autoMath
+              />
+            </div>
+            <p>
+              هذه معاينة للنص الذي تراجعه، لا تأكيد لصحته. تحقّق من i و1، ومن
+              إشارة الجذر واللاحقات؛ لا نخمّن الرموز المفقودة.
+            </p>
+          </details>
           <button
             className="text-xs inline-flex gap-1.5 items-center text-emerald-300 font-bold py-1"
             onClick={() => {

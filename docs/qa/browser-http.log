@@ -55,6 +55,10 @@ PASS ordered urn conditional controls calculate the correct restricted space
 PASS invalid urn controls never show a stale live probability or allow a solve
 PASS probability context and histogram visuals survive an offline reload
 PASS probability board tabs, focus and floating layout work at narrow phone widths
+PASS the exact Syrian textbook question solves both demands with named exponentials and conjugate deduction
+PASS textbook definitions persist across reload and a named follow-up selects B rather than the last C
+PASS Levantine, Egyptian, Gulf and Maghrebi form requests use the same correct Worker result
+PASS printed complex notation is OCR-reviewed, mathematically previewed, and solved only after approval
 PASS local OCR returns reviewable text and never solves before approval
 PASS cancelling OCR initialization leaves the composer and solver usable
 PASS malformed saved answer is ignored instead of crashing React
@@ -67,4 +71,4 @@ PASS speech policy: unavailable
 PASS speech policy: server-only
 PASS no external HTTP requests or uncaught browser errors
 
-Browser: 68 passed, 0 failed
+Browser: 72 passed, 0 failed

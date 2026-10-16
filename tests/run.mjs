@@ -5,7 +5,13 @@ const directory = new URL("./.generated/", import.meta.url);
 await mkdir(directory, { recursive: true });
 let failed = false;
 try {
-  for (const name of ["engines", "solver", "complex", "probability"]) {
+  for (const name of [
+    "engines",
+    "solver",
+    "complex",
+    "probability",
+    "textbook",
+  ]) {
     const output = new URL(`${name}.mjs`, directory).pathname;
     await build({
       entryPoints: [new URL(`./${name}.test.ts`, import.meta.url).pathname],
