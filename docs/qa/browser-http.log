@@ -55,6 +55,34 @@ PASS ordered urn conditional controls calculate the correct restricted space
 PASS invalid urn controls never show a stale live probability or allow a solve
 PASS probability context and histogram visuals survive an offline reload
 PASS probability board tabs, focus and floating layout work at narrow phone widths
+PASS spatial workbench is an on-demand conversation tool with six responsive categories
+PASS spatial tabs, fields and sticky actions fit 320/360/390px screens with working focus
+PASS editing a point field changes the actual Worker answer rather than a cached example
+PASS loading and solving two examples yields two distinct results
+PASS spatial insertion creates an editable draft and never solves before sending
+PASS spatial controls reveal their fields immediately on selection
+PASS invalid directions and zero barycentric weight sums block submission without fabricated results
+PASS barycenter fields support four points and reopening preserves operands rather than generated G
+PASS sphere radius fields and the projected surface use the current exact data
+PASS the spatial diagram rotates and resets without changing the mathematical result
+PASS line-plane controls distinguish containment and parallel nonintersection
+PASS a specific older geometry answer reopens its own data, not the newest example
+PASS spatial vector-to-matrix follow-up runs the matrix engine and can return to the named vectors
+PASS a geometric distance is reused exactly in the scientific calculator
+PASS spatial solids change with fields and do not save history without an explicit action
+PASS line relations, plane intersections and altitude-volume answers remain narrow-screen math
+PASS geometry context and 3D diagrams survive reload with the original exact coordinates
+PASS the formula bank exposes spatial barycentric and projection conditions
+PASS school exponential aggregate calculates the requested S rather than returning two forms
+PASS quadratic roots flow by their actual z1/z2 names into the next school demand
+PASS the full two-box school problem separates the new white-count experiment
+PASS long school cards retain labels and fit phone widths without raw math errors
+PASS school source labels, box stock and exact law survive a browser reload
+PASS missing quantities yield only one visible clarification while other parts are listed pending
+PASS exact numerical answers remain primary and decimal display opens only on request
+PASS affine induction displays base hypothesis and transfer and refuses a false claim
+PASS school uniqueness and derived integrals use actual proofs and calculus models
+PASS the in-app capability guide states limits and inserts examples without auto-solving
 PASS the exact Syrian textbook question solves both demands with named exponentials and conjugate deduction
 PASS textbook definitions persist across reload and a named follow-up selects B rather than the last C
 PASS Levantine, Egyptian, Gulf and Maghrebi form requests use the same correct Worker result
@@ -71,4 +99,4 @@ PASS speech policy: unavailable
 PASS speech policy: server-only
 PASS no external HTTP requests or uncaught browser errors
 
-Browser: 72 passed, 0 failed
+Browser: 100 passed, 0 failed

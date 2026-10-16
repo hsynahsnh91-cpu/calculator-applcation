@@ -230,6 +230,118 @@
       "pass": true
     },
     {
+      "name": "spatial workbench is an on-demand conversation tool with six responsive categories",
+      "pass": true
+    },
+    {
+      "name": "spatial tabs, fields and sticky actions fit 320/360/390px screens with working focus",
+      "pass": true
+    },
+    {
+      "name": "editing a point field changes the actual Worker answer rather than a cached example",
+      "pass": true
+    },
+    {
+      "name": "loading and solving two examples yields two distinct results",
+      "pass": true
+    },
+    {
+      "name": "spatial insertion creates an editable draft and never solves before sending",
+      "pass": true
+    },
+    {
+      "name": "spatial controls reveal their fields immediately on selection",
+      "pass": true
+    },
+    {
+      "name": "invalid directions and zero barycentric weight sums block submission without fabricated results",
+      "pass": true
+    },
+    {
+      "name": "barycenter fields support four points and reopening preserves operands rather than generated G",
+      "pass": true
+    },
+    {
+      "name": "sphere radius fields and the projected surface use the current exact data",
+      "pass": true
+    },
+    {
+      "name": "the spatial diagram rotates and resets without changing the mathematical result",
+      "pass": true
+    },
+    {
+      "name": "line-plane controls distinguish containment and parallel nonintersection",
+      "pass": true
+    },
+    {
+      "name": "a specific older geometry answer reopens its own data, not the newest example",
+      "pass": true
+    },
+    {
+      "name": "spatial vector-to-matrix follow-up runs the matrix engine and can return to the named vectors",
+      "pass": true
+    },
+    {
+      "name": "a geometric distance is reused exactly in the scientific calculator",
+      "pass": true
+    },
+    {
+      "name": "spatial solids change with fields and do not save history without an explicit action",
+      "pass": true
+    },
+    {
+      "name": "line relations, plane intersections and altitude-volume answers remain narrow-screen math",
+      "pass": true
+    },
+    {
+      "name": "geometry context and 3D diagrams survive reload with the original exact coordinates",
+      "pass": true
+    },
+    {
+      "name": "the formula bank exposes spatial barycentric and projection conditions",
+      "pass": true
+    },
+    {
+      "name": "school exponential aggregate calculates the requested S rather than returning two forms",
+      "pass": true
+    },
+    {
+      "name": "quadratic roots flow by their actual z1/z2 names into the next school demand",
+      "pass": true
+    },
+    {
+      "name": "the full two-box school problem separates the new white-count experiment",
+      "pass": true
+    },
+    {
+      "name": "long school cards retain labels and fit phone widths without raw math errors",
+      "pass": true
+    },
+    {
+      "name": "school source labels, box stock and exact law survive a browser reload",
+      "pass": true
+    },
+    {
+      "name": "missing quantities yield only one visible clarification while other parts are listed pending",
+      "pass": true
+    },
+    {
+      "name": "exact numerical answers remain primary and decimal display opens only on request",
+      "pass": true
+    },
+    {
+      "name": "affine induction displays base hypothesis and transfer and refuses a false claim",
+      "pass": true
+    },
+    {
+      "name": "school uniqueness and derived integrals use actual proofs and calculus models",
+      "pass": true
+    },
+    {
+      "name": "the in-app capability guide states limits and inserts examples without auto-solving",
+      "pass": true
+    },
+    {
       "name": "the exact Syrian textbook question solves both demands with named exponentials and conjugate deduction",
       "pass": true
     },

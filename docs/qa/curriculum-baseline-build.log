@@ -1,0 +1,15 @@
+
+> react-vite-tailwind@0.0.0 build
+> vite build
+
+vite v7.3.2 building client environment for production...
+transforming...
+✓ 1977 modules transformed.
+rendering chunks...
+[plugin vite:singlefile] 
+
+[plugin vite:singlefile] Inlining: index-BW-qFNaT.js
+[plugin vite:singlefile] Inlining: style-CjgIAsk4.css
+computing gzip size...
+dist/index.html  16,960.26 kB │ gzip: 6,950.94 kB
+✓ built in 13.82s

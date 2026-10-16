@@ -1,3 +1,4 @@
+import { isSpaceIntent } from "./spaceNotation";
 import { isComplexIntent } from "./complexTypes";
 import {
   ENGINE_LABELS,
@@ -42,10 +43,34 @@ export function routePrompt(
     give("matricesEngine", 0.99, "مصفوفة أو عملية عليها");
   if (/متتالي|حدها|حدودها|اساسها|الحد الاول|\bu_?\{?n|\bu\([n0-9]/.test(text))
     give("sequences", 0.99, "معطيات متتالية أو مجموع حدودها");
+  const sequenceIntent =
+    /\bu_?\{?n(?:\+1)?|\bu\(n|متتالي|التدريج/.test(text) &&
+    !/متحول|متغير|احتمال|سحب|السحب|كرات|كرت|كيس|صندوق/.test(text);
+  if (
+    sequenceIntent ||
+    (!!context?.school?.sequence &&
+      /عبار|صريح|اساس|نهاية المتتالية|رتابة/.test(text) &&
+      !/سحب|كيس|صندوق/.test(text))
+  )
+    give("sequences", 1, "تعريف متتالية أو علاقة تدريجية أو طلب تابع لها");
+  if (/حل(?:ا)? وحيد|حلا وحيدا|وجود حل وحيد/.test(text))
+    give("calculusEngine", 1, "وجود ووحدانية بدراسة الاستمرار والرتابة");
+  if (
+    /مساحة.*(?:منحني|منحنى)|حجم دوراني|الحجم الدوراني|القيمة الوسط[ىي]|القيمة المتوسطة/.test(
+      text,
+    )
+  )
+    give("integrationEngine", 1, "مساحة أو حجم أو قيمة وسطى بتكامل معرف");
+  if (/(?:^|\s)تحقق/.test(text) && /جذر|\b[fgh]\s*\(/.test(text))
+    give("calculusEngine", 1, "تحقق بالتعويض عند قيمة محددة في تابع معطى");
+  const spatialIntent = isSpaceIntent(text, context);
+  if (spatialIntent)
+    give("geometryEngine", 1, "معطيات أو متابعة هندسية فراغية منظمة");
   const scalarReference =
-    /(?:الاحتمال|النتيجة)\s+السابق(?:ة)?/.test(text) || /\bans\b/.test(text);
+    /(?:الاحتمال|النتيجة(?:\s+الهندسية)?)\s+السابق(?:ة)?/.test(text) ||
+    /\bans\b/.test(text);
   const probabilityIntent =
-    /احتمال|احصاء|كرات|كرت|كيس|صندوق|ثنائي|برنولي|توزيع|طبيعي|غاوسي|توافيق|تراتيب|عاملي|متوسط|وسيط|منوال|انحراف|تباين|امل رياضي|الامل|العزم الثاني|قواعد الاحداث|متمم|مكمل|الفضاء العيني|مدرج (?:ال)?تكراري|بيانات|تكرارات|متحول (?:ال)?عشوائي|متغير (?:ال)?عشوائي|استقلال|مستقلان|متنافي|اتحاد|تقاطع|بايز|شجرة الاحتمالات|دالة مولدة|الدالة المولدة|[Pp]\s*\(\s*[A-Z](?![A-Za-z0-9_,])|[EV]\s*\(\s*[XY]|n\s*\(\s*Ω|(?:X|Y|J|q)\s*=\s*\[/.test(
+    /احتمال|احصاء|كرات|كرت|كيس|صندوق|متغير عشوائي|المتغير العشوائي|ثنائي|برنولي|توزيع|طبيعي|غاوسي|توافيق|تراتيب|عاملي|متوسط|وسيط|منوال|انحراف|تباين|امل رياضي|الامل|العزم الثاني|قواعد الاحداث|متمم|مكمل|الفضاء العيني|مدرج (?:ال)?تكراري|بيانات|تكرارات|متحول (?:ال)?عشوائي|متغير (?:ال)?عشوائي|استقلال|مستقلان|متنافي|اتحاد|تقاطع|بايز|شجرة الاحتمالات|دالة مولدة|الدالة المولدة|[Pp]\s*\(\s*[A-Z](?![A-Za-z0-9_,])|[EV]\s*\(\s*[XY]|n\s*\(\s*Ω|(?:X|Y|J|q)\s*=\s*\[/.test(
       text,
     ) ||
     ((!!context?.probability ||
@@ -77,6 +102,7 @@ export function routePrompt(
   const realDomain = /حقيقي|ℝ|\bR\b/.test(text) && !/عقدي|ℂ|¢|\bC\b/.test(text);
   const complexIntent =
     !realDomain &&
+    !spatialIntent &&
     isComplexIntent(
       text,
       (context?.lastEngine === "complexEngine" ||
@@ -99,9 +125,9 @@ export function routePrompt(
   if (/معادل|حل\s|جملة|جذور/.test(text) || /[xyz][^\u0600-\u06ff]*=/.test(text))
     give("equationSolver", 0.94, "معادلة تحتوي مجهولاً وعلامة مساواة");
   const stripped = text
-    .replace(/(?:الاحتمال|النتيجة)\s+السابق(?:ة)?/g, "ans")
+    .replace(/(?:الاحتمال|النتيجة(?:\s+الهندسية)?)\s+السابق(?:ة)?/g, "ans")
     .replace(
-      /(?:احسب|احسبي|احسبلي|جد|قيمة|كم|يساوي|نتيجة|لي|بالتفصيل|درجة|راديان|غراد|جراد)/g,
+      /(?:احسب|احسبي|احسبلي|جد|قيمة|كم|يساوي|نتيجة|لي|بالتفصيل|عدديا|تقريبا|تقريبي|تقريب|درجة|راديان|غراد|جراد)/g,
       "",
     )
     .trim();
@@ -109,7 +135,8 @@ export function routePrompt(
     /^[\s\dA-Za-z+*/^().,!=\[\]{}°_\-|]+$/.test(stripped) &&
     (/\d/.test(stripped) ||
       (/\bans\b/.test(stripped) &&
-        context?.probability?.lastScalar !== undefined) ||
+        (context?.probability?.lastScalar !== undefined ||
+          context?.geometry?.lastScalar !== undefined)) ||
       Object.keys(context?.solutions ?? context?.assignments ?? {}).some(
         (key) => new RegExp(`\\b${key}\\b`).test(stripped),
       )) &&
@@ -134,6 +161,18 @@ export function selectEngines(
   let selected = candidates
     .filter((candidate) => candidate.confidence >= 0.9)
     .map((candidate) => candidate.engine);
+  for (const engine of [
+    "sequences",
+    "integrationEngine",
+    "calculusEngine",
+  ] as EngineId[])
+    if (candidates.some((c) => c.engine === engine && c.confidence === 1))
+      return [engine];
+  if (
+    selected.includes("geometryEngine") &&
+    candidates.some((c) => c.engine === "geometryEngine" && c.confidence === 1)
+  )
+    return ["geometryEngine"];
   // Plane applications, Euler and numerical complex algebra are one coherent intent.
   if (selected.includes("complexTools"))
     selected = selected.filter(

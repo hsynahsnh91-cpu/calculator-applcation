@@ -13,6 +13,7 @@ import {
   Copy,
   Info,
   Dices,
+  Cuboid,
 } from "lucide-react";
 import { Tex, RichText } from "../common/Tex";
 import { Step } from "../common/Step";
@@ -25,6 +26,7 @@ import {
 import { copyToClipboard } from "../../utils/cn";
 import { answerAsText } from "../../solver/composer";
 import type { ProbabilityContext } from "../../solver/probabilityTypes";
+import type { GeometryContext } from "../../solver/geometryTypes";
 import type { ResultViewProps } from "./ResultVisuals";
 const Scientific = lazy(() => import("../scientific/ScientificCalculator"));
 const Equations = lazy(() => import("../equations/EquationSolver"));
@@ -85,6 +87,7 @@ export const AnswerBubble = memo(function AnswerBubble({
   onFollowUp,
   onSave,
   onProbability,
+  onGeometry,
   saved,
   animate = false,
 }: {
@@ -92,9 +95,11 @@ export const AnswerBubble = memo(function AnswerBubble({
   onFollowUp: (text: string) => void;
   onSave: (answer: SolverAnswer) => void;
   onProbability?: (context?: ProbabilityContext) => void;
+  onGeometry?: (context?: GeometryContext) => void;
   saved: boolean;
   animate?: boolean;
 }) {
+  const schoolCards = answer.results.some((r) => !!r.school?.label);
   const [copied, setCopied] = useState(false),
     [phase, setPhase] = useState(animate ? 0 : 2),
     [copyError, setCopyError] = useState("");
@@ -140,9 +145,21 @@ export const AnswerBubble = memo(function AnswerBubble({
                 label="النتيجة النهائية"
               >
                 <section className="final-result">
-                  {answer.results.length > 1 && (
-                    <p className="text-xs text-slate-400 mb-2">
-                      {result.title}
+                  {(answer.results.length > 1 || result.school?.label) && (
+                    <p className="school-result-heading">
+                      {result.school?.label && (
+                        <bdi className="school-request-label">
+                          {result.school.label}
+                        </bdi>
+                      )}
+                      <RichText
+                        text={
+                          result.school?.label
+                            ? result.school.title
+                            : result.title
+                        }
+                        autoMath
+                      />
                     </p>
                   )}
                   <Tex
@@ -150,11 +167,22 @@ export const AnswerBubble = memo(function AnswerBubble({
                     math={result.finalLatex}
                     className="text-[1.13rem] sm:text-xl text-emerald-100"
                   />
-                  {result.decimal !== undefined && (
-                    <div className="text-xs text-slate-400 mt-2 flex items-center justify-center gap-2">
-                      <span>عدديًا</span>
-                      <Tex math={String(result.decimal)} />
-                    </div>
+                  {result.decimal !== undefined &&
+                    (result.school && !result.school.showDecimal ? (
+                      <details className="answer-decimal">
+                        <summary>طلب تقريب عددي</summary>
+                        <Tex math={String(result.decimal)} />
+                      </details>
+                    ) : (
+                      <div className="text-xs text-slate-400 mt-2 flex items-center justify-center gap-2">
+                        <span>عدديًا</span>
+                        <Tex math={String(result.decimal)} />
+                      </div>
+                    ))}
+                  {result.verification.passed && (
+                    <p className="verification-method">
+                      {result.verification.method}
+                    </p>
                   )}
                   <div className="verification-row">
                     {result.verification.passed ? (
@@ -193,10 +221,25 @@ export const AnswerBubble = memo(function AnswerBubble({
                 label={`خطوات ${result.title}`}
                 resetKey={result.id}
               >
-                <div className="space-y-3">
-                  {answer.results.length > 1 && (
-                    <h4 className="text-sm text-emerald-200 pt-4">
-                      {result.title}
+                <section
+                  className={schoolCards ? "school-request-card" : "space-y-3"}
+                  data-request-label={result.school?.label || undefined}
+                >
+                  {(schoolCards || answer.results.length > 1) && (
+                    <h4 className="school-result-heading">
+                      {result.school?.label && (
+                        <bdi className="school-request-label">
+                          {result.school.label}
+                        </bdi>
+                      )}
+                      <RichText
+                        text={
+                          result.school?.label
+                            ? result.school.title
+                            : result.title
+                        }
+                        autoMath
+                      />
                     </h4>
                   )}
                   {result.steps.map((step, index) => (
@@ -207,7 +250,19 @@ export const AnswerBubble = memo(function AnswerBubble({
                       <RichText text={result.note} />
                     </p>
                   )}
-                </div>
+                  {schoolCards && phase >= 2 && result.visuals.length > 0 && (
+                    <Suspense
+                      fallback={
+                        <p className="text-xs text-slate-500">تجهيز الرسم…</p>
+                      }
+                    >
+                      {(() => {
+                        const View = views[result.engine];
+                        return <View result={result} />;
+                      })()}
+                    </Suspense>
+                  )}
+                </section>
               </SectionErrorBoundary>
             ))}
           </div>
@@ -215,7 +270,7 @@ export const AnswerBubble = memo(function AnswerBubble({
         {phase >= 2 && (
           <div className="space-y-4 reveal-section">
             {answer.results
-              .filter((result) => result.visuals.length)
+              .filter((result) => result.visuals.length && !schoolCards)
               .map((result) => {
                 const View = views[result.engine];
                 return (
@@ -236,9 +291,35 @@ export const AnswerBubble = memo(function AnswerBubble({
               })}
           </div>
         )}
-        {answer.unsolved.map((part, index) => (
+        {answer.unsolved.slice(0, 1).map((part, index) => (
           <div className="clarification-card" key={index} role="status">
-            <p>{part.message}</p>
+            {part.school?.label && (
+              <p className="school-result-heading">
+                <bdi className="school-request-label">{part.school.label}</bdi>
+                <RichText text={part.school.title} autoMath />
+              </p>
+            )}
+            <p>
+              <RichText
+                text={part.message.replace(/؟(?=[\s\S]*؟)/g, "،")}
+                autoMath
+              />
+            </p>
+            {answer.unsolved.length > 1 && (
+              <details className="school-pending">
+                <summary>
+                  الطلبات المعلّقة الأخرى ({answer.unsolved.length - 1})
+                </summary>
+                <ul>
+                  {answer.unsolved.slice(1).map((u, i) => (
+                    <li key={i}>
+                      <bdi>{u.school?.label}</bdi>{" "}
+                      <RichText text={u.school?.title || u.request} autoMath />
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
             {part.engine && answer.results.length > 0 && (
               <p className="mt-2 text-xs text-slate-500">
                 الجزء غير المكتمل: {ENGINE_LABELS[part.engine]}
@@ -261,6 +342,23 @@ export const AnswerBubble = memo(function AnswerBubble({
         {phase >= 2 && (
           <>
             <div className="answer-actions">
+              {onGeometry &&
+                (answer.results.some((r) => r.mode === "geometry") ||
+                  answer.unsolved.some(
+                    (r) =>
+                      r.engine === "geometryEngine" ||
+                      r.engine === "geometryTools",
+                  )) && (
+                  <button
+                    type="button"
+                    className="answer-action"
+                    aria-label="تعديل معطيات الهندسة الفراغية"
+                    onClick={() => onGeometry(answer.context.geometry)}
+                  >
+                    <Cuboid size={15} />
+                    <span>لوحة الهندسة</span>
+                  </button>
+                )}
               {onProbability &&
                 (answer.results.some((r) => r.mode === "probability") ||
                   answer.unsolved.some(

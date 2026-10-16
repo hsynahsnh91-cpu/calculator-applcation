@@ -11,6 +11,9 @@ try {
     "complex",
     "probability",
     "textbook",
+    "geometry",
+    "curriculum",
+    "school-safety",
   ]) {
     const output = new URL(`${name}.mjs`, directory).pathname;
     await build({

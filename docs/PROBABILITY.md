@@ -119,6 +119,6 @@ q أوزان الفروع Hᵢ وتجمع1، وp احتمالات B داخل ك�
 | القوانين والإحصاء | `utils/probabilityLaws.ts` | الدعم والعزوم، Welford، underflow، التكرارات |
 | الدمج والجسور | `utils/probabilityWorkbench.ts` و`solver/composer.ts` | قانون→اشتقاق، جدول→مصفوفة، كسر→حساب |
 | اللوحة والرسوم | `ProbabilityBoard.tsx` و`probabilityPresentation.ts` و`ResultVisuals.tsx` | اللون الفعلي، الحقول، نمط السحب، الهاتف |
-| التسليم | `tests/probability.test.ts` و`tests/browser.mjs` و`tools/package.py` | 108 احتمال/إحصاء، 72 متصفح لكل نقل، CRC وبصمات |
+| التسليم | `tests/probability.test.ts` و`tests/browser.mjs` و`tools/package.py` | 108 احتمال/إحصاء، 100 متصفح لكل نقل، CRC وبصمات |
 
 راجع [QA.md](QA.md) للسجلات والأدلة والحدود الفعلية لبيئة الاختبار.

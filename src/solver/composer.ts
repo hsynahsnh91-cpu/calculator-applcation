@@ -148,6 +148,33 @@ export function composeAnswer(
         "اشرح قواعد الاحتمال الشرطي",
       );
   }
+  if (results.some((r) => r.mode === "geometry") && context.geometry) {
+    const g = context.geometry,
+      p = g.active.points,
+      v = g.active.vectors,
+      q = g.active.planes,
+      l = g.active.lines;
+    const follow: string[] = [];
+    if (q.length) {
+      follow.push(`جد ناظم المستوي ${q[0]}`);
+      if (p.length) follow.push(`جد بعد ${p[0]} عن المستوي ${q[0]}`);
+    }
+    if (v.length >= 2)
+      follow.push(
+        `ادرس الارتباط الخطي للأشعة ${v.slice(0, 3).join(" و")}`,
+        `حول الأشعة ${v.slice(0, 3).join(" و")} إلى مصفوفة`,
+      );
+    if (g.operation === "barycenter" && p.length >= 3)
+      follow.push("اشرح التجميع ومركز الأبعاد المتناسبة");
+    if (g.operation === "line-plane" && l.length && q.length)
+      follow.push(`جد بعد نقطة التقاطع عن المستوي ${q[0]}`);
+    if (l.length >= 2)
+      follow.push(`اكتب جملة التقاطع للمستقيمين ${l.slice(0, 2).join(" و")}`);
+    if (g.lastScalar !== undefined)
+      follow.push("احسب النتيجة الهندسية السابقة * 2");
+    follow.push("ارسم المعطيات الهندسية السابقة");
+    suggestions.unshift(...follow);
+  }
   if (results.length) suggestions.push("اشرح الخطوات بتفصيل أكثر");
   const intro = results.length
     ? unsolved.length
@@ -172,13 +199,15 @@ export function answerAsText(answer: SolverAnswer): string {
   return [
     answer.intro,
     ...answer.results.flatMap((result) => [
-      `${ENGINE_LABELS[result.engine]} — ${result.title}`,
+      `${result.school?.label || ""} ${result.school?.label ? result.school.title : ENGINE_LABELS[result.engine] + " — " + result.title}`,
       String.raw`\[${result.finalLatex}\]`,
       ...result.steps.map(
         (step) =>
           `${step.title}: ${step.text ?? ""}\n${String.raw`\[${step.latex}\]`}`,
       ),
     ]),
-    ...answer.unsolved.map((part) => part.message),
+    ...answer.unsolved.map(
+      (part) => `${part.school?.label || ""} ${part.message}`,
+    ),
   ].join("\n\n");
 }

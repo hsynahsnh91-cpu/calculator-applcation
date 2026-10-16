@@ -1,3 +1,5 @@
+import { isSchoolContext, isSchoolResultInfo } from "./schoolTypes";
+import { isGeometryContext, spaceSolidDimensions } from "./geometryTypes";
 import { isProbabilityContext } from "./probabilityTypes";
 import { ENGINE_LABELS, type ConversationTurn } from "./types";
 const record = (value: unknown): value is Record<string, unknown> =>
@@ -58,6 +60,8 @@ function context(value: unknown, partial = false): boolean {
             value.complex.pointNames.every((name) => /^[A-Z]$/.test(name)))) &&
         (value.complex.ambiguous === undefined ||
           typeof value.complex.ambiguous === "boolean"))) &&
+    (value.geometry === undefined || isGeometryContext(value.geometry)) &&
+    (value.school === undefined || isSchoolContext(value.school)) &&
     (value.probability === undefined ||
       isProbabilityContext(value.probability)) &&
     (value.lastEngine === undefined || engine(value.lastEngine)) &&
@@ -86,6 +90,93 @@ function tree(
 }
 function visual(value: unknown): boolean {
   if (!record(value) || !text(value.title, 500)) return false;
+  if (value.kind === "space") {
+    const vector = (v: unknown) =>
+      Array.isArray(v) &&
+      v.length === 3 &&
+      v.every((n) => finite(n) && Math.abs(n) <= 1e12);
+    const list = (v: unknown, max: number, check: (x: unknown) => boolean) =>
+      Array.isArray(v) && v.length <= max && v.every(check);
+    return (
+      list(
+        value.points,
+        64,
+        (p) =>
+          record(p) &&
+          vector(p.position) &&
+          text(p.label, 50) &&
+          (p.latex === undefined || text(p.latex, 5000)),
+      ) &&
+      (value.lines === undefined ||
+        list(
+          value.lines,
+          8,
+          (l) =>
+            record(l) &&
+            vector(l.point) &&
+            vector(l.direction) &&
+            (l.direction as number[]).some((n) => n !== 0) &&
+            text(l.label, 50),
+        )) &&
+      (value.planes === undefined ||
+        list(
+          value.planes,
+          8,
+          (p) =>
+            record(p) &&
+            vector(p.normal) &&
+            (p.normal as number[]).some((n) => n !== 0) &&
+            finite(p.offset) &&
+            Math.abs(p.offset) <= 1e12 &&
+            text(p.label, 50),
+        )) &&
+      (value.segments === undefined ||
+        list(
+          value.segments,
+          96,
+          (l) =>
+            record(l) &&
+            finite(l.from) &&
+            Number.isInteger(l.from) &&
+            l.from >= 0 &&
+            l.from < (value.points as unknown[]).length &&
+            finite(l.to) &&
+            Number.isInteger(l.to) &&
+            l.to >= 0 &&
+            l.to < (value.points as unknown[]).length &&
+            (l.arrow === undefined || typeof l.arrow === "boolean") &&
+            (l.dashed === undefined || typeof l.dashed === "boolean"),
+        )) &&
+      (value.sphere === undefined ||
+        (record(value.sphere) &&
+          vector(value.sphere.center) &&
+          finite(value.sphere.radius) &&
+          value.sphere.radius >= 0 &&
+          value.sphere.radius <= 1e12)) &&
+      (value.solid === undefined ||
+        (record(value.solid) &&
+          [
+            "cube",
+            "cuboid",
+            "sphere",
+            "cylinder",
+            "cone",
+            "pyramid",
+            "triangularPrism",
+          ].includes(String(value.solid.id)) &&
+          record(value.solid.dimensions) &&
+          Object.keys(value.solid.dimensions).length <= 4 &&
+          spaceSolidDimensions(String(value.solid.id)).every((k) =>
+            finite(
+              (value.solid as { dimensions: Record<string, unknown> })
+                .dimensions[k],
+            ),
+          ) &&
+          Object.values(value.solid.dimensions).every(
+            (n) => finite(n) && n > 0 && n <= 1e9,
+          )))
+    );
+  }
   if (value.kind === "histogram")
     return (
       Array.isArray(value.bins) &&
@@ -206,6 +297,7 @@ function result(value: unknown): boolean {
       "complex",
     ].includes(value.mode) &&
     text(value.title, 1000) &&
+    (value.school === undefined || isSchoolResultInfo(value.school)) &&
     text(value.finalLatex, 50000) &&
     (value.decimal === undefined ||
       finite(value.decimal) ||
@@ -266,6 +358,7 @@ export function isConversationTurn(value: unknown): value is ConversationTurn {
       (part: unknown) =>
         record(part) &&
         text(part.request) &&
+        (part.school === undefined || isSchoolResultInfo(part.school)) &&
         text(part.message) &&
         strings(part.choices) &&
         (part.engine === undefined || engine(part.engine)),

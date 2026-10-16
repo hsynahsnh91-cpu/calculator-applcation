@@ -1,3 +1,4 @@
+import { mathInstructionText } from "../textbook";
 import { ClarificationError, type SolverContext } from "../types";
 import type {
   ProbabilityComparison,
@@ -113,7 +114,7 @@ const COLOR =
   "حمراء|حمر|احمر|حمرا|بيضاء|بيض|ابيض|بيضا|سوداء|سود|اسود|سودا|خضراء|خضر|اخضر|زرقاء|زرق|ازرق|صفراء|صفر|اصفر|برتقالية|بنفسجية";
 export const canonicalColor = (s: string) =>
   canonicalColors[s.replace(/^ال/, "")] || s.replace(/^ال/, "").trim();
-function readColors(text: string): UrnModel["colors"] {
+export function readColors(text: string): UrnModel["colors"] {
   const custom = namedList(text, "الالوان|الوان");
   if (custom)
     return custom.map((item) => {
@@ -253,6 +254,13 @@ function parseUrn(text: string, context: SolverContext): ProbabilityRequest {
   )
     count = 1;
   if (count === undefined && /كرتان|كرتين/.test(data)) count = 2;
+  if (
+    count === undefined &&
+    /(?:سحب|نسحب|سحبت)(?:\s+عشوائيا)?\s*(?:كر[ةه]\s+1|1\s+كر[ةه])/.test(
+      drawSource,
+    )
+  )
+    count = 1;
   if (count === undefined) count = old?.count;
   if (count === undefined && context.lastPrompt) {
     const m = context.lastPrompt.match(/(?:سحبت|سحب|نسحب)\s*(\d+)|كرتان|كرتين/);
@@ -262,13 +270,17 @@ function parseUrn(text: string, context: SolverContext): ProbabilityRequest {
     throw new ClarificationError(
       "كم كرة سُحبت؟ حدّد r أو اكتب مثلًا: سحب كرتين.",
     );
-  const mode = drawMode(text, old?.mode) || old?.mode;
+  const mode =
+    drawMode(text, old?.mode) || (count === 1 ? "simultaneous" : old?.mode);
   if (!mode)
-    throw new ClarificationError("هل السحب معًا أم متتاليًا؟ وهل تعاد الكرة؟", [
-      "السحب معًا دون إعادة",
-      "السحب متتاليًا مع إعادة",
-      "السحب متتاليًا دون إعادة",
-    ]);
+    throw new ClarificationError(
+      "هل السحب معًا، أم متتاليًا دون إعادة، أم متتاليًا مع إعادة؟",
+      [
+        "السحب معًا دون إعادة",
+        "السحب متتاليًا مع إعادة",
+        "السحب متتاليًا دون إعادة",
+      ],
+    );
   const model: UrnModel = {
     colors,
     count,
@@ -437,13 +449,20 @@ function parseUrn(text: string, context: SolverContext): ProbabilityRequest {
   const known = eventText.match(
     new RegExp(`(?:ال)?(${COLOR})(?![\\u0621-\\u063a\\u0641-\\u064a])`),
   );
+  const variableColor = text.match(
+    new RegExp(
+      `\\b[XY]\\b[^؛;\\n]{0,100}?عدد\\s+(?:ال)?كرات\\s+(?:ال)?(${COLOR})`,
+    ),
+  )?.[1];
   const target = targetMatch
     ? canonicalColor(targetMatch[1].trim().replace(/[.؟?]+$/, ""))
     : mentions.length === 1
       ? mentions[0].name
       : known
         ? canonicalColor(known[1])
-        : old?.target;
+        : variableColor
+          ? canonicalColor(variableColor)
+          : old?.target;
   if (!target)
     throw new ClarificationError(
       "أي لون يعدّه X؟ اختر اللون المطلوب؛ لا أختار لونًا خفيًا. ",
@@ -477,6 +496,7 @@ function parseUrn(text: string, context: SolverContext): ProbabilityRequest {
               ? 1
               : undefined
         : Number(value);
+    if (query.k === undefined && count === 1) query.k = 1;
     if (query.k === undefined && !query.first)
       throw new ClarificationError(
         "كم كرة من اللون المطلوب، وما المقارنة؟ اكتب مثلًا X=1 أو X≥1 (واحدة أو أكثر) أو X<2 (أقل من اثنتين).",
@@ -537,11 +557,14 @@ export function extractProbabilityRequest(
       labels: string[] | undefined;
     if (!p && /الصندوق الاول.*الصندوق الثاني/.test(text)) {
       const segments = text.split(/الصندوق\s*(?:الاول|الثاني|الثالث)/).slice(1),
-        target = canonicalColor(
-          text
-            .slice(Math.max(0, text.lastIndexOf("احتمال")))
-            .match(new RegExp(COLOR))?.[0] || "حمراء",
+        targetWord = text
+          .slice(Math.max(0, text.lastIndexOf("احتمال")))
+          .match(new RegExp(COLOR))?.[0];
+      if (!targetWord)
+        throw new ClarificationError(
+          "ما لون الكرة أو الحدث الذي تريد احتماله؟ لا يُختار اللون الأحمر تلقائيًا.",
         );
+      const target = canonicalColor(targetWord);
       const boxes = segments.map((s) =>
         readColors(s.split(/احتمال|اختيار|جد|احسب/)[0]),
       );
@@ -620,12 +643,14 @@ export function extractProbabilityRequest(
     ) &&
       !/كرات|كرت|ثنائي/.test(text))
   ) {
-    const question = text.slice(
-      Math.max(
-        text.lastIndexOf("احسب"),
-        text.lastIndexOf("جد"),
-        text.lastIndexOf("هل"),
-        0,
+    const question = mathInstructionText(
+      text.slice(
+        Math.max(
+          text.lastIndexOf("احسب"),
+          text.lastIndexOf("جد"),
+          text.lastIndexOf("هل"),
+          0,
+        ),
       ),
     );
     const notation = [...question.matchAll(/P\s*\(([^()]+)\)(?!\s*=)/g)].slice(
@@ -669,12 +694,14 @@ export function extractProbabilityRequest(
     const merged = Object.keys(given).length ? given : old?.events || {};
     const assumption =
       /متنافي/.test(text) &&
-      !/غير\s*متنافي|ليسا\s*متنافي|ليس[اا]? متنافي/.test(text)
+      !/هل|تحقق|اثبت|بين ان|برهن|غير\s*متنافي|ليسا\s*متنافي|ليس[اا]? متنافي/.test(
+        text,
+      )
         ? "disjoint"
         : /مستقل(?:ان|ين)|مستقلان معطي|بفرض الاستقلال|بفرض استقلال/.test(
               text,
             ) &&
-            !/هل|فحص|اختبر|تحقق|غير\s*مستقل|ليسا\s*مستقل|ليس[اا]? مستقل/.test(
+            !/هل|فحص|اختبر|تحقق|اثبت|بين ان|برهن|غير\s*مستقل|ليسا\s*مستقل|ليس[اا]? مستقل/.test(
               text,
             )
           ? "independent"

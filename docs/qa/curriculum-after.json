@@ -1,0 +1,1270 @@
+{
+  "passed": 83,
+  "failed": 0,
+  "cases": [
+    {
+      "id": "C01",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "الشكل الأسي للعدد العقدي",
+          "latex": "z=2e^{i\\frac{\\pi}{3}}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C02",
+      "chapter": "complex",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "احسب قيمة المقدار مستخدما الشكل الاسي: S=(z1)^(12)+(z2)^(12)",
+          "school": {
+            "label": "3.",
+            "title": "احسب قيمة المقدار مستخدمًا الشكل الأسي: S=(z_{1})^{12}+(z_{2})^{12}",
+            "intent": "compute",
+            "showDecimal": false
+          },
+          "engine": "complexEngine",
+          "message": "ما تعريف \\(z_{1}\\) و\\(z_{2}\\)؟ أعط الأعداد المطلوبة، ولا تكفي نتيجة سابقة غير مسماة.",
+          "choices": [
+            "حوّل العدد العقدي 3+4i إلى الشكل الأسي"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "قيمة المقدار العقدي",
+          "latex": "S=8192",
+          "decimal": 8192
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C04",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "حل المعادلة في الأعداد العقدية",
+          "latex": "\\begin{aligned}z_{1}&=1 + \\sqrt{3}i\\\\[5pt]z_{2}&=1 - \\sqrt{3}i\\end{aligned}"
+        },
+        {
+          "title": "قيمة المقدار العقدي",
+          "latex": "S=8192",
+          "decimal": 8192
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C05",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "قيمة المقدار العقدي",
+          "latex": "S=-8",
+          "decimal": -8
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C06",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "قيمة المقدار العقدي",
+          "latex": "S=6",
+          "decimal": 6
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C07",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "قيمة المقدار العقدي",
+          "latex": "S=5",
+          "decimal": 5
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C08",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "مرافق العدد العقدي",
+          "latex": "\\overline z=3 - 2i"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C09",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "حل المعادلة في الأعداد العقدية",
+          "latex": "\\begin{aligned}z_{1}&=1 + \\sqrt{3}i\\\\[5pt]z_{2}&=1 - \\sqrt{3}i\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C10",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "الشكل الأسي للعدد العقدي",
+          "latex": "z=0"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C11",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "المسافة بين نقطتين",
+          "latex": "AB=|z_B-z_A|=5",
+          "decimal": 5
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C12",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "الزوايا وعمدة النسبة",
+          "latex": "\\begin{aligned}\\widehat{(\\overrightarrow{AB},\\overrightarrow{AC})}&=\\arg\\left(\\frac{z_C-z_A}{z_B-z_A}\\right)\\\\[5pt]&=\\frac{\\pi}{2}\\pmod{2\\pi}\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C13",
+      "chapter": "complex",
+      "passed": true,
+      "results": [
+        {
+          "title": "الدوران بقانون أويلر",
+          "latex": "\\begin{aligned}z'-\\omega&=e^{i\\theta}(z-\\omega)\\\\[5pt]z'&=-1 + i\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "C14",
+      "chapter": "complex",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "عين مجموعة النقط M في المستوي العقدي التي تحقق |z-1|=2",
+          "school": {
+            "label": "",
+            "title": "عين مجموعة النقط M في المستوي العقدي التي تحقق |z-1|=2",
+            "intent": "verify",
+            "showDecimal": false
+          },
+          "engine": "complexEngine",
+          "message": "ما العدد العقدي الذي تريد العمل عليه؟ اكتب z=3+4i مثلًا.",
+          "choices": [
+            "اكتب الأشكال الثلاثة للعدد العقدي z=3+4i"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P01",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "احتمال اللون — قانون الاحتمال الكلي",
+          "latex": "P(R)=\\sum_iP(U_i)P(R\\mid U_i)=\\frac{7}{15}",
+          "decimal": 0.4666666666666667
+        },
+        {
+          "title": "احتمال الصندوق بعد معرفة اللون — بايز",
+          "latex": "P(U_{1}\\mid R)=\\frac{P(U_{1})P(R\\mid U_{1})}{\\sum_iP(U_i)P(R\\mid U_i)}=\\frac{9}{14}",
+          "decimal": 0.6428571428571429
+        },
+        {
+          "title": "قيم المتغير العشوائي",
+          "latex": "X(\\Omega)=\\{0,1,2\\}"
+        },
+        {
+          "title": "قانون عدد الكرات من اللون بيضاء",
+          "latex": "\\begin{array}{cccc}x_i&0&1&2\\\\\\hline P(X=x_i)&\\frac{3}{10}&\\frac{3}{5}&\\frac{1}{10}\\end{array}"
+        },
+        {
+          "title": "قانون المتحول العشوائي وعزومه",
+          "latex": "E(X)=\\frac{4}{5}",
+          "decimal": 0.8
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P02",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "احتمال اللون — قانون الاحتمال الكلي",
+          "latex": "P(R)=\\sum_iP(U_i)P(R\\mid U_i)=\\frac{7}{12}",
+          "decimal": 0.5833333333333334
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P03",
+      "chapter": "probability",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "U1: يحتوي علي 2 حمراء و3 بيضاء. U2: يحتوي علي 4 حمراء و1 بيضاء. نختار احد الصندوقين ونسحب كرة. احسب احتمال الحمراء",
+          "school": {
+            "label": "",
+            "title": "U1: يحتوي علي 2 حمراء و3 بيضاء. U2: يحتوي علي 4 حمراء و1 بيضاء. نختار احد الصندوقين ونسحب كرة. احسب احتمال الحمراء",
+            "intent": "compute",
+            "showDecimal": false
+          },
+          "engine": "probabilityEngine",
+          "message": "ما احتمالات اختيار الصناديق؟ لا يفترض تساوي الاختيار دون عبارة تبرره.",
+          "choices": [
+            "احسب حجم مكعب طول حرفه 3",
+            "كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون",
+            "التوزيع الثنائي n=10 p=0.5 k=5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P04",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال المطلوب",
+          "latex": "P(X=1)=\\frac{2}{5}",
+          "decimal": 0.4
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P05",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال المطلوب",
+          "latex": "P(X=1)=\\frac{3}{5}",
+          "decimal": 0.6
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P06",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال المطلوب",
+          "latex": "P(C_2\\mid C_1)=\\frac{\\frac{3}{10}}{\\frac{2}{5}}=\\frac{3}{4}",
+          "decimal": 0.75
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P07",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال المطلوب",
+          "latex": "P(C_2\\mid C_1)=\\frac{\\frac{6}{25}}{\\frac{2}{5}}=\\frac{3}{5}",
+          "decimal": 0.6
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P08",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "قانون عدد الكرات من اللون بيضاء",
+          "latex": "\\begin{aligned}E(X)&=\\frac{4}{5}\\\\E(X^2)&=1\\\\V(X)&=\\frac{9}{25}\\\\\\sigma_{X}&=\\sqrt{\\frac{9}{25}}\\approx 0.6\\end{aligned}"
+        },
+        {
+          "title": "قانون المتحول العشوائي وعزومه",
+          "latex": "E(X)=\\frac{4}{5}",
+          "decimal": 0.8
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P09",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال الشرطي",
+          "latex": "P(A\\mid B)=\\frac{P(A\\cap B)}{P(B)}=\\frac{\\frac{1}{6}}{\\frac{1}{3}}=\\frac{1}{2}",
+          "decimal": 0.5
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P10",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال الشرطي",
+          "latex": "P(A\\mid B)=\\frac{P(A\\cap B)}{P(B)}=\\frac{\\frac{1}{6}}{\\frac{1}{3}}=\\frac{1}{2}",
+          "decimal": 0.5
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P11",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال الشرطي",
+          "latex": "P(A\\mid B)=\\frac{P(A\\cap B)}{P(B)}=\\frac{\\frac{1}{6}}{\\frac{1}{3}}=\\frac{1}{2}",
+          "decimal": 0.5
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P12",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "فحص استقلال الحدثين",
+          "latex": "P(A\\cap B)=\\frac{1}{6}=\\frac{1}{6}=P(A)P(B)\\quad\\Longrightarrow\\quad\\text{الحدثان مستقلان}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P13",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال الكلاسيكي",
+          "latex": "P(A)=\\frac{5}{12}",
+          "decimal": 0.4166666666666667
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P14",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "التوزيع الثنائي",
+          "latex": "P(X=2)\\approx 0.375",
+          "decimal": 0.3749999999999999
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P15",
+      "chapter": "probability",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "X=[0,1,2]، p=[1/4,1/4,1/4]، اكتب قانون الاحتمال",
+          "school": {
+            "label": "",
+            "title": "X=[0,1,2]، p=[1/4,1/4,1/4]، اكتب قانون الاحتمال",
+            "intent": "write",
+            "showDecimal": false
+          },
+          "engine": "probabilityEngine",
+          "message": "جدول قانون الاحتمال غير مكتمل أو غير متسق: يجب أن يكون مجموع الاحتمالات ١ تمامًا. لن أطبّع الأعداد تلقائيًا.",
+          "choices": [
+            "كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون",
+            "التوزيع الثنائي n=10 p=0.5 k=5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P16",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "قانون المتحول العشوائي وعزومه",
+          "latex": "E(X)=0",
+          "decimal": 0
+        },
+        {
+          "title": "قانون المتحول العشوائي وعزومه",
+          "latex": "V(X)=\\frac{1}{2}",
+          "decimal": 0.5
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P17",
+      "chapter": "probability",
+      "passed": true,
+      "results": [
+        {
+          "title": "الاحتمال الكلي",
+          "latex": "P(B)=\\sum_iP(H_i)P(B\\mid H_i)=\\frac{1}{3}",
+          "decimal": 0.3333333333333333
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "P18",
+      "chapter": "probability",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "نسحب كرتين من كيس فيه 3 حمراء و2 بيضاء. احسب احتمال اختلاف اللون",
+          "school": {
+            "label": "",
+            "title": "نسحب كرتين من كيس فيه 3 حمراء و2 بيضاء. احسب احتمال اختلاف اللون",
+            "intent": "compute",
+            "showDecimal": false
+          },
+          "engine": "probabilityEngine",
+          "message": "هل السحب معًا، أم متتاليًا دون إعادة، أم متتاليًا مع إعادة؟",
+          "choices": [
+            "السحب معًا دون إعادة",
+            "السحب متتاليًا مع إعادة",
+            "السحب متتاليًا دون إعادة"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S01",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [
+        {
+          "title": "المتتالية الأفينية",
+          "latex": "u_n=42^{n}-3"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "S02",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [
+        {
+          "title": "المتتالية المساعدة والصيغة الصريحة",
+          "latex": "v_{n+1}=(2)v_n,\\quad v_n=(4)(2)^{n},\\quad u_n=42^{n}-3"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "S03",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [
+        {
+          "title": "الصيغة الصريحة وبرهانها بالتدريج",
+          "latex": "u_n=42^{n}-3"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "S04",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [
+        {
+          "title": "المتتالية الحسابية",
+          "latex": "S=\\sum_{n=0}^{4}u_n=40",
+          "decimal": 40
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "S05",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [
+        {
+          "title": "المتتالية الهندسية",
+          "latex": "S=\\sum_{n=1}^{4}u_n=45",
+          "decimal": 45
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "S06",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [
+        {
+          "title": "المتتالية الأفينية",
+          "latex": "u_n=2n+4"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "S07",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [
+        {
+          "title": "المتتالية الأفينية",
+          "latex": "\\lim_{n\\to+\\infty}u_n=2"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "S08",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "u_n+1=2u_n+3، جد العبارة الصريحة للمتتالية",
+          "school": {
+            "label": "",
+            "title": "u_n+1=2u_n+3، جد العبارة الصريحة للمتتالية",
+            "intent": "compute",
+            "showDecimal": false
+          },
+          "engine": "sequences",
+          "message": "ما قيمة الحد الابتدائي للمتتالية ورتبته؟",
+          "choices": [
+            "متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S09",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "u_0=1 وu_n+1=u_n^2+1، اثبت بالتدريج انها محدودة",
+          "school": {
+            "label": "",
+            "title": "u_0=1 وu_n+1=u_n^2+1، اثبت بالتدريج انها محدودة",
+            "intent": "prove",
+            "showDecimal": false
+          },
+          "engine": "sequences",
+          "message": "العلاقات التدريجية المدعومة أفينية فقط؛ لا يولّد التطبيق برهانًا لعلاقة غير خطية.",
+          "choices": [
+            "متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S10",
+      "chapter": "sequences",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "ادرس تجاور متتاليتين عامتين u_n وv_n دون اعطاء عبارتيهما",
+          "school": {
+            "label": "",
+            "title": "ادرس تجاور متتاليتين عامتين u_n وv_n دون اعطاء عبارتيهما",
+            "intent": "study",
+            "showDecimal": false
+          },
+          "engine": "sequences",
+          "message": "ما الحد الأول للمتتالية؟",
+          "choices": [
+            "متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "F01",
+      "chapter": "functions",
+      "passed": true,
+      "results": [
+        {
+          "title": "المشتقة ودراسة التغيرات",
+          "latex": "f'(x) = 3\\times{ x}^{2}-3"
+        },
+        {
+          "title": "وجود حل وحيد بمبرهنة القيم المتوسطة والرتابة",
+          "latex": "\\exists!\\alpha\\in\\left(0,1\\right):f(\\alpha)=0"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "F02",
+      "chapter": "functions",
+      "passed": true,
+      "results": [
+        {
+          "title": "المشتقة ودراسة التغيرات",
+          "latex": "f'(x)=3\\cdot{ x}^{2}-3\\qquad y=-1"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "F03",
+      "chapter": "functions",
+      "passed": true,
+      "results": [
+        {
+          "title": "النهاية وسلوك الدالة",
+          "latex": "\\begin{aligned}\\lim_{x\\to 1} \\frac{{ x}^{2}-1}{ x-1} = 2\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "F04",
+      "chapter": "functions",
+      "passed": true,
+      "results": [
+        {
+          "title": "النهاية وسلوك الدالة",
+          "latex": "\\begin{aligned}\\lim_{x\\to 0^{+}} \\ln\\left( x\\right) = -\\infty\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "F05",
+      "chapter": "functions",
+      "passed": true,
+      "results": [
+        {
+          "title": "النهاية وسلوك الدالة",
+          "latex": "\\begin{aligned}\\lim_{x\\to 2} \\sqrt{ x-2} = 0 \\\\ \\lim_{x\\to +\\infty} \\sqrt{ x-2} = +\\infty\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "F06",
+      "chapter": "functions",
+      "passed": true,
+      "results": [
+        {
+          "title": "وجود حل وحيد بمبرهنة القيم المتوسطة والرتابة",
+          "latex": "\\exists!\\alpha\\in\\left(0,1\\right):f(\\alpha)=0"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "F07",
+      "chapter": "functions",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "ادرس استمرار تابع معرف علي اجزاء دون اعطاء تعريفه علي الاجزاء",
+          "school": {
+            "label": "",
+            "title": "ادرس استمرار تابع معرف علي اجزاء دون اعطاء تعريفه علي الاجزاء",
+            "intent": "study",
+            "showDecimal": false
+          },
+          "message": "هذا النوع من الدراسة العامة غير مدعوم كاملًا؛ ما الجزء المحدد ومعطياته الذي تريد حسابه؟",
+          "choices": []
+        }
+      ]
+    },
+    {
+      "id": "F08",
+      "chapter": "functions",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "f(x)=exp(x)/x، ادرس التابع دراسة كاملة مع الاستمرار والمقاربات والحصر والرسم",
+          "school": {
+            "label": "",
+            "title": "f(x)=exp(x)/x، ادرس التابع دراسة كاملة مع الاستمرار والمقاربات والحصر والرسم",
+            "intent": "study",
+            "showDecimal": false
+          },
+          "message": "هذا النوع من الدراسة العامة غير مدعوم كاملًا؛ ما الجزء المحدد ومعطياته الذي تريد حسابه؟",
+          "choices": []
+        }
+      ]
+    },
+    {
+      "id": "F09",
+      "chapter": "functions",
+      "passed": true,
+      "results": [
+        {
+          "title": "المشتقة ودراسة التغيرات",
+          "latex": "f'(x) = { e}^{ x}\\qquad f'(0)=1",
+          "decimal": 1
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "F10",
+      "chapter": "functions",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "نظم جدول تغيرات الدالة دون اعطاء عبارتها",
+          "school": {
+            "label": "",
+            "title": "نظم جدول تغيرات الدالة دون اعطاء عبارتها",
+            "intent": "draw",
+            "showDecimal": false
+          },
+          "engine": "calculusEngine",
+          "message": "ما عبارة الدالة التي تريد دراستها؟",
+          "choices": [
+            "جد مشتق f(x)=x^3-3x+1",
+            "احسب تكامل x^2 من 0 إلى 1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "I01",
+      "chapter": "integration",
+      "passed": true,
+      "results": [
+        {
+          "title": "قيمة التكامل المحدد",
+          "latex": "\\int_{0}^{1} e^{x} \\cdot x\\,dx = 1",
+          "decimal": 1
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "I02",
+      "chapter": "integration",
+      "passed": true,
+      "results": [
+        {
+          "title": "الدالة الأصلية",
+          "latex": "\\int \\sin\\left(x\\right)\\,dx = -\\cos\\left(x\\right) + c \\qquad (c \\in \\mathbb{R})"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "I03",
+      "chapter": "integration",
+      "passed": true,
+      "results": [
+        {
+          "title": "قيمة التكامل المحدد",
+          "latex": "\\int_{0}^{1} \\frac{2 \\cdot x}{x^{2}+1}\\,dx = \\frac{34657359027997265471}{50000000000000000000}",
+          "decimal": 0.6931471805599453
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "I04",
+      "chapter": "integration",
+      "passed": true,
+      "results": [
+        {
+          "title": "قيمة التكامل المحدد",
+          "latex": "\\int_{0}^{3} x^{2}\\,dx = 9",
+          "decimal": 9
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "I05",
+      "chapter": "integration",
+      "passed": true,
+      "results": [
+        {
+          "title": "المساحة بين المنحنيين",
+          "latex": "A=\\frac{1}{6}",
+          "decimal": 0.16666666666666666
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "I06",
+      "chapter": "integration",
+      "passed": true,
+      "results": [
+        {
+          "title": "الحجم الدوراني حول محور الفواصل",
+          "latex": "V=\\frac{\\pi}{3}",
+          "decimal": 1.0471975511965979
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "I07",
+      "chapter": "integration",
+      "passed": true,
+      "results": [
+        {
+          "title": "القيمة الوسطى للتابع",
+          "latex": "M=3",
+          "decimal": 3
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "I08",
+      "chapter": "integration",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "احسب تكامل 1/x من -1 الي 1",
+          "school": {
+            "label": "",
+            "title": "احسب تكامل 1/x من -1 الي 1",
+            "intent": "compute",
+            "showDecimal": false
+          },
+          "engine": "integrationEngine",
+          "message": "يتضمن مجال التكامل نقطة شذوذ داخلية. لا يجوز التعويض المباشر بفرق الدالة الأصلية أو اعتماد القيمة الرئيسية على أنها تكامل متقارب.",
+          "choices": [
+            "احسب تكامل x e^x من 0 إلى 1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "G01",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [
+        {
+          "title": "بعد نقطة عن مستوٍ ومسقطها العمودي",
+          "latex": "\\begin{aligned}d(A,P)=\\frac{1}{3}\\\\[5pt]H\\left(\\frac{7}{9},\\,\\frac{19}{9},\\,\\frac{25}{9}\\right)\\end{aligned}",
+          "decimal": 0.3333333333333333
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G02",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [
+        {
+          "title": "إحداثيات شعاع وطويلته",
+          "latex": "\\begin{aligned}\\overrightarrow{AB}=\\left(3,\\,4,\\,0\\right)\\\\[5pt]\\|\\overrightarrow{AB}\\|=5\\end{aligned}",
+          "decimal": 5
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G03",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [
+        {
+          "title": "النقاط الأربع تقع في مستوٍ واحد",
+          "latex": "\\text{النقاط الأربع تقع في مستوٍ واحد}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G04",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [
+        {
+          "title": "الأوضاع النسبية لمستويين",
+          "latex": "P\\cap Q=D,\\qquad \\begin{cases}x=\\frac{1}{2}+t\\\\y=\\frac{1}{2}+t\\\\z=-2t\\end{cases},\\quad t\\in\\mathbb R"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G05",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [
+        {
+          "title": "المعادلة الديكارتية للكرة",
+          "latex": "\\left(x-1\\right)^2+\\left(y-2\\right)^2+\\left(z-3\\right)^2=4"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G06",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [
+        {
+          "title": "الوضع النسبي للمستوي والكرة",
+          "latex": "d^2=1,\\quad R^2=1\\Longrightarrow\\text{المستوي مماس للكرة}",
+          "decimal": 1
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G07",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [
+        {
+          "title": "مركز الأبعاد المتناسبة",
+          "latex": "G\\left(1,\\,1,\\,0\\right)"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "G08",
+      "chapter": "geometry",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "جد بعد النقطة Z عن المستوي P: x+y+z=0 دون تعريف Z",
+          "school": {
+            "label": "",
+            "title": "جد بعد النقطة Z عن المستوي P: x+y+z=0 دون تعريف Z",
+            "intent": "compute",
+            "showDecimal": false
+          },
+          "engine": "geometryEngine",
+          "message": "ما معطيات Z؟ عرّفه بدل استعمال أول عنصر معطى أو نتيجة قديمة.",
+          "choices": [
+            "جد المسافة بين النقطة A(1,2,3) والمستوي 2x-y+2z-5=0",
+            "حل المعادلة 2x^2-5x+3=0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "A01",
+      "chapter": "algebra",
+      "passed": true,
+      "results": [
+        {
+          "title": "حل المعادلة",
+          "latex": "x_{1} = \\frac{3}{2} \\qquad x_{2} = 1",
+          "decimal": "x₁ = 1.5، x₂ = 1"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "A02",
+      "chapter": "algebra",
+      "passed": true,
+      "results": [
+        {
+          "title": "حل المعادلة",
+          "latex": "\\begin{aligned}\\Delta&=-4<0\\\\[4pt]S_{\\mathbb R}&=\\varnothing\\\\[4pt]&\\text{مستحيلة الحل}\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "A03",
+      "chapter": "algebra",
+      "passed": true,
+      "results": [
+        {
+          "title": "حل المعادلة",
+          "latex": "x_{1} = 1 \\qquad x_{2} = 3 \\qquad x_{3} = 2",
+          "decimal": "x₁ = 1، x₂ = 3، x₃ = 2"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "A04",
+      "chapter": "algebra",
+      "passed": true,
+      "results": [
+        {
+          "title": "قيمة العبارة",
+          "latex": "\\sqrt{2}+\\frac{1}{2}",
+          "decimal": "1.9142135624"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "A05",
+      "chapter": "algebra",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "حل المتراجحة |x-1|<2 في R",
+          "school": {
+            "label": "",
+            "title": "حل المتراجحة |x-1|<2 في R",
+            "intent": "solve",
+            "showDecimal": false
+          },
+          "message": "هذا النوع من الدراسة العامة غير مدعوم كاملًا؛ ما الجزء المحدد ومعطياته الذي تريد حسابه؟",
+          "choices": []
+        }
+      ]
+    },
+    {
+      "id": "A06",
+      "chapter": "algebra",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "حل المعادلة x^5-x+1=0 جبريا في R",
+          "school": {
+            "label": "",
+            "title": "حل المعادلة x^5-x+1=0 جبريا في R",
+            "intent": "solve",
+            "showDecimal": false
+          },
+          "engine": "equationSolver",
+          "message": "المعادلات الرمزية المدعومة هنا حتى الدرجة الثالثة. حدّد مجالًا عدديًا إذا كانت المعادلة غير كثيرة حدود.",
+          "choices": [
+            "حل المعادلة 2x^2-5x+3=0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01",
+      "chapter": "matrices",
+      "passed": true,
+      "results": [
+        {
+          "title": "عمليات المصفوفة",
+          "latex": "\\begin{aligned}\\det A = 3\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "M02",
+      "chapter": "matrices",
+      "passed": true,
+      "results": [
+        {
+          "title": "عمليات المصفوفة",
+          "latex": "\\begin{aligned}A^{-1} = \\begin{pmatrix}1 & 0 \\\\ 0 & \\frac{1}{2}\\end{pmatrix}\\end{aligned}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "M03",
+      "chapter": "matrices",
+      "passed": true,
+      "results": [
+        {
+          "title": "حل الجملة الخطية",
+          "latex": "x = 2 \\qquad y = 1"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "U01",
+      "chapter": "unsupported",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "حل المعادلة التفاضلية y'=2y مع الشرط y(0)=1",
+          "school": {
+            "label": "",
+            "title": "حل المعادلة التفاضلية y'=2y مع الشرط y(0)=1",
+            "intent": "solve",
+            "showDecimal": false
+          },
+          "message": "لا يدعم التطبيق حاليًا حل المعادلات التفاضلية؛ هل تريد بدلًا منها اشتقاق تابع معطى؟",
+          "choices": []
+        }
+      ]
+    },
+    {
+      "id": "U02",
+      "chapter": "unsupported",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "اكتب برهانا عاما لمبرهنة القيم المتوسطة دون تحديد تابع او مجال",
+          "school": {
+            "label": "",
+            "title": "اكتب برهانا عاما لمبرهنة القيم المتوسطة دون تحديد تابع او مجال",
+            "intent": "prove",
+            "showDecimal": false
+          },
+          "message": "هذا البرهان ليس ضمن مسارات الاستدلال المدرسية المدعومة؛ هل تريد حساب المقدار أو صياغة المطلوب المحدد بدل اعتبار النتيجة المعطاة معطى جديدًا؟",
+          "choices": []
+        }
+      ]
+    },
+    {
+      "id": "U03",
+      "chapter": "unsupported",
+      "passed": true,
+      "results": [],
+      "unsolved": [
+        {
+          "request": "برهن ان كل عدد اولي فردي دون اي فرض اخر",
+          "school": {
+            "label": "",
+            "title": "برهن ان كل عدد اولي فردي دون اي فرض اخر",
+            "intent": "prove",
+            "showDecimal": false
+          },
+          "message": "هذا البرهان ليس ضمن مسارات الاستدلال المدرسية المدعومة؛ هل تريد حساب المقدار أو صياغة المطلوب المحدد بدل اعتبار النتيجة المعطاة معطى جديدًا؟",
+          "choices": []
+        }
+      ]
+    },
+    {
+      "id": "L01",
+      "chapter": "layout",
+      "passed": true,
+      "results": [
+        {
+          "title": "المشتقة ودراسة التغيرات",
+          "latex": "f'(x) = 2\\times x"
+        },
+        {
+          "title": "قيمة التكامل المحدد",
+          "latex": "\\int_{0}^{1} x^{2}+1\\,dx = \\frac{4}{3}",
+          "decimal": 1.3333333333333333
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "L02",
+      "chapter": "layout",
+      "passed": true,
+      "results": [
+        {
+          "title": "الشكل الأسي للعدد العقدي",
+          "latex": "z_{A}=2e^{i\\frac{\\pi}{3}}"
+        },
+        {
+          "title": "الشكل الأسي للعدد العقدي",
+          "latex": "z_{C}=2e^{-i\\frac{\\pi}{3}}"
+        }
+      ],
+      "unsolved": []
+    },
+    {
+      "id": "L03",
+      "chapter": "layout",
+      "passed": true,
+      "results": [
+        {
+          "title": "المشتقة ودراسة التغيرات",
+          "latex": "f'(x) = 2\\times x"
+        },
+        {
+          "title": "قيمة العبارة",
+          "latex": "\\frac{1}{2}",
+          "decimal": "0.5"
+        }
+      ],
+      "unsolved": [
+        {
+          "request": "احسب التكامل من الحد المجهول الي",
+          "school": {
+            "label": "2.",
+            "title": "احسب التكامل من الحد المجهول إلى",
+            "intent": "compute",
+            "showDecimal": false
+          },
+          "engine": "integrationEngine",
+          "message": "ما الحد السفلي والحد العلوي للتكامل؟",
+          "choices": [
+            "احسب تكامل x^2 من 0 إلى 1"
+          ]
+        }
+      ]
+    }
+  ]
+}

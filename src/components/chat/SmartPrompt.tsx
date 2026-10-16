@@ -31,7 +31,16 @@ export const SmartPrompt = forwardRef<SmartPromptHandle, Props>(
       }
       if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? "";
       if (node.nodeName === "BR") return "\n";
-      const text = Array.from(node.childNodes).map(serialize).join("");
+      let text = "";
+      for (const child of Array.from(node.childNodes)) {
+        if (
+          ["DIV", "P"].includes(child.nodeName) &&
+          text &&
+          !text.endsWith("\n")
+        )
+          text += "\n";
+        text += serialize(child);
+      }
       return node !== host.current && ["DIV", "P"].includes(node.nodeName)
         ? `${text}\n`
         : text;

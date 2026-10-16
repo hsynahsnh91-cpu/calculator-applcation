@@ -1,3 +1,4 @@
+import { readSchoolDocument } from "./schoolDocument";
 import {
   normalizeMathTypography,
   stripPromptMarkdown,
@@ -133,6 +134,11 @@ export function decodeLatex(source: string): string {
       }
     }
     let first = readGroup(text, next);
+    if (!first && /frac/.test(command[1])) {
+      let at = next;
+      while (/\s/.test(text[at] || "") && at < text.length) at++;
+      if (/[A-Za-z0-9]/.test(text[at] || "")) first = [text[at], at + 1];
+    }
     if (!first && command[1] === "sqrt") {
       let atom = next;
       while (atom < text.length && /\s/.test(text[atom])) atom++;
@@ -143,7 +149,12 @@ export function decodeLatex(source: string): string {
       continue;
     }
     if (/frac/.test(command[1])) {
-      const second = readGroup(text, first[1]);
+      let second = readGroup(text, first[1]);
+      if (!second) {
+        let at = first[1];
+        while (/\s/.test(text[at] || "") && at < text.length) at++;
+        if (/[A-Za-z0-9]/.test(text[at] || "")) second = [text[at], at + 1];
+      }
       if (!second) {
         out += text[index++];
         continue;
@@ -259,15 +270,49 @@ export function normalizePrompt(source: string): string {
       /(^|[^\u0600-\u06ff])(?:بدي|عايز|اريد)(?=$|[^\u0600-\u06ff])/g,
       "$1جد",
     );
+  text = text
+    .replace(/احدا(?=\s+(?:الصندوقين|الصناديق))/g, "احد")
+    .replace(
+      /\bP_\{?([A-Z](?:[1-8])?)\}?\s*\(\s*([A-Z](?:[1-8])?)\s*\)/g,
+      "P($2|$1)",
+    )
+    .replace(
+      /\bP\(\s*([A-Z](?:[1-8])?)\s*\/\s*([A-Z](?:[1-8])?)\s*\)/g,
+      "P($1|$2)",
+    )
+    .replace(/(?:القانون الاحتمالي|التوزيع الاحتمالي)/g, "قانون الاحتمال")
+    .replace(/(?:التوقع الرياضي|الامل الرياضي)/g, "الامل الرياضي")
+    .replace(/تابعا اصليا|تابع اصلي|دالة اصلية/g, "تابع اصلي")
+    .replace(/\.\s*$/g, "");
   return normalizeMathDialect(text).trim();
 }
 export function parsePrompt(
   source: string,
   previous: SolverContext = emptyContext(),
+  plain = false,
 ): ParsedPrompt {
+  const document = plain ? undefined : readSchoolDocument(source);
+  if (document) {
+    const base = parsePrompt(document.preamble || "", previous, true);
+    const legacy = parsePrompt(source, previous, true);
+    const parts = document.parts.map((p) => ({
+      ...p,
+      text: normalizePrompt(p.text),
+    }));
+    return {
+      original: source,
+      text: parts.map((p) => p.text).join("\n"),
+      requests: legacy.requests,
+      context: base.context,
+      preamble: normalizePrompt(document.preamble),
+      parts,
+    };
+  }
   let raw = stripPromptMarkdown(
     normalizeMathTypography(normalizeArabic(source)),
   );
+  if (/(?:[DLd][1-6]?\s*:|بارامتري|بارامتر|وسيطي)/.test(raw))
+    raw = raw.replace(/[؛;](?=\s*[xyz]\s*=)/g, "،");
   if (/جملة|نظام/.test(raw))
     raw = raw.replace(/[؛;](?=\s*(?:[-+(\d]|[xyz])[^؛;\n]*=)/g, "،");
   const context: SolverContext = {
@@ -282,6 +327,11 @@ export function parsePrompt(
   const requests: string[] = [];
   let pendingDefinitions = "";
   let pendingComplex = "";
+  let pendingSpace = "";
+  const spaceDefinition = (part: string) =>
+    !hasMathInstruction(part) &&
+    (/\b[A-Zuvwn]\s*(?:=|:)?\s*\([^()]*,[^()]*,[^()]*\)/.test(part) ||
+      /\b[DLdPQR][1-6]?\s*:/.test(part));
   const complexDefinition = (part: string) =>
     /\bz(?:_[A-Z]|[1-9])?\s*=/.test(part) && !hasMathInstruction(part);
   const probabilityDefinition = (part: string) =>
@@ -293,6 +343,20 @@ export function parsePrompt(
       /[0-9]|كرتان|كرتين/.test(part) &&
       /كيس|صندوق|سحب|السحب/.test(part));
   for (let part of fragments) {
+    if (spaceDefinition(part)) {
+      pendingSpace += (pendingSpace ? "\n" : "") + part;
+      continue;
+    }
+    if (pendingSpace) {
+      if (
+        /شعاع|اشعة|متجه|نقط|مستوي|مستقيم|بعد|مسافة|مركز|ارتباط|استقلال|تعامد|سلمي|كرة|استقامة|استواء|متلاق|تلاقي|مستوية|حجم|تقاطع|مصفوف|احداثيات/.test(
+          part,
+        )
+      )
+        part = pendingSpace + "\n" + part;
+      else requests.push(pendingSpace);
+      pendingSpace = "";
+    }
     if (complexDefinition(part)) {
       pendingComplex += (pendingComplex ? "\n" : "") + part;
       continue;
@@ -324,6 +388,7 @@ export function parsePrompt(
   }
   if (pendingDefinitions) requests.push(pendingDefinitions);
   if (pendingComplex) requests.push(pendingComplex);
+  if (pendingSpace) requests.push(pendingSpace);
   const text = requests.join("\n");
   const initial = requests[0] ?? text;
   const definition = initial.match(

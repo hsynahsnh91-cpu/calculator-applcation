@@ -1,0 +1,154 @@
+PASS C01 complex
+PASS C02 complex
+FAIL C03 complex AssertionError [ERR_ASSERTION]: result 0: undefined != 8192
+FAIL C04 complex AssertionError [ERR_ASSERTION]: [{"request":"في مجموعة الاعداد العقدي:\nالمطلوب:","engine":"complexEngine","message":"ما العدد العقدي الذي تريد العمل عليه؟ اكتب z=3+4i مثلًا.","choices":["اكتب الأشكال الثلاثة للعدد العقدي z=3+4i"]},{"request":"استنتج مستخدما الشكل الاسي S=z1^12+z2^12.","engine":"complexEngine","message":"للنتيجة السابقة عدة أعداد أو جذور؛ حدّد العدد الذي تريد متابعة العمل عليه بدل اختيار واحد دون إذنك.","choices":["حوّل العدد العقدي 3+4i إلى الشكل الأسي"]}]
+
+2 !== 0
+
+FAIL C05 complex AssertionError [ERR_ASSERTION]: result 0: undefined != -8
+FAIL C06 complex AssertionError [ERR_ASSERTION]: result 0: undefined != 6
+FAIL C07 complex AssertionError [ERR_ASSERTION]: result 0: undefined != 5
+PASS C08 complex
+PASS C09 complex
+PASS C10 complex
+PASS C11 complex
+PASS C12 complex
+PASS C13 complex
+PASS C14 complex
+FAIL P01 probability AssertionError [ERR_ASSERTION]: [{"request":"يحتوي صندوقان علي كرات متماثلة لا نفرق بينها باللمس.\nالصندوق الاول U1: يحتوي علي 3 كرات حمراء و2 كرات بيضاء.\nالصندوق الثاني U2: يحتوي علي 2 كرات حمراء و4 كرات بيضاء.\nنختار عشوائيا احد الصندوقين (احتمال اختيار كل صندوق هو ((1)/(2)))،","engine":"probabilityEngine","message":"حدّد أوزان اختيار الفروع q واحتمال B في كل فرع p؛ لا أفترض أن الصناديق متساوية الاختيار.","choices":["الاحتمال الكلي q=[1/3,2/3]، p=[1/2,1/4]","بايز q=[1/3,2/3]، p=[1/2,1/4]، احسب P(H1|B)"]},{"request":"نسحب منه كرة 1.\nالمطلوب:، احسب احتمال ان تكون الكرة المسحوبة حمراء.","engine":"probabilityEngine","message":"كم كرة سُحبت؟ حدّد r أو اكتب مثلًا: سحب كرتين.","choices":["احسب حجم مكعب طول حرفه 3","كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون","التوزيع الثنائي n=10 p=0.5 k=5"]},{"request":"اذا علمت ان الكرة المسحوبة حمراء، فما احتمال ان تكون قد سحبت من الصندوق الاول U1؟","engine":"probabilityEngine","message":"حدّد أوزان اختيار الفروع q واحتمال B في كل فرع p؛ لا أفترض أن الصناديق متساوية الاختيار.","choices":["الاحتمال الكلي q=[1/3,2/3]، p=[1/2,1/4]","بايز q=[1/3,2/3]، p=[1/2,1/4]، احسب P(H1|B)"]},{"request":"نعيد الكرة المسحوبة الي صندوقها. نقوم الان بتجربة جديدة: نسحب من الصندوق الاول U1 كرتين معا. ليكن X المتغير العشوائي الذي يدل علي عدد الكرات البيضاء المسحوبة.\nاوجد قيم المتغير العشوائي X.","engine":"probabilityEngine","message":"حدّد أوزان اختيار الفروع q واحتمال B في كل فرع p؛ لا أفترض أن الصناديق متساوية الاختيار.","choices":["الاحتمال الكلي q=[1/3,2/3]، p=[1/2,1/4]","بايز q=[1/3,2/3]، p=[1/2,1/4]، احسب P(H1|B)"]},{"request":"احسب توقعه الرياضي E(X).","engine":"probabilityEngine","message":"حدّد نوع المسألة أو افتح لوحة الاحتمالات لبناء سؤال واضح.","choices":["كيس فيه 3 كرات حمراء و5 بيضاء، سحب كرتين معًا، احسب احتمال اختلاف اللون","P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، احسب الاتحاد","المتحول X=[0,1,2]، p=[1/4,1/2,1/4]، احسب الأمل والتباين"]}]
+
+5 !== 0
+
+FAIL P02 probability AssertionError [ERR_ASSERTION]: [{"request":"U1: يحتوي علي 1 كرة حمراء و1 كرة بيضاء.\nU2: يحتوي علي 3 كرات حمراء و1 كرة بيضاء.\nاحتمال اختيار U1=2/3 واحتمال اختيار U2=1/3.\nالمطلوب:","engine":"probabilityEngine","message":"كم كرة سُحبت؟ حدّد r أو اكتب مثلًا: سحب كرتين.","choices":["كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون","التوزيع الثنائي n=10 p=0.5 k=5"]},{"request":"احسب احتمال سحب كرة حمراء بعد اختيار الصندوق.","engine":"probabilityEngine","message":"هل السحب معًا أم متتاليًا؟ وهل تعاد الكرة؟","choices":["السحب معًا دون إعادة","السحب متتاليًا مع إعادة","السحب متتاليًا دون إعادة"]}]
+
+2 !== 0
+
+PASS P03 probability
+FAIL P04 probability AssertionError [ERR_ASSERTION]: [{"request":"يضم كيس 2 كرات حمراء و3 بيضاء متماثلة باللمس. نسحب عشوائيا كرة 1. احسب احتمال الحمراء.","engine":"probabilityEngine","message":"كم كرة سُحبت؟ حدّد r أو اكتب مثلًا: سحب كرتين.","choices":["كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون","التوزيع الثنائي n=10 p=0.5 k=5"]}]
+
+1 !== 0
+
+PASS P05 probability
+PASS P06 probability
+PASS P07 probability
+FAIL P08 probability AssertionError [ERR_ASSERTION]: [{"request":"كيس فيه 3 حمراء و2 بيضاء، نسحب كرتين معا. X عدد الكرات البيضاء. اوجد القانون الاحتمالي","engine":"probabilityEngine","message":"أي لون يعدّه X؟ اختر اللون المطلوب؛ لا أختار لونًا خفيًا. ","choices":["احسب قانون احتمال عدد الكرات من اللون حمراء","احسب قانون احتمال عدد الكرات من اللون بيضاء"]},{"request":"احسب التوقع الرياضي E(X).","engine":"probabilityEngine","message":"حدّد نوع المسألة أو افتح لوحة الاحتمالات لبناء سؤال واضح.","choices":["كيس فيه 3 كرات حمراء و5 بيضاء، سحب كرتين معًا، احسب احتمال اختلاف اللون","P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، احسب الاتحاد","المتحول X=[0,1,2]، p=[1/4,1/2,1/4]، احسب الأمل والتباين"]}]
+
+2 !== 0
+
+FAIL P09 probability AssertionError [ERR_ASSERTION]: [{"request":"P(A)=\\frac12، P(B)=\\frac13، P(A\\cap B)=\\frac16، احسب P_B(A).","engine":"probabilityEngine","message":"حدّد الحدث والعملية المطلوبة: متمم، اتحاد، تقاطع، شرط، أم فحص استقلال؟","choices":["كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون","التوزيع الثنائي n=10 p=0.5 k=5"]}]
+
+1 !== 0
+
+FAIL P10 probability AssertionError [ERR_ASSERTION]: [{"request":"P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، احسب P(A/B).","engine":"probabilityEngine","message":"استخدم رموز أحداث بحرف كبير مثل P(A)، P(A∩B)، P(A|B)، P(A').","choices":["كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون","التوزيع الثنائي n=10 p=0.5 k=5"]}]
+
+1 !== 0
+
+PASS P11 probability
+FAIL P12 probability AssertionError [ERR_ASSERTION]: [{"request":"P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، بين ان الحدثين مستقلان.","engine":"probabilityEngine","message":"لفحص الاستقلال نحتاج P(A) وP(B) وP(A∩B)، أو شرطًا/اتحادًا يسمح باشتقاق التقاطع. لن أفترض الاستقلال.","choices":["P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، هل الحدثان مستقلان؟"]}]
+
+1 !== 0
+
+PASS P13 probability
+PASS P14 probability
+PASS P15 probability
+FAIL P16 probability AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+3 !== 2
+
+PASS P17 probability
+PASS P18 probability
+FAIL S01 sequences AssertionError [ERR_ASSERTION]: [{"request":"نعرف المتتالية (u_n) بالحد u_0=1 والعلاقة u_n+1=2u_n+3. المطلوب: اوجد عبارتها الصريحة.","engine":"sequences","message":"اكتب معامل التراجع a في uₙ₊₁ = a uₙ + b.","choices":["متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"]}]
+
+1 !== 0
+
+FAIL S02 sequences AssertionError [ERR_ASSERTION]: [{"request":"لتكن u_0=1 وu_n+1=2u_n+3. نضع v_n=u_n+3. بين ان v_n هندسية واوجد اساسها.","engine":"sequences","message":"اكتب معامل التراجع a في uₙ₊₁ = a uₙ + b.","choices":["متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"]}]
+
+1 !== 0
+
+FAIL S03 sequences AssertionError [ERR_ASSERTION]: [{"request":"لتكن u_0=1 وu_n+1=2u_n+3. اثبت بالتدريج ان u_n=4*2^n-3 لكل n طبيعي.","engine":"probabilityEngine","message":"حدّد المتوسط μ والانحراف المعياري σ.","choices":["التوزيع الطبيعي mu=0 sigma=1 x=1"]}]
+
+1 !== 0
+
+FAIL S04 sequences AssertionError [ERR_ASSERTION]: [{"request":"متتالية حسابية حدها u_0=2 واساسها r=3، احسب مجموع حدودها من الرتبة 0 الي الرتبة 4.","engine":"sequences","message":"كم حدًا تريد جمعه؟","choices":["متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"]},{"request":"متتالية حسابية حدها u_0=2 واساسها r=3، احسب مجموع حدودها من الرتبة 0 الي الرتبة 4.","engine":"matricesEngine","message":"اكتب عناصر المصفوفة على شكل صفوف داخل أقواس.","choices":["جد محدد ومقلوب المصفوفة [[1,2],[3,4]]"]}]
+
+2 !== 0
+
+PASS S05 sequences
+FAIL S06 sequences AssertionError [ERR_ASSERTION]: [{"request":"u_0=4 وu_n+1=u_n+2، جد عبارة u_n.","engine":"sequences","message":"اكتب معامل التراجع a في uₙ₊₁ = a uₙ + b.","choices":["متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا"]}]
+
+1 !== 0
+
+FAIL S07 sequences AssertionError [ERR_ASSERTION]: [{"request":"u_0=0 وu_n+1=1/2*u_n+1، حدد نهاية المتتالية.","engine":"sequences","message":"اكتب معامل التراجع a في uₙ₊₁ = a uₙ + b.","choices":["متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا","جد نهاية (x^2-1)/(x-1) عندما x تؤول إلى 1"]},{"request":"u_0=0 وu_n+1=1/2*u_n+1، حدد نهاية المتتالية.","engine":"limitsEngine","message":"ما قيمة المتغير u_n؟ عرّفه قبل الحساب.","choices":["متتالية حسابية حدها الأول 3 وأساسها 4، جد مجموع أول 20 حدًا","جد نهاية (x^2-1)/(x-1) عندما x تؤول إلى 1"]}]
+
+2 !== 0
+
+PASS S08 sequences
+PASS S09 sequences
+PASS S10 sequences
+FAIL F01 functions AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+1 !== 2
+
+PASS F02 functions
+PASS F03 functions
+PASS F04 functions
+PASS F05 functions
+FAIL F06 functions AssertionError [ERR_ASSERTION]: [{"request":"f(x)=x^3-3x+1، اثبت وجود حل وحيد للمعادلة f(x)=0 في الفترة (0,1).","engine":"equationSolver","message":"الدالة المكتوبة غير مدعومة. تحقق من اسمها الرياضي.","choices":["حل المعادلة 2x^2-5x+3=0"]}]
+
+1 !== 0
+
+PASS F07 functions
+PASS F08 functions
+PASS F09 functions
+PASS F10 functions
+PASS I01 integration
+FAIL I02 integration AssertionError [ERR_ASSERTION]: [{"request":"اوجد تابعا اصليا للدالة sin(x).","message":"هل تريد حساب قيمة، أم حل معادلة، أم دراسة دالة؟ لا توجد معطيات كافية لاختيار حل موثوق.","choices":["حل المعادلة 2x^2-5x+3=0","جد مشتق f(x)=x^3-3x+1 ونظم جدول تغيراته","كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معا، جد احتمال اختلاف اللون"]}]
+
+1 !== 0
+
+PASS I03 integration
+PASS I04 integration
+FAIL I05 integration AssertionError [ERR_ASSERTION]: result 0: undefined != 1/6
+FAIL I06 integration AssertionError [ERR_ASSERTION]: [{"request":"f(x)=x، احسب الحجم الدوراني حول محور الفواصل للحيز تحت المنحني في الفترة [0,1].","engine":"geometryTools","message":"اكتب أعدادًا وكسورًا وجذورًا حقيقية بسيطة، دون رموز مجهولة أو أوامر.","choices":["احسب حجم مكعب طول حرفه 3","جد مشتق f(x)=x^3-3x+1 ونظم جدول تغيراته","حل المعادلة 2x^2-5x+3=0"]}]
+
+1 !== 0
+
+FAIL I07 integration AssertionError [ERR_ASSERTION]: [{"request":"f(x)=x^2، احسب القيمة الوسطي للتابع في الفترة [0,3].","engine":"equationSolver","message":"الدالة المكتوبة غير مدعومة. تحقق من اسمها الرياضي.","choices":["حل المعادلة 2x^2-5x+3=0"]}]
+
+1 !== 0
+
+PASS I08 integration
+PASS G01 geometry
+PASS G02 geometry
+PASS G03 geometry
+PASS G04 geometry
+PASS G05 geometry
+FAIL G06 geometry AssertionError [ERR_ASSERTION]: missing مماس
+PASS G07 geometry
+PASS G08 geometry
+PASS A01 algebra
+PASS A02 algebra
+PASS A03 algebra
+FAIL A04 algebra AssertionError [ERR_ASSERTION]: [{"request":"احسب sin(30°)+sqrt(2).","engine":"mathEngine","message":"تعذّر إكمال هذا الجزء بهذه الصيغة. تحقق من المعطيات ومجال التعريف.","choices":["احسب sin(30°)+√2"]}]
+
+1 !== 0
+
+PASS A05 algebra
+PASS A06 algebra
+PASS M01 matrices
+PASS M02 matrices
+PASS M03 matrices
+PASS U01 unsupported
+PASS U02 unsupported
+PASS U03 unsupported
+FAIL L01 layout AssertionError [ERR_ASSERTION]: [{"request":"المسالة الاولي\n(10 درجات)\nلتكن f(x)=x^2+1.\nوالمطلوب:","engine":"equationSolver","message":"الدالة المكتوبة غير مدعومة. تحقق من اسمها الرياضي.","choices":["حل المعادلة 2x^2-5x+3=0"]}]
+
+1 !== 0
+
+PASS L02 layout
+FAIL L03 layout AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+1 !== 2
+
+
+Curriculum: 54 passed, 29 failed

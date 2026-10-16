@@ -362,3 +362,270 @@ PASS a stale invalid derivation hint never invalidates a correctly specified tar
 PASS pi coefficients keep TeX control words separate from i and the exponential base
 
 Textbook regression: 37 passed, 0 failed
+PASS exact real-field arithmetic preserves decimals, radicals, division and sign
+PASS polynomial analysis proves linearity and sphere shape instead of sampling two points
+PASS the directed vector and point distance update with actual point coordinates
+PASS radical coordinates, exact fractional distances and Arabic digits are not rounded away
+PASS spatial basis vectors are not mistaken for the imaginary unit
+PASS opposite, subtraction order and scalar multiplication retain vector meaning
+PASS norm and cross product have their own valid results
+PASS two-vector dependence is exact: 1,2,3/2,4,6
+PASS two-vector dependence is exact: 1,0,0/0,1,0
+PASS two-vector dependence is exact: 0,0,0/1,2,3
+PASS two-vector dependence is exact: 1,1,0/1,1.000000000000000000001,0
+PASS three-vector dependence agrees with exact elimination: 1,1,0
+PASS three-vector dependence agrees with exact elimination: 0,0,1
+PASS three-vector dependence agrees with exact elimination: 0,0,0
+PASS linear dependence of AB/AC/AD bridges to coplanarity and the determinant matrix
+PASS three-point collinearity and repeated-point degeneracy are distinguished
+PASS coplanar and noncoplanar quadruples produce correct geometric verdicts
+PASS barycenter of 2 points checks the defining balance and grouping
+PASS barycenter of 3 points checks the defining balance and grouping
+PASS barycenter of 4 points checks the defining balance and grouping
+PASS negative weights are supported while zero total and missing weights clarify
+PASS triangle centroid concurrency is proved and collinear medians are not a unique intersection
+PASS the analytic dot product, zero vector and orthogonality have correct conditions
+PASS geometric dot respects explicit angle unit: 60 درجة
+PASS geometric dot respects explicit angle unit: pi/3 راديان
+PASS geometric dot respects explicit angle unit: 200/3 غراد
+PASS geometric dot respects explicit angle unit: 90 درجة
+PASS geometric dot respects explicit angle unit: 120 درجة
+PASS near-right exact angles never get snapped to an exact zero
+PASS a plane from three points and its normal remain reusable after persistence
+PASS a plane can pass four coplanar points even if the first three are collinear
+PASS point-normal planes and perpendicular bisectors use the actual midpoint
+PASS a line uses one shared parameter and does not silently accept a zero direction
+PASS Cartesian component and LaTeX cases line declarations accept the same single parameter
+PASS relative planes include constants: x-y=0
+PASS relative planes include constants: 2x+2y+2z=2
+PASS relative planes include constants: 2x+2y+2z=4
+PASS line-plane classification: x+y+z=3
+PASS line-plane classification: x-y=0
+PASS line-plane classification: x-y=1
+PASS line relation منطبقان
+PASS line relation متوازيان
+PASS line relation متقاطعان
+PASS line relation متخالفان
+PASS orthogonal directions on skew lines are not falsely called intersecting perpendicular lines
+PASS point-plane distance and orthogonal projection reproduce the original acceptance result
+PASS point-line distance checks a perpendicular foot instead of a planar-only formula
+PASS a named face defines the actual altitude plane of a tetrahedron
+PASS sphere center/radius, diameter, and expanded equation are consistent
+PASS radical radius and zero-radius degeneracy stay exact
+PASS volume ties the mixed product to the point-plane altitude
+PASS solid inputs produce changed results, not the previous example answer
+PASS geometry scalars bridge to scientific arithmetic without using an older probability
+PASS matrix and line-system bridges retain the source geometry model
+PASS separate textbook givens and numbered spatial demands share structured context
+PASS missing named targets, contradictory definitions and incomplete dimensions clarify
+PASS out-of-range values and corrupt saved context/visuals fail safely
+PASS new output names and reconstructed geometry do not reuse an old plane or line
+PASS projection feet and sphere centers never overwrite differently located source points
+PASS vector result aliases do not replace an input named w
+PASS a radius with an unrelated point is not enough to assume a sphere center
+PASS a plane parallel to a named source plane passes the new point without replacing the source
+PASS generated follow-up choices remain executable for distance, vectors, intersections and barycenters
+PASS a general pyramid volume can reuse a previously computed altitude without assuming a square base
+PASS a numerically unresolved tiny radius around a distant center does not gain a fake badge
+PASS a large exact barycenter is preserved while its out-of-range drawing is withheld
+PASS the actual board preview accepts normalized Arabic on reopening real geometry answers
+PASS named Greek planes retain their actual mathematical labels in formulas and the diagram
+PASS form solid, example 1: actual fields -> solver -> valid result
+PASS form solid, example 2: actual fields -> solver -> valid result
+PASS form pyramid-volume, example 1: actual fields -> solver -> valid result
+PASS form pyramid-volume, example 2: actual fields -> solver -> valid result
+PASS form tetrahedron, example 1: actual fields -> solver -> valid result
+PASS form tetrahedron, example 2: actual fields -> solver -> valid result
+PASS form parallelepiped, example 1: actual fields -> solver -> valid result
+PASS form parallelepiped, example 2: actual fields -> solver -> valid result
+PASS form vector, example 1: actual fields -> solver -> valid result
+PASS form vector, example 2: actual fields -> solver -> valid result
+PASS form opposite, example 1: actual fields -> solver -> valid result
+PASS form opposite, example 2: actual fields -> solver -> valid result
+PASS form add, example 1: actual fields -> solver -> valid result
+PASS form add, example 2: actual fields -> solver -> valid result
+PASS form subtract, example 1: actual fields -> solver -> valid result
+PASS form subtract, example 2: actual fields -> solver -> valid result
+PASS form scale, example 1: actual fields -> solver -> valid result
+PASS form scale, example 2: actual fields -> solver -> valid result
+PASS form norm, example 1: actual fields -> solver -> valid result
+PASS form norm, example 2: actual fields -> solver -> valid result
+PASS form cross, example 1: actual fields -> solver -> valid result
+PASS form cross, example 2: actual fields -> solver -> valid result
+PASS form dot, example 1: actual fields -> solver -> valid result
+PASS form dot, example 2: actual fields -> solver -> valid result
+PASS form geometric-dot, example 1: actual fields -> solver -> valid result
+PASS form geometric-dot, example 2: actual fields -> solver -> valid result
+PASS form dependence2, example 1: actual fields -> solver -> valid result
+PASS form dependence2, example 2: actual fields -> solver -> valid result
+PASS form dependence3, example 1: actual fields -> solver -> valid result
+PASS form dependence3, example 2: actual fields -> solver -> valid result
+PASS form matrix, example 1: actual fields -> solver -> valid result
+PASS form matrix, example 2: actual fields -> solver -> valid result
+PASS form distance, example 1: actual fields -> solver -> valid result
+PASS form distance, example 2: actual fields -> solver -> valid result
+PASS form collinear, example 1: actual fields -> solver -> valid result
+PASS form collinear, example 2: actual fields -> solver -> valid result
+PASS form coplanar, example 1: actual fields -> solver -> valid result
+PASS form coplanar, example 2: actual fields -> solver -> valid result
+PASS form barycenter, example 1: actual fields -> solver -> valid result
+PASS form barycenter, example 2: actual fields -> solver -> valid result
+PASS form normal, example 1: actual fields -> solver -> valid result
+PASS form normal, example 2: actual fields -> solver -> valid result
+PASS form plane-three, example 1: actual fields -> solver -> valid result
+PASS form plane-three, example 2: actual fields -> solver -> valid result
+PASS form plane-normal, example 1: actual fields -> solver -> valid result
+PASS form plane-normal, example 2: actual fields -> solver -> valid result
+PASS form bisector, example 1: actual fields -> solver -> valid result
+PASS form bisector, example 2: actual fields -> solver -> valid result
+PASS form planes, example 1: actual fields -> solver -> valid result
+PASS form planes, example 2: actual fields -> solver -> valid result
+PASS form distance-plane, example 1: actual fields -> solver -> valid result
+PASS form distance-plane, example 2: actual fields -> solver -> valid result
+PASS form line-existing, example 1: actual fields -> solver -> valid result
+PASS form line-existing, example 2: actual fields -> solver -> valid result
+PASS form line-points, example 1: actual fields -> solver -> valid result
+PASS form line-points, example 2: actual fields -> solver -> valid result
+PASS form line-direction, example 1: actual fields -> solver -> valid result
+PASS form line-direction, example 2: actual fields -> solver -> valid result
+PASS form line-plane, example 1: actual fields -> solver -> valid result
+PASS form line-plane, example 2: actual fields -> solver -> valid result
+PASS form lines, example 1: actual fields -> solver -> valid result
+PASS form lines, example 2: actual fields -> solver -> valid result
+PASS form distance-line, example 1: actual fields -> solver -> valid result
+PASS form distance-line, example 2: actual fields -> solver -> valid result
+PASS form line-system, example 1: actual fields -> solver -> valid result
+PASS form line-system, example 2: actual fields -> solver -> valid result
+PASS form sphere-center, example 1: actual fields -> solver -> valid result
+PASS form sphere-center, example 2: actual fields -> solver -> valid result
+PASS form sphere-diameter, example 1: actual fields -> solver -> valid result
+PASS form sphere-diameter, example 2: actual fields -> solver -> valid result
+PASS form sphere-equation, example 1: actual fields -> solver -> valid result
+PASS form sphere-equation, example 2: actual fields -> solver -> valid result
+
+Geometry regression: 140 passed, 0 failed
+PASS C01 complex
+PASS C02 complex
+PASS C03 complex
+PASS C04 complex
+PASS C05 complex
+PASS C06 complex
+PASS C07 complex
+PASS C08 complex
+PASS C09 complex
+PASS C10 complex
+PASS C11 complex
+PASS C12 complex
+PASS C13 complex
+PASS C14 complex
+PASS P01 probability
+PASS P02 probability
+PASS P03 probability
+PASS P04 probability
+PASS P05 probability
+PASS P06 probability
+PASS P07 probability
+PASS P08 probability
+PASS P09 probability
+PASS P10 probability
+PASS P11 probability
+PASS P12 probability
+PASS P13 probability
+PASS P14 probability
+PASS P15 probability
+PASS P16 probability
+PASS P17 probability
+PASS P18 probability
+PASS S01 sequences
+PASS S02 sequences
+PASS S03 sequences
+PASS S04 sequences
+PASS S05 sequences
+PASS S06 sequences
+PASS S07 sequences
+PASS S08 sequences
+PASS S09 sequences
+PASS S10 sequences
+PASS F01 functions
+PASS F02 functions
+PASS F03 functions
+PASS F04 functions
+PASS F05 functions
+PASS F06 functions
+PASS F07 functions
+PASS F08 functions
+PASS F09 functions
+PASS F10 functions
+PASS I01 integration
+PASS I02 integration
+PASS I03 integration
+PASS I04 integration
+PASS I05 integration
+PASS I06 integration
+PASS I07 integration
+PASS I08 integration
+PASS G01 geometry
+PASS G02 geometry
+PASS G03 geometry
+PASS G04 geometry
+PASS G05 geometry
+PASS G06 geometry
+PASS G07 geometry
+PASS G08 geometry
+PASS A01 algebra
+PASS A02 algebra
+PASS A03 algebra
+PASS A04 algebra
+PASS A05 algebra
+PASS A06 algebra
+PASS M01 matrices
+PASS M02 matrices
+PASS M03 matrices
+PASS U01 unsupported
+PASS U02 unsupported
+PASS U03 unsupported
+PASS L01 layout
+PASS L02 layout
+PASS L03 layout
+
+Curriculum: 83 passed, 0 failed
+PASS school labels preserve Roman and original Arabic numerals while titles and marks are not demands
+PASS both textbook examples preserve their actual source labels and exact answers
+PASS new experiment uses original U1 stock and the exact full white-count law
+PASS named box data never supplies an unmentioned observation colour
+PASS a new ordinary urn does not inherit the active named box or its white variable
+PASS missing indexed complex data never falls back to a current unlabelled value
+PASS the general aggregate engine handles nonconjugate unequal powers without inventing conjugacy
+PASS powers outside the documented aggregate bound ask instead of producing an unsafe answer
+PASS a scalar calculated from named complex values can be reused scientifically by its own name
+PASS an incorrect closed form is not given an induction proof or a badge
+PASS an incorrectly shifted auxiliary sequence is not declared geometric
+PASS a zero multiplier does not prove a false all-ranks constant formula
+PASS finding polynomial roots does not replace a missing uniqueness proof
+PASS a crossing curve difference is not integrated as signed area
+PASS a plane cutting a sphere is not falsely reported tangent
+PASS safe TeX lexical rules do not turn OCR confusables into guessed numbers
+PASS one visible clarification is shown even when multiple parts remain incomplete
+PASS unrequested decimals remain collapsed and explicit numeric requests are visible
+PASS the source question, labels and deep school state survive guarded persistence
+PASS a failed dependent part does not consume a stale earlier result while independent parts finish
+PASS setup definitions do not consume the budget of twelve actual demands
+PASS a requested tangent point x=1 is not replaced by the old default point0
+PASS derivatives at rational points and exponential tangents stay exact
+PASS explicit givens after حيث bind the requested quantity instead of requesting them again
+PASS mixture formulas retain nonconsecutive given box identifiers
+PASS an explicitly named Y urn variable retains its symbol and its expectation
+PASS modulus synonyms and vertical bars request the actual norm rather than generic forms
+PASS arg notation returns an actual argument and zero never gets a fabricated one
+PASS named angle ratios still use the geometry operation instead of single-number arg handling
+PASS a heading sharing a pasted line with a definition never consumes the given expression
+PASS unnamed stock boxes do not default an unspecified observation to red
+PASS a general sequence formula is not followed by an unrequested sum as its decimal value
+PASS a generic previous result never reuses an unrelated old probability after complex arithmetic
+PASS scientific division by zero and overflow do not masquerade as numerical limits
+PASS verification substitutes the proposed value instead of accepting an asserted equality
+PASS proof verbs inside a numbered question are not silently mistaken for definitions
+PASS a proof conclusion cannot redefine an unknown z and verify its own assertion
+PASS an independence proof requires data and never treats the requested conclusion as a given assumption
+
+School safety: 38 passed, 0 failed

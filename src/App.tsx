@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   History,
   Dices,
+  Cuboid,
   ImagePlus,
   Keyboard,
   LoaderCircle,
@@ -50,6 +51,7 @@ import {
 } from "./solver/types";
 import type { AngleMode, HistoryEntry } from "./types";
 import type { ProbabilityContext } from "./solver/probabilityTypes";
+import type { GeometryContext } from "./solver/geometryTypes";
 import type { NaturalMathFieldHandle } from "./components/common/NaturalMathField";
 const NaturalMathField = lazy(() =>
   import("./components/common/NaturalMathField").then((module) => ({
@@ -79,7 +81,13 @@ const ImageAttachment = lazy(() =>
 const ProbabilityBoard = lazy(
   () => import("./components/probability/ProbabilityBoard"),
 );
+const GeometryBoard = lazy(() => import("./components/geometry/GeometryBoard"));
+const CurriculumGuide = lazy(
+  () => import("./components/reference/CurriculumGuide"),
+);
 type Modal =
+  | "curriculum"
+  | "geometry"
   | "math"
   | "probability"
   | "reference"
@@ -105,6 +113,12 @@ export default function App() {
     [error, setError] = useState("");
   const [menu, setMenu] = useState(false),
     [modal, setModal] = useState<Modal>(null);
+  const [geometryDraft, setGeometryDraft] = useState<GeometryContext>();
+  const openGeometry = useCallback((value?: GeometryContext) => {
+    setGeometryDraft(value);
+    setMenu(false);
+    setModal("geometry");
+  }, []);
   const [probabilityDraft, setProbabilityDraft] =
     useState<ProbabilityContext>();
   const openProbability = useCallback((value?: ProbabilityContext) => {
@@ -210,6 +224,7 @@ export default function App() {
     setMenu(false);
     if (value === "name") setEditName(name);
     if (value === "math") setMathLatex("");
+    if (value === "geometry") setGeometryDraft(context.current.geometry);
     if (value === "probability")
       setProbabilityDraft(context.current.probability);
     setModal(value);
@@ -410,6 +425,7 @@ export default function App() {
                     onFollowUp={followUp}
                     onSave={save}
                     onProbability={openProbability}
+                    onGeometry={openGeometry}
                     saved={history.some((entry) =>
                       entry.tags?.includes(turn.answer.id),
                     )}
@@ -535,10 +551,19 @@ export default function App() {
                       <span>إرفاق صورة للمسألة</span>
                       <span className="menu-tag">OCR محلي</span>
                     </button>
+                    <button role="menuitem" onClick={() => open("geometry")}>
+                      <Cuboid size={17} />
+                      <span>لوحة الهندسة الفراغية</span>
+                      <ChevronLeft size={14} />
+                    </button>
                     <button role="menuitem" onClick={() => open("probability")}>
                       <Dices size={17} />
                       <span>لوحة الاحتمالات والإحصاء</span>
                       <ChevronLeft size={14} />
+                    </button>
+                    <button role="menuitem" onClick={() => open("curriculum")}>
+                      <BookOpen size={17} />
+                      <span>دليل قدرات التطبيق</span>
                     </button>
                     <button role="menuitem" onClick={() => open("reference")}>
                       <BookOpen size={17} />
@@ -712,25 +737,37 @@ export default function App() {
       {modal && (
         <ToolModal
           title={
-            modal === "probability"
-              ? "لوحة الاحتمالات والإحصاء"
-              : modal === "math"
-                ? "لوحة المفاتيح الرياضية"
-                : modal === "reference"
-                  ? "بنك القوانين"
-                  : modal === "history"
-                    ? "السجل"
-                    : modal === "name"
-                      ? "كيف أناديك؟"
-                      : "مسح المحادثة"
+            modal === "curriculum"
+              ? "قدرات التطبيق وحدود الدعم"
+              : modal === "geometry"
+                ? "الهندسة الفراغية"
+                : modal === "probability"
+                  ? "لوحة الاحتمالات والإحصاء"
+                  : modal === "math"
+                    ? "لوحة المفاتيح الرياضية"
+                    : modal === "reference"
+                      ? "بنك القوانين"
+                      : modal === "history"
+                        ? "السجل"
+                        : modal === "name"
+                          ? "كيف أناديك؟"
+                          : "مسح المحادثة"
           }
           onClose={() => setModal(null)}
           wide={
+            modal === "curriculum" ||
             modal === "reference" ||
             modal === "history" ||
-            modal === "probability"
+            modal === "probability" ||
+            modal === "geometry"
           }
-          className={modal === "probability" ? "probability-modal" : ""}
+          className={
+            modal === "geometry"
+              ? "geometry-modal"
+              : modal === "probability"
+                ? "probability-modal"
+                : ""
+          }
         >
           <SectionErrorBoundary label="الأداة" resetKey={modal}>
             <Suspense fallback={loading}>
@@ -767,6 +804,21 @@ export default function App() {
                   </button>
                 </div>
               )}
+              {modal === "geometry" && (
+                <GeometryBoard
+                  context={geometryDraft}
+                  angleMode={angle}
+                  busy={busy}
+                  onInsert={(question) => {
+                    prompt.current?.setValue(question);
+                    setModal(null);
+                  }}
+                  onSolve={(question) => {
+                    setModal(null);
+                    void sendRef.current(question);
+                  }}
+                />
+              )}
               {modal === "probability" && (
                 <ProbabilityBoard
                   context={probabilityDraft}
@@ -778,6 +830,14 @@ export default function App() {
                   onSolve={(question) => {
                     setModal(null);
                     void sendRef.current(question);
+                  }}
+                />
+              )}
+              {modal === "curriculum" && (
+                <CurriculumGuide
+                  onInsert={(question) => {
+                    prompt.current?.setValue(question);
+                    setModal(null);
                   }}
                 />
               )}

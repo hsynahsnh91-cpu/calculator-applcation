@@ -1349,6 +1349,665 @@ await test("probability board tabs, focus and floating layout work at narrow pho
   assert.equal(await page.getByRole("dialog").count(), 0);
 });
 
+// Spatial workbench: actual field changes, real Worker, SVG and cross-tool context.
+async function openGeometryBoard() {
+  await fresh();
+  await tool("لوحة الهندسة الفراغية");
+  await page.getByTestId("geometry-board").waitFor();
+}
+async function geometryOperation(tab, id) {
+  await page.getByRole("tab", { name: tab, exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "العملية الهندسية", exact: true })
+    .selectOption(id);
+}
+async function submitGeometryBoard() {
+  const count = await page.locator(".assistant-message").count();
+  await page
+    .getByRole("button", { name: "حل في المحادثة", exact: true })
+    .click();
+  await page.waitForFunction(
+    (n) => document.querySelectorAll(".assistant-message").length > n,
+    count,
+  );
+  await completeAnswer();
+  return lastTurn();
+}
+await test("spatial workbench is an on-demand conversation tool with six responsive categories", async () => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await openGeometryBoard();
+  assert.equal(
+    await page
+      .getByRole("dialog", { name: "الهندسة الفراغية", exact: true })
+      .count(),
+    1,
+  );
+  assert.equal(
+    await page
+      .getByRole("tablist", { name: "أدوات الهندسة الفراغية", exact: true })
+      .getByRole("tab")
+      .count(),
+    6,
+  );
+  assert.equal(await page.locator("header,nav.bottom-nav").count(), 0);
+  await page.screenshot({
+    path: fileURLToPath(new URL("geometry-board-desktop.png", output)),
+    fullPage: true,
+  });
+  await page.keyboard.press("Escape");
+});
+await test("spatial tabs, fields and sticky actions fit 320/360/390px screens with working focus", async () => {
+  await openGeometryBoard();
+  for (const width of [320, 360, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    assert(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth + 1,
+      ),
+    );
+    const box = await page.getByRole("dialog").boundingBox();
+    assert(box.x >= 0 && box.x + box.width <= width + 1);
+    assert(
+      await page
+        .locator(".chat-modal-body")
+        .evaluate((e) => e.scrollWidth <= e.clientWidth + 1),
+    );
+    const action = await page
+      .getByRole("button", { name: "حل في المحادثة", exact: true })
+      .boundingBox();
+    assert(action.y >= 0 && action.y + action.height <= 844);
+  }
+  await page.getByRole("tab", { name: "الأشعة", exact: true }).focus();
+  await page.keyboard.press("ArrowLeft");
+  assert.equal(
+    await page
+      .getByRole("tab", { name: "النقاط والمراكز", exact: true })
+      .getAttribute("aria-selected"),
+    "true",
+  );
+  await page.screenshot({
+    path: fileURLToPath(new URL("geometry-board-mobile.png", output)),
+    fullPage: true,
+  });
+  await page.keyboard.press("Escape");
+  assert.equal(await page.getByRole("dialog").count(), 0);
+});
+await test("editing a point field changes the actual Worker answer rather than a cached example", async () => {
+  await openGeometryBoard();
+  await page.getByRole("textbox", { name: "B: y", exact: true }).fill("8");
+  const a = await submitGeometryBoard();
+  assert.equal(a.answer.unsolved.length, 0);
+  assert.deepEqual(
+    a.answer.context.geometry.vectors.AB.map((s) =>
+      Number(s.replace(/[()]/g, "")),
+    ),
+    [3, 6, 0],
+  );
+  assert(Math.abs(a.answer.results[0].decimal - Math.sqrt(45)) < 1e-9);
+  await page
+    .locator(".assistant-message")
+    .last()
+    .getByRole("button", { name: "تعديل معطيات الهندسة الفراغية", exact: true })
+    .click();
+  await page.getByTestId("geometry-board").waitFor();
+  assert.equal(
+    await page.getByRole("textbox", { name: "B: y", exact: true }).inputValue(),
+    "(8)",
+  );
+  await page.getByRole("textbox", { name: "B: y", exact: true }).fill("6");
+  const b = await submitGeometryBoard();
+  assert.equal(b.answer.results[0].decimal, 5);
+  assert.notEqual(
+    a.answer.results[0].finalLatex,
+    b.answer.results[0].finalLatex,
+  );
+});
+await test("loading and solving two examples yields two distinct results", async () => {
+  await openGeometryBoard();
+  await page.getByRole("button", { name: "تحميل مثال 1", exact: true }).click();
+  const a = await submitGeometryBoard();
+  assert.equal(a.answer.results[0].decimal, 5);
+  await page
+    .locator(".assistant-message")
+    .last()
+    .getByRole("button", { name: "تعديل معطيات الهندسة الفراغية", exact: true })
+    .click();
+  await page.getByTestId("geometry-board").waitFor();
+  await page.getByRole("button", { name: "تحميل مثال 1", exact: true }).click();
+  await page.getByRole("button", { name: "تحميل مثال 2", exact: true }).click();
+  const b = await submitGeometryBoard();
+  assert.equal(b.answer.results[0].decimal, 2);
+  assert.notEqual(
+    a.answer.results[0].finalLatex,
+    b.answer.results[0].finalLatex,
+  );
+});
+await test("spatial insertion creates an editable draft and never solves before sending", async () => {
+  await openGeometryBoard();
+  await geometryOperation("المستويات", "distance-plane");
+  await page
+    .getByRole("button", { name: "إدراج في السؤال", exact: true })
+    .click();
+  assert.equal(await page.getByRole("dialog").count(), 0);
+  assert.equal(await page.locator(".assistant-message").count(), 0);
+  assert(
+    (await page.locator(".smart-prompt").innerText()).includes("2x-y+2z-5=0"),
+  );
+  await page
+    .getByRole("button", { name: "إرسال المسألة", exact: true })
+    .click();
+  await page.locator(".assistant-message").waitFor();
+  await completeAnswer();
+  const turn = await lastTurn();
+  assert.equal(turn.answer.unsolved.length, 0);
+  assert(Math.abs(turn.answer.results[0].decimal - 1 / 3) < 1e-9);
+  assert(turn.answer.results[0].verification.passed);
+});
+await test("spatial controls reveal their fields immediately on selection", async () => {
+  await openGeometryBoard();
+  await geometryOperation("المجسمات", "solid");
+  await page
+    .getByRole("combobox", { name: "نوع المجسم", exact: true })
+    .selectOption("cuboid");
+  assert.equal(
+    await page.getByRole("textbox", { name: "العرض b", exact: true }).count(),
+    1,
+  );
+  assert.equal(
+    await page
+      .getByRole("textbox", { name: "الارتفاع c", exact: true })
+      .count(),
+    1,
+  );
+  await page
+    .getByRole("combobox", { name: "نوع المجسم", exact: true })
+    .selectOption("cylinder");
+  assert.equal(
+    await page
+      .getByRole("textbox", { name: "نصف القطر r", exact: true })
+      .count(),
+    1,
+  );
+  assert.equal(
+    await page
+      .getByRole("textbox", { name: "طول الحرف a", exact: true })
+      .count(),
+    0,
+  );
+  await geometryOperation("المستويات", "normal");
+  assert.equal(
+    await page
+      .getByRole("textbox", { name: "معادلة المستوي P", exact: true })
+      .count(),
+    1,
+  );
+  await page.keyboard.press("Escape");
+});
+await test("invalid directions and zero barycentric weight sums block submission without fabricated results", async () => {
+  await openGeometryBoard();
+  await geometryOperation("المستقيمات", "line-existing");
+  for (const axis of ["x", "y", "z"])
+    await page
+      .getByRole("textbox", { name: `اتجاه D1: ${axis}`, exact: true })
+      .fill("0");
+  assert(
+    await page
+      .getByRole("button", { name: "حل في المحادثة", exact: true })
+      .isDisabled(),
+  );
+  assert((await page.getByRole("alert").innerText()).includes("معدوم"));
+  await geometryOperation("النقاط والمراكز", "barycenter");
+  await page
+    .getByRole("combobox", { name: "عدد نقاط مركز الأبعاد", exact: true })
+    .selectOption("2");
+  await page.getByRole("textbox", { name: "وزن A", exact: true }).fill("1");
+  await page.getByRole("textbox", { name: "وزن B", exact: true }).fill("-1");
+  assert(
+    await page
+      .getByRole("button", { name: "حل في المحادثة", exact: true })
+      .isDisabled(),
+  );
+  assert((await page.getByRole("alert").innerText()).includes("صفر"));
+  await page.keyboard.press("Escape");
+});
+await test("barycenter fields support four points and reopening preserves operands rather than generated G", async () => {
+  await openGeometryBoard();
+  await geometryOperation("النقاط والمراكز", "barycenter");
+  await page.getByRole("button", { name: "تحميل مثال 1", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "عدد نقاط مركز الأبعاد", exact: true })
+    .selectOption("4");
+  assert.equal(
+    await page.getByRole("textbox", { name: "وزن D", exact: true }).count(),
+    1,
+  );
+  const turn = await submitGeometryBoard();
+  assert.equal(turn.answer.unsolved.length, 0);
+  assert(turn.answer.results[0].verification.passed);
+  assert.deepEqual(turn.answer.context.geometry.inputs.points, [
+    "A",
+    "B",
+    "C",
+    "D",
+  ]);
+  await page.screenshot({
+    path: fileURLToPath(new URL("geometry-barycenter-mobile.png", output)),
+    fullPage: true,
+  });
+  await page
+    .locator(".assistant-message")
+    .last()
+    .getByRole("button", { name: "تعديل معطيات الهندسة الفراغية", exact: true })
+    .click();
+  assert.equal(
+    await page
+      .getByRole("textbox", { name: "اسم النقطة 1", exact: true })
+      .inputValue(),
+    "A",
+  );
+  assert.equal(
+    await page.getByRole("textbox", { name: "A: x", exact: true }).inputValue(),
+    "0",
+  );
+  await page.keyboard.press("Escape");
+});
+await test("sphere radius fields and the projected surface use the current exact data", async () => {
+  await openGeometryBoard();
+  await geometryOperation("الكرة", "sphere-center");
+  await page
+    .getByRole("textbox", { name: "نصف قطر الكرة R", exact: true })
+    .fill("sqrt(2)");
+  const turn = await submitGeometryBoard();
+  assert.equal(turn.answer.unsolved.length, 0);
+  assert(turn.answer.results[0].finalLatex.endsWith("=2"));
+  assert(turn.answer.results[0].verification.passed);
+  assert(await page.getByTestId("space-figure").isVisible());
+  await cleanMath();
+});
+await test("the spatial diagram rotates and resets without changing the mathematical result", async () => {
+  const figure = page.getByTestId("space-figure");
+  await figure.locator("summary").click();
+  const paths = () =>
+    figure
+      .locator("svg")
+      .first()
+      .locator("path")
+      .evaluateAll((p) => p.map((e) => e.getAttribute("d")).join("|"));
+  const before = await paths(),
+    latex = (await lastTurn()).answer.results[0].finalLatex;
+  await figure
+    .getByRole("slider", { name: "الدوران الأفقي للرسم", exact: true })
+    .focus();
+  await page.keyboard.press("ArrowRight");
+  assert.notEqual(await paths(), before);
+  assert.equal((await lastTurn()).answer.results[0].finalLatex, latex);
+  await figure
+    .getByRole("button", { name: "إعادة المنظور", exact: true })
+    .click();
+  assert.equal(await paths(), before);
+  assert((await figure.locator("table").innerText()).includes("الإحداثيات"));
+  await cleanMath();
+});
+await test("line-plane controls distinguish containment and parallel nonintersection", async () => {
+  await openGeometryBoard();
+  await geometryOperation("المستقيمات", "line-plane");
+  await page
+    .getByRole("textbox", { name: "معادلة المستوي P", exact: true })
+    .fill("x-y=0");
+  const a = await submitGeometryBoard();
+  assert(a.answer.results[0].finalLatex.includes("محتوى"));
+  await page
+    .locator(".assistant-message")
+    .last()
+    .getByRole("button", { name: "تعديل معطيات الهندسة الفراغية", exact: true })
+    .click();
+  await page
+    .getByRole("textbox", { name: "معادلة المستوي P", exact: true })
+    .fill("x-y=1");
+  const b = await submitGeometryBoard();
+  assert(b.answer.results[0].finalLatex.includes("مواز"));
+  assert.notEqual(
+    a.answer.results[0].finalLatex,
+    b.answer.results[0].finalLatex,
+  );
+});
+await test("a specific older geometry answer reopens its own data, not the newest example", async () => {
+  await fresh();
+  await solve("جد المسافة بين A(0,0,0) وB(1,0,0)");
+  await completeAnswer();
+  await solve("جد المسافة بين A(0,0,0) وB(2,0,0)");
+  await completeAnswer();
+  await page
+    .locator(".assistant-message")
+    .first()
+    .getByRole("button", { name: "تعديل معطيات الهندسة الفراغية", exact: true })
+    .click();
+  await page.getByTestId("geometry-board").waitFor();
+  assert.equal(
+    await page.getByRole("textbox", { name: "B: x", exact: true }).inputValue(),
+    "(1)",
+  );
+  const turn = await submitGeometryBoard();
+  assert.equal(turn.answer.results[0].decimal, 1);
+});
+await test("spatial vector-to-matrix follow-up runs the matrix engine and can return to the named vectors", async () => {
+  await fresh();
+  let turn = await solve("ادرس الارتباط الخطي u=(1,0,0)، v=(0,1,0)، w=(0,0,1)");
+  await completeAnswer();
+  assert(turn.answer.results[0].verification.passed);
+  const count = await page.locator(".assistant-message").count();
+  await page
+    .locator(".assistant-message")
+    .last()
+    .getByRole("button", { name: /حول الأشعة.*مصفوفة/ })
+    .click();
+  await page.waitForFunction(
+    (n) => document.querySelectorAll(".assistant-message").length > n,
+    count,
+  );
+  await completeAnswer();
+  turn = await lastTurn();
+  assert.deepEqual(turn.answer.context.matrix, [
+    [1, 0, 0],
+    [0, 1, 0],
+    [0, 0, 1],
+  ]);
+  turn = await solve("جد محدد المصفوفة");
+  assert.equal(turn.answer.results[0].engine, "matricesEngine");
+  turn = await solve("ادرس ارتباط الأشعة u وv وw خطيا");
+  await completeAnswer();
+  assert.equal(turn.answer.unsolved.length, 0);
+  assert(turn.answer.results[0].title.includes("مستقلة"));
+});
+await test("a geometric distance is reused exactly in the scientific calculator", async () => {
+  await fresh();
+  await solve("جد بعد M(0,0,1/3) عن المستوي P: z=0");
+  await completeAnswer();
+  const turn = await solve("احسب النتيجة الهندسية السابقة * 3");
+  await completeAnswer();
+  assert.equal(turn.answer.results[0].engine, "mathEngine");
+  assert(Math.abs(Number(turn.answer.results[0].decimal) - 1) < 1e-10);
+  await cleanMath();
+});
+await test("spatial solids change with fields and do not save history without an explicit action", async () => {
+  const before = await page.evaluate(
+    () =>
+      JSON.parse(localStorage.getItem("pro_calc_history_v2") || "[]").length,
+  );
+  await openGeometryBoard();
+  await geometryOperation("المجسمات", "solid");
+  const a = await submitGeometryBoard();
+  assert.equal(a.answer.results[0].decimal, 27);
+  await page
+    .locator(".assistant-message")
+    .last()
+    .getByRole("button", { name: "تعديل معطيات الهندسة الفراغية", exact: true })
+    .click();
+  await page
+    .getByRole("textbox", { name: "طول الحرف a", exact: true })
+    .fill("4");
+  const b = await submitGeometryBoard();
+  assert.equal(b.answer.results[0].decimal, 64);
+  const after = await page.evaluate(
+    () =>
+      JSON.parse(localStorage.getItem("pro_calc_history_v2") || "[]").length,
+  );
+  assert.equal(after, before);
+  await cleanMath();
+});
+await test("line relations, plane intersections and altitude-volume answers remain narrow-screen math", async () => {
+  await fresh();
+  for (const q of [
+    "جد تقاطع المستويين P: x+y+z=1، Q: x-y=0",
+    "جد وضع المستقيمين D1: (x,y,z)=(0,0,0)+t*(1,0,0)، D2: (x,y,z)=(0,1,1)+s*(0,1,0)",
+    "احسب حجم رباعي الوجوه A(0,0,0)، B(1,0,0)، C(0,1,0)، D(0,0,2)",
+  ]) {
+    const turn = await solve(q);
+    await completeAnswer();
+    assert.equal(turn.answer.unsolved.length, 0);
+    assert(turn.answer.results[0].verification.passed);
+    assert(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth + 1,
+      ),
+    );
+    await cleanMath();
+  }
+  await page.screenshot({
+    path: fileURLToPath(new URL("geometry-tetrahedron-mobile.png", output)),
+    fullPage: true,
+  });
+});
+await test("geometry context and 3D diagrams survive reload with the original exact coordinates", async () => {
+  await page.reload({ waitUntil: "networkidle" });
+  await page.getByTestId("space-figure").first().waitFor();
+  const turn = await lastTurn();
+  assert(turn.answer.context.geometry.points.D);
+  assert(await page.getByTestId("space-figure").count());
+  assert(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth + 1,
+    ),
+  );
+  await cleanMath();
+});
+await test("the formula bank exposes spatial barycentric and projection conditions", async () => {
+  await fresh();
+  await tool("بنك القوانين");
+  const search = page.getByRole("textbox").first();
+  await search.fill("مركز الأبعاد");
+  await page
+    .getByText("مركز الأبعاد المتناسبة والتجميع", { exact: true })
+    .waitFor();
+  assert(await page.locator(".katex").count());
+  await page.keyboard.press("Escape");
+});
+
+// School documents: real source labels, exact engines, guarded persistence and mobile cards.
+const schoolCases = JSON.parse(
+  await readFile(
+    new URL("./fixtures/curriculum.json", import.meta.url),
+    "utf8",
+  ),
+);
+await test("school exponential aggregate calculates the requested S rather than returning two forms", async () => {
+  await fresh();
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const a = await solve(schoolCases.find((c) => c.id === "C03").prompt);
+  await completeAnswer();
+  assert.equal(a.answer.unsolved.length, 0);
+  assert.equal(a.answer.results.length, 1);
+  assert.equal(a.answer.results[0].decimal, 8192);
+  assert.equal(a.answer.results[0].school.label, "3.");
+  assert.equal(
+    await page.locator('.school-request-card[data-request-label="3."]').count(),
+    1,
+  );
+  assert(a.answer.results[0].steps.some((s) => s.latex.includes("e^")));
+  await cleanMath();
+  await page.screenshot({
+    path: fileURLToPath(new URL("curriculum-exponential-desktop.png", output)),
+    fullPage: true,
+  });
+});
+await test("quadratic roots flow by their actual z1/z2 names into the next school demand", async () => {
+  await fresh();
+  const a = await solve(schoolCases.find((c) => c.id === "C04").prompt);
+  await completeAnswer();
+  assert.equal(a.answer.unsolved.length, 0);
+  assert.equal(a.answer.results.length, 2);
+  assert.equal(a.answer.results[1].decimal, 8192);
+  assert.deepEqual(
+    a.answer.results.map((r) => r.school.label),
+    ["1)", "2)"],
+  );
+  assert.equal(await page.locator(".school-request-card").count(), 2);
+  await cleanMath();
+});
+await test("the full two-box school problem separates the new white-count experiment", async () => {
+  await fresh();
+  const a = await solve(schoolCases.find((c) => c.id === "P01").prompt);
+  await completeAnswer();
+  assert.equal(a.answer.unsolved.length, 0);
+  assert.equal(a.answer.results.length, 5);
+  assert(Math.abs(a.answer.results[0].decimal - 7 / 15) < 1e-10);
+  assert(Math.abs(a.answer.results[1].decimal - 9 / 14) < 1e-10);
+  assert.equal(a.answer.results[4].decimal, 4 / 5);
+  assert.deepEqual(a.answer.context.probability.law.probabilities, [
+    "3/10",
+    "3/5",
+    "1/10",
+  ]);
+  assert.equal(a.answer.context.probability.urn.count, 2);
+  assert.equal(a.answer.context.probability.urn.target, "بيضاء");
+  assert.equal(await page.locator(".school-request-card").count(), 5);
+  assert(
+    a.answer.results[4].steps.some((s) => s.title.includes("القانون المثبت")),
+  );
+  const tree = a.answer.results[0].visuals.find((v) => v.kind === "tree");
+  assert(tree.root.children.every((n) => n.children[0].label === "R"));
+  await cleanMath();
+  await page.screenshot({
+    path: fileURLToPath(new URL("curriculum-boxes-desktop.png", output)),
+    fullPage: true,
+  });
+});
+await test("long school cards retain labels and fit phone widths without raw math errors", async () => {
+  for (const width of [320, 360, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    assert(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth + 1,
+      ),
+    );
+    assert.equal(await page.locator(".school-request-card").count(), 5);
+    const labels = await page
+      .locator(".school-request-card")
+      .evaluateAll((e) => e.map((x) => x.dataset.requestLabel));
+    assert.deepEqual(labels, ["1.", "2.", "3. •", "3. •", "3. •"]);
+    await cleanMath();
+  }
+  await page.screenshot({
+    path: fileURLToPath(new URL("curriculum-boxes-mobile.png", output)),
+    fullPage: true,
+  });
+});
+await test("school source labels, box stock and exact law survive a browser reload", async () => {
+  await page.reload({ waitUntil: "networkidle" });
+  await page.locator(".school-request-card").first().waitFor();
+  assert.equal(await page.locator(".school-request-card").count(), 5);
+  const a = await lastTurn();
+  assert.deepEqual(a.answer.context.probability.law.probabilities, [
+    "3/10",
+    "3/5",
+    "1/10",
+  ]);
+  assert(a.answer.context.school.urns.U1);
+  await cleanMath();
+});
+await test("missing quantities yield only one visible clarification while other parts are listed pending", async () => {
+  await fresh();
+  const a = await solve(
+    "المطلوب:\n1. احسب S=z1^12+z2^12 مستخدما الشكل الأسي.\n2. استنتج الشكل الأسي له.",
+  );
+  await page
+    .locator(".assistant-message")
+    .last()
+    .locator(".clarification-card")
+    .waitFor();
+  assert.equal(a.answer.results.length, 0);
+  assert(a.answer.unsolved.length >= 2);
+  assert.equal(await page.locator(".clarification-card").count(), 1);
+  assert.equal(await page.locator(".verified-badge").count(), 0);
+  assert.equal(await page.locator(".school-pending").count(), 1);
+});
+await test("exact numerical answers remain primary and decimal display opens only on request", async () => {
+  await fresh();
+  await solve("جد المسافة بين A(0,0,0) وB(1,1,0)");
+  await completeAnswer();
+  const detail = page.locator(".answer-decimal");
+  assert.equal(await detail.getAttribute("open"), null);
+  await detail.locator("summary").click();
+  assert.notEqual(await detail.getAttribute("open"), null);
+  await cleanMath();
+});
+await test("affine induction displays base hypothesis and transfer and refuses a false claim", async () => {
+  await fresh();
+  const a = await solve(schoolCases.find((c) => c.id === "S03").prompt);
+  await completeAnswer();
+  assert.equal(a.answer.unsolved.length, 0);
+  const text = a.answer.results[0].steps.map((s) => s.title).join(" ");
+  assert(
+    text.includes("البداية") &&
+      text.includes("فرض") &&
+      text.includes("الانتقال"),
+  );
+  await cleanMath();
+  const b = await solve("u_0=1 وu_{n+1}=2u_n+3، أثبت بالتدريج أن u_n=4*2^n-2");
+  await page
+    .locator(".assistant-message")
+    .last()
+    .locator(".clarification-card")
+    .waitFor();
+  assert.equal(b.answer.results.length, 0);
+  assert.equal(
+    await page
+      .locator(".assistant-message")
+      .last()
+      .locator(".verified-badge")
+      .count(),
+    0,
+  );
+});
+await test("school uniqueness and derived integrals use actual proofs and calculus models", async () => {
+  await fresh();
+  let a = await solve(schoolCases.find((c) => c.id === "F06").prompt);
+  await completeAnswer();
+  assert.equal(a.answer.unsolved.length, 0);
+  assert(
+    a.answer.results[0].steps.some((s) => s.title.includes("القيم المتوسطة")),
+  );
+  assert(a.answer.results[0].steps.some((s) => s.title.includes("الرتابة")));
+  await cleanMath();
+  a = await solve(
+    "ليكن f(x)=x وg(x)=x^2.\nالمطلوب:\nأ) احسب مساحة الحيز بين المنحنيين في الفترة [0,1].\nب) احسب الحجم الدوراني حول محور الفواصل في الفترة [0,1].\nج) احسب القيمة الوسطى للتابع f في الفترة [0,1].",
+  );
+  await completeAnswer();
+  assert.equal(a.answer.unsolved.length, 0);
+  assert.equal(a.answer.results.length, 3);
+  assert(Math.abs(a.answer.results[0].decimal - 1 / 6) < 1e-9);
+  assert(Math.abs(a.answer.results[1].decimal - Math.PI / 3) < 1e-9);
+  assert(Math.abs(a.answer.results[2].decimal - 1 / 2) < 1e-9);
+  assert(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth + 1,
+    ),
+  );
+  await cleanMath();
+});
+await test("the in-app capability guide states limits and inserts examples without auto-solving", async () => {
+  await fresh();
+  await tool("دليل قدرات التطبيق");
+  await page
+    .getByRole("dialog", { name: "قدرات التطبيق وحدود الدعم", exact: true })
+    .waitFor();
+  await page.locator(".curriculum-guide").waitFor();
+  assert.equal(await page.locator(".curriculum-guide section").count(), 9);
+  assert(
+    (await page.locator(".curriculum-guide").innerText()).includes(
+      "غير مدعومة",
+    ),
+  );
+  await page
+    .locator(".curriculum-guide section")
+    .first()
+    .getByRole("button")
+    .click();
+  assert.equal(await page.getByRole("dialog").count(), 0);
+  assert.equal(await page.locator(".assistant-message").count(), 0);
+  assert((await page.locator(".smart-prompt").innerText()).trim().length > 10);
+});
+
 // Verbatim Syrian textbook statement, copied formatting and reviewed image input.
 const textbookQuestion = JSON.parse(
   await readFile(

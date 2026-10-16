@@ -1,3 +1,4 @@
+import SpaceFigure from "../geometry/SpaceFigure";
 import { useId } from "react";
 import type {
   CurveVisual,
@@ -300,6 +301,7 @@ function Branch({ node }: { node: TreeNode }) {
   );
 }
 function Draw({ visual }: { visual: Visual }) {
+  if (visual.kind === "space") return <SpaceFigure visual={visual} />;
   if (visual.kind === "curve") return <Curve visual={visual} />;
   if (visual.kind === "histogram") return <Histogram visual={visual} />;
   if (visual.kind === "table")

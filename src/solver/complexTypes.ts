@@ -18,6 +18,7 @@ export type ComplexOperation =
   | "theorem";
 export interface ComplexRequest {
   operation: ComplexOperation;
+  measure?: "modulus" | "argument";
   form?: "algebraic" | "trigonometric" | "exponential" | "all";
   targetName?: string;
   formTargets?: { name: string; expression: string }[];
@@ -63,7 +64,7 @@ export type ComplexAnswer = Pick<
 export const COMPLEX_EXPLICIT =
   /عقدي|اويلر|اولر|د[يو]\s*موا?فر|ديموافر|ℂ|¢|\bC\b|\bi\b|(?:\d|\))i\b|\bz(?:_?[A-Z]|[1-9])?\b/;
 export const COMPLEX_ACTION =
-  /شكل|صيغة|صيغ|اسي|جبري|مثلثي|مرافق|مقلوب|قوة|قوته|قوي|قوى|جذور|جذر|مثله|تمثيل|انسحاب|تحاكي|دوران|زاوية|عمدة|طويلة|مسافة|اجمع|اطرح|اقسم/;
+  /شكل|صيغة|صيغ|اسي|جبري|مثلثي|مرافق|مقلوب|قوة|قوته|قوي|قوى|جذور|جذر|مثله|تمثيل|انسحاب|تحاكي|دوران|زاوية|عمدة|طويلة|مقياس|arg|abs|مسافة|اجمع|اطرح|اقسم/;
 export function isComplexIntent(text: string, followUp = false): boolean {
   const plane3D =
     /جملة|نظام/.test(text) ||

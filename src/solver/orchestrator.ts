@@ -1,3 +1,11 @@
+import {
+  prepareSchoolContext,
+  runSchoolProbability,
+  schoolUnimplemented,
+  partInfo,
+} from "./schoolRuntime";
+import { schoolIntent } from "./schoolDocument";
+import type { SchoolPart } from "./schoolTypes";
 import { parsePrompt } from "./parser";
 import { routePrompt, selectEngines } from "./router";
 import { clarificationChoices, composeAnswer } from "./composer";
@@ -41,8 +49,72 @@ export async function solvePrompt(
     );
   progress?.({ stage: "analyzing", engines: [] });
   const { runEngine } = await import("./runners");
-  for (let request of parsed.requests.slice(0, 12)) {
-    context = parsePrompt(request, context).context;
+  try {
+    context = await prepareSchoolContext(parsed.preamble || "", context);
+  } catch (error) {
+    return composeAnswer(
+      question,
+      [],
+      [
+        {
+          request: question,
+          message:
+            error instanceof Error && /[\u0600-\u06ff]/.test(error.message)
+              ? error.message
+              : "تعذّر قراءة التعريف الرياضي؛ هل يمكنك إكمال العبارة والأقواس؟",
+          choices: [],
+        },
+      ],
+      [],
+      context,
+      performance.now() - started,
+    );
+  }
+  const parts: SchoolPart[] =
+    parsed.parts ||
+    parsed.requests.map((text) => ({
+      text,
+      title: text,
+      label: "",
+      intent: schoolIntent(text),
+      setup: false,
+      depends: /استنتج|النتيجة السابقة|الطلب السابق/.test(text),
+    }));
+  let previousFailed = false,
+    demands = 0;
+  for (const [partIndex, part] of parts.entries()) {
+    if (!part.setup && ++demands > 12) break;
+    let request = part.text;
+    const info = partInfo(part);
+    if (part.depends && previousFailed) {
+      unsolved.push({
+        request,
+        school: info,
+        message:
+          "يعتمد هذا الطلب على نتيجة لم تكتمل؛ أكمل معطيات الطلب السابق أولًا.",
+        choices: [],
+      });
+      continue;
+    }
+    try {
+      context = parsePrompt(request, context).context;
+      context = await prepareSchoolContext(request, context);
+      schoolUnimplemented(request);
+    } catch (error) {
+      unsolved.push({
+        request,
+        school: info,
+        message:
+          error instanceof Error && /[\u0600-\u06ff]/.test(error.message)
+            ? error.message
+            : "تعذّر قراءة التعريف الرياضي؛ هل يمكنك إكمال العبارة والأقواس؟",
+        choices: [],
+      });
+      previousFailed = true;
+      continue;
+    }
+    if (part.setup) continue;
+    previousFailed = false;
     if (
       /^(?:(?:لتكن|ضع|حيث)\s*)?[a-dkmpqrt]\s*=\s*-?\d+(?:\.\d+)?$/.test(request)
     )
@@ -71,6 +143,7 @@ export async function solvePrompt(
     if (!selected.length) {
       unsolved.push({
         request,
+        school: info,
         message:
           "هل تريد حساب قيمة، أم حل معادلة، أم دراسة دالة؟ لا توجد معطيات كافية لاختيار حل موثوق.",
         choices: clarificationChoices(ranked),
@@ -81,12 +154,32 @@ export async function solvePrompt(
     const completed: SolverResult[] = [];
     const group = await Promise.allSettled(
       selected.map(async (engine) => {
-        const value = await runEngine(
-          engine,
-          request,
-          context,
-          options.angleMode,
-        );
+        const namedProbability =
+          engine === "probabilityEngine" || engine === "probabilityTools"
+            ? await runSchoolProbability(request, context)
+            : undefined;
+        const prefix =
+          partIndex === 0 &&
+          parsed.preamble &&
+          [
+            "complexEngine",
+            "complexTools",
+            "geometryEngine",
+            "geometryTools",
+            "probabilityEngine",
+            "sequences",
+          ].includes(engine)
+            ? parsed.preamble + "\n"
+            : "";
+        const value =
+          namedProbability ||
+          (await runEngine(
+            engine,
+            prefix + request,
+            context,
+            options.angleMode,
+          ));
+        value.school = info;
         completed.push(value);
         progress?.({
           stage: "verifying",
@@ -111,6 +204,7 @@ export async function solvePrompt(
           lastPrompt: request,
         };
       } else {
+        previousFailed = true;
         const error: unknown = value.reason;
         const message =
           error instanceof Error && /[\u0600-\u06ff]/.test(error.message)
@@ -118,6 +212,7 @@ export async function solvePrompt(
             : "تعذّر إكمال هذا الجزء بهذه الصيغة. تحقق من المعطيات ومجال التعريف.";
         unsolved.push({
           request,
+          school: info,
           engine: selected[index],
           message,
           choices:
@@ -142,7 +237,7 @@ export async function solvePrompt(
         ? ["جد مشتقة الدالة", "ارسم المنحنى", "أوجد الدالة الأصلية للدالة"]
         : [],
     });
-  if (parsed.requests.length > 12)
+  if (parts.filter((p) => !p.setup).length > 12)
     unsolved.push({
       request: "الطلبات المتبقية",
       message: "قُرئت أول 12 فقرة. أرسل بقية الطلبات في رسالة جديدة.",

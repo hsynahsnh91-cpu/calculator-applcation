@@ -6,26 +6,29 @@
     "complex": 52,
     "probability": 108,
     "textbook": 37,
-    "passed": 335,
+    "geometry": 140,
+    "curriculum": 83,
+    "schoolSafety": 38,
+    "passed": 596,
     "failed": 0
   },
   "browser": {
     "http": {
-      "passed": 72,
+      "passed": 100,
       "failed": 0,
       "externalRequests": 0,
       "uncaughtErrors": 0
     },
     "file": {
-      "passed": 72,
+      "passed": 100,
       "failed": 0,
       "externalRequests": 0,
       "uncaughtErrors": 0
     }
   },
   "build": {
-    "htmlBytes": 16855426,
-    "sha256": "269a91ec0d5199135116ef12b84537f4bf7dc4cd2059633fe52b74fd5a86601b",
+    "htmlBytes": 17025877,
+    "sha256": "7f57bdfb8ea7678349572a65a9d6a346f28356ad744f90a0058e69543dd60248",
     "separateRuntimeFiles": 0,
     "embeddedLicenseNotices": 48
   },
@@ -39,7 +42,13 @@
     "Exact rational arithmetic is bounded; binomial and normal distributions use finite-precision approximations. Underflow does not imply a mathematically impossible event or a verified zero variance.",
     "Independent numerical checks are not proofs; unsupported or ambiguous cases ask for clarification.",
     "Textbook and dialect support is rule-based and bounded, not a guarantee for all wording or dialects. Missing or ambiguous data still requires clarification.",
-    "Textbook image test uses real local OCR followed by explicit human review/correction. The radical was recognized as Vv3 in the printed fixture; mathematical OCR is not assumed infallible."
+    "Textbook image test uses real local OCR followed by explicit human review/correction. The radical was recognized as Vv3 in the printed fixture; mathematical OCR is not assumed infallible.",
+    "Spatial geometry assumes an orthonormal frame for metric formulas; a nonorthonormal frame without Gram data is not silently treated as orthonormal.",
+    "Spatial algebra is bounded: at most three radical primes/eight terms; finite inputs up to 1e9; drawing values up to 1e12. Unsupported nested radicals and excess expression complexity require clarification.",
+    "Spatial diagrams are projections, not geometric proofs. Matrix bridges are explicitly numerical while exact coordinate models remain stored.",
+    "Curriculum conformity is not certified: official catalog access did not provide a complete verified ministry textbook edition.",
+    "School proofs are bounded: affine closed-form induction, selected geometric criteria, and polynomial IVT/monotonicity. Not a general proof or full function-study engine.",
+    "School corpus includes 18 expected clarifications and one partial success; passing these tests does not imply support for their unsupported mathematical topics."
   ],
   "environment": {
     "node": "22.22.3",
@@ -49,6 +58,22 @@
   },
   "supplementaryDocumentationSmoke": {
     "passed": 23,
+    "geometryPassed": 27,
+    "curriculumExamplesPassed": 11,
+    "failed": 0
+  },
+  "schoolBaseline": {
+    "questions": 83,
+    "passed": 54,
+    "failed": 29,
+    "originalNodeTestsPassed": 475
+  },
+  "schoolCorpus": {
+    "questions": 83,
+    "solvedCompletelyExpected": 64,
+    "partialSuccessExpected": 1,
+    "clarificationExpected": 18,
+    "passed": 83,
     "failed": 0
   }
 }

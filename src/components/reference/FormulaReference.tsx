@@ -15,6 +15,94 @@ interface FormulaItem {
 }
 
 const FORMULA_DATABASE: FormulaItem[] = [
+  {
+    id: "space_coordinates",
+    category: "الهندسة الفراغية",
+    title: "إحداثيات الشعاع والمسافة في الفضاء",
+    latex:
+      "\\overrightarrow{AB}=(x_B-x_A,y_B-y_A,z_B-z_A),\\quad AB=\\|\\overrightarrow{AB}\\|",
+    description:
+      "الصيغ المترية في معلم متعامد متجانس؛ عكس الاتجاه لا يغير الطول.",
+  },
+  {
+    id: "space_dependence",
+    category: "الهندسة الفراغية",
+    title: "الارتباط الخطي والاستقامة والاستواء",
+    latex:
+      "\\vec u\\times\\vec v=\\vec0,\\quad\\det(\\vec u,\\vec v,\\vec w)=0",
+    description:
+      "الأول شرط ارتباط شعاعين، والثاني ارتباط ثلاثة. مع أشعة من نقطة مشتركة نستنتج استقامة3 نقاط أو استواء4 نقاط. المعدوم لا يحدد اتجاهًا.",
+  },
+  {
+    id: "space_barycenter",
+    category: "الهندسة الفراغية",
+    title: "مركز الأبعاد المتناسبة والتجميع",
+    latex:
+      "G=\\frac{\\sum_i\\alpha_i A_i}{\\sum_i\\alpha_i},\\quad\\sum_i\\alpha_i\\ne0,\\quad\\sum_i\\alpha_i\\overrightarrow{GA_i}=\\vec0",
+    description:
+      "الأوزان المتساوية تعطي مركز الثقل. لتجميع مجموعة فرعية يجب ألا يكون مجموع أوزانها صفرًا.",
+  },
+  {
+    id: "space_dot",
+    category: "الهندسة الفراغية",
+    title: "الجداء السلمي والتعامد",
+    latex:
+      "\\vec u\\cdot\\vec v=u_1v_1+u_2v_2+u_3v_3=\\|u\\|\\|v\\|\\cos\\theta",
+    description:
+      "تكون زاوية الشعاعين معرفة إذا كانا غير معدومين. اتجاهان متعامدان لا يثبتان تقاطع مستقيمين متخالفين.",
+  },
+  {
+    id: "space_plane",
+    category: "الهندسة الفراغية",
+    title: "المستوي وشعاعه الناظم",
+    latex: "P:ax+by+cz+d=0,\\quad\\vec n=(a,b,c)\\ne\\vec0",
+    description:
+      "ثلاث نقاط غير مستقيمة تعطي ناظمًا بالجداء الشعاعي؛ ثلاث نقاط مستقيمة لا تعطي مستويًا وحيدًا.",
+  },
+  {
+    id: "space_parametric",
+    category: "الهندسة الفراغية",
+    title: "التمثيل البارامتري للمستقيم",
+    latex:
+      "M=A+t\\vec u,\\quad\\begin{cases}x=x_A+tu_1\\\\y=y_A+tu_2\\\\z=z_A+tu_3\\end{cases},\\quad\\vec u\\ne\\vec0",
+    description:
+      "الوسيط نفسه في الإحداثيات الثلاث. الشروط الخاصة باتجاهين معدومين لا تعرّف مستقيمين.",
+  },
+  {
+    id: "space_relative",
+    category: "الهندسة الفراغية",
+    title: "أوضاع المستقيم والمستوي",
+    latex: "P(A+t\\vec u)=(\\vec n\\cdot\\vec u)t+(\\vec n\\cdot A+d)",
+    description:
+      "إذا كان معامل الوسيط غير معدوم فتقاطع وحيد؛ إذا انعدم نختبر الحد الثابت للاحتواء أو التوازي.",
+  },
+  {
+    id: "space_point_plane",
+    category: "الهندسة الفراغية",
+    title: "بعد نقطة عن مستوٍ ومسقطها العمودي",
+    latex:
+      "d(M,P)=\\frac{|ax_M+by_M+cz_M+d|}{\\sqrt{a^2+b^2+c^2}},\\quad H=M-\\frac{ax_M+by_M+cz_M+d}{a^2+b^2+c^2}\\vec n",
+    description:
+      "فحص انتماء H وتوازي MH مع الناظم يوفر تحققًا مستقلًا من قانون البعد.",
+  },
+  {
+    id: "space_sphere",
+    category: "الهندسة الفراغية",
+    title: "المعادلة الديكارتية للكرة وقطرها",
+    latex:
+      "(x-a)^2+(y-b)^2+(z-c)^2=R^2,\\quad K=\\frac{A+B}{2},\\quad R^2=\\frac{AB^2}{4}",
+    description:
+      "المركز K(a,b,c). معاملات الحدود التربيعية متساوية، ولا حدود مختلطة؛ R²<0 لا يعطي كرة حقيقية.",
+  },
+  {
+    id: "space_volume",
+    category: "الهندسة الفراغية",
+    title: "حجم رباعي الوجوه والارتفاع",
+    latex:
+      "V_{ABCD}=\\frac16|\\det(\\overrightarrow{AB},\\overrightarrow{AC},\\overrightarrow{AD})|=\\frac13 S_{ABC}h",
+    description:
+      "حجم متوازي السطوح هو قيمة المحدد المطلقة بلا قسمة6. إذا كانت القاعدة مستقيمة فلا تعطي مستويًا وحيدًا للارتفاع.",
+  },
   // Trigonometry
   {
     id: "trig_pythagoras",
