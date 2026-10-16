@@ -1,10 +1,10 @@
 {
   "corpus": {
-    "total": 84,
-    "completeExpected": 70,
+    "total": 92,
+    "completeExpected": 78,
     "clarificationExpected": 14
   },
-  "passed": 161,
+  "passed": 177,
   "failed": 0,
   "results": [
     {
@@ -344,6 +344,38 @@
       "pass": true
     },
     {
+      "name": "school M85: محددا مصفوفتين",
+      "pass": true
+    },
+    {
+      "name": "school M86: أثرا مصفوفتين",
+      "pass": true
+    },
+    {
+      "name": "school M87: منقولا مصفوفتين",
+      "pass": true
+    },
+    {
+      "name": "school M88: عبارتان حسابيتان مستقلتان",
+      "pass": true
+    },
+    {
+      "name": "school M89: مصفوفة بأسطر منقوطة",
+      "pass": true
+    },
+    {
+      "name": "school M90: رتبة ومحدد بالاسم نفسه",
+      "pass": true
+    },
+    {
+      "name": "school M91: ثلاث معادلات في مجهولين",
+      "pass": true
+    },
+    {
+      "name": "school M92: جملة بوسيطي التقاطع",
+      "pass": true
+    },
+    {
       "name": "independent exact determinant/inverse/row reduction, order 1",
       "pass": true
     },
@@ -649,6 +681,38 @@
     },
     {
       "name": "complete LaTeX systems render as one mathematical block instead of two hidden fallback messages",
+      "pass": true
+    },
+    {
+      "name": "Gauss checks an extra contradictory equation instead of solving only a convenient pair",
+      "pass": true
+    },
+    {
+      "name": "two equations in three unknowns produce the entire verified affine family",
+      "pass": true
+    },
+    {
+      "name": "free parameters never collide with t and s as actual unknown names",
+      "pass": true
+    },
+    {
+      "name": "Cramer explicitly refuses a rectangular system rather than inventing a determinant",
+      "pass": true
+    },
+    {
+      "name": "rectangular CX=B uses the actual RHS, coefficient name and every row",
+      "pass": true
+    },
+    {
+      "name": "a specifically named augmented operand overrides an unrelated saved system",
+      "pass": true
+    },
+    {
+      "name": "school-system givens survive a formatted preamble and both requested methods",
+      "pass": true
+    },
+    {
+      "name": "rectangular-system storage remains bounded and saved t/s solutions stay usable in arithmetic",
       "pass": true
     }
   ]

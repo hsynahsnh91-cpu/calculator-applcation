@@ -1,3 +1,4 @@
+import { prepareSpaceContext } from "./extractors/geometry";
 import { prepareMatrixContext, matrixIntent } from "./extractors/matrices";
 import {
   ClarificationError,
@@ -78,6 +79,7 @@ export async function prepareSchoolContext(
   }
 
   context = prepareMatrixContext(declarations, context);
+  context = prepareSpaceContext(declarations, context);
 
   for (const m of declarations.matchAll(
     /\b([fgh])\s*\(\s*([a-z])\s*\)\s*=\s*/g,
@@ -472,7 +474,7 @@ export function schoolUnimplemented(text: string, context?: SolverContext) {
   if (
     /اثبت|بين ان|برهن/.test(text) &&
     !matrixIntent(text, context) &&
-    !/مصفوف|تبادلي|متبادل|قابلة للقلب|قابلة للعكس|\b[A-Z]\s*\*?\s*[A-Z]\s*(?:=|!=|≠)|بالتدريج|\bv_n\b|مستقل|استقامة|استواء|مستوية|مرتبط|تعامد|متعامد|ناظم|مماس|تماس|تلاقي|مركز الثقل|مركز الابعاد|التجميع|حل(?:ا)? وحيد|حلا وحيدا|وجود حل وحيد/.test(
+    !/مصفوف|تبادلي|متبادل|قابلة للقلب|قابلة للعكس|\b[A-Z]\s*\*?\s*[A-Z]\s*(?:=|!=|≠)|بالتدريج|\bv_n\b|مستقل|استقامة|استواء|مستوية|مستو(?:ي)? (?:واحد|1)|اساس.*فراغ|مرتبط|تعامد|متعامد|ناظم|مماس|تماس|تلاقي|مركز الثقل|مركز الابعاد|التجميع|حل(?:ا)? وحيد|حلا وحيدا|وجود حل وحيد/.test(
       text,
     )
   )

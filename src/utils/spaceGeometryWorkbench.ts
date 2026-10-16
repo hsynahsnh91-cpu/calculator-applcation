@@ -1,4 +1,4 @@
-import type { MatrixContext } from "../solver/matrixTypes";
+import { bridgeMatrixName, type MatrixContext } from "../solver/matrixTypes";
 import type {
   GeometryContext,
   SpaceAnswer,
@@ -490,6 +490,17 @@ export function solveSpaceRequest(
           "عندما تنخفض الرتبة لا يعني ذلك أن المستقيم أو المستوي الحامل وحيد، خاصة عند تكرار النقاط.",
         ),
       ];
+      if (vectors.length === 3 && input.operation === "dependence")
+        out.steps.push(
+          step(
+            "دلالة الرتبة في فضاء ثلاثي الأبعاد",
+            text(
+              d.rank === 3
+                ? "ثلاثة أشعة مستقلة في الفراغ تشكل أساسًا؛ أما التعامد والتجانس فيحتاجان شروطًا إضافية."
+                : "هذه الأشعة لا تشكل أساسًا للفراغ لأن رتبتها أقل من ثلاثة.",
+            ),
+          ),
+        );
       if (d.dependent)
         out.steps.push(
           step(
@@ -525,7 +536,7 @@ export function solveSpaceRequest(
           points.reduce((s, p, i) => add(s, scale(p, weights[i])), origin()),
           sum.inv(),
         ),
-        target = freshPoint("G");
+        target = freshPoint(input.outputName || "G");
       addPoint(target, g);
       activePoints = [target, ...input.points];
       out.title = "مركز الأبعاد المتناسبة";
@@ -637,6 +648,11 @@ export function solveSpaceRequest(
       scalar = d;
       out.title = "الجداء السلمي والتعامد";
       out.finalLatex = T`${labelV(input.vectors[0])}\cdot${labelV(input.vectors[1])}=${d.tex()}`;
+      if (!zeroV(u) && !zeroV(v))
+        out.finalLatex = aligned([
+          out.finalLatex,
+          text(d.zero() ? "الشعاعان متعامدان" : "الشعاعان غير متعامدين"),
+        ]);
       out.steps = [
         step(
           "الصيغة التحليلية",
@@ -874,7 +890,7 @@ export function solveSpaceRequest(
       addLine(name, l);
       activeLines = [name];
       out.title = "التمثيل البارامتري للمستقيم";
-      out.finalLatex = lineTex(l);
+      out.finalLatex = T`${cleanName(name)}:\quad ${lineTex(l)}`;
       out.steps = [
         step(
           "نقطة وشعاع توجيه",
@@ -1349,23 +1365,37 @@ export function solveSpaceRequest(
           return n;
         }),
       );
+      const cells = rows.map((r) => r.map((c) => c.text())),
+        alias = bridgeMatrixName(previousMatrices?.values, cells);
+      if (input.operation === "matrix")
+        out.finalLatex = out.finalLatex.replace(/^M=/, `${alias}=`);
       out.contextPatch = {
         matrix,
         matrices: {
           values: {
             ...previousMatrices?.values,
-            M: rows.map((r) => r.map((c) => c.text())),
+            [alias]: cells,
           },
-          active: "M",
+          active: alias,
           origin: "geometry",
           scalarFactor: previousMatrices?.scalarFactor,
+          system:
+            input.operation === "line-system"
+              ? {
+                  coefficients: rows.map((r) =>
+                    r.slice(0, -1).map((c) => c.text()),
+                  ),
+                  constants: rows.map((r) => r[r.length - 1].text()),
+                  variables: ["t", "s"],
+                }
+              : undefined,
         },
       };
       out.steps = [
         step(
           "جسر إلى محرك المصفوفات",
           out.finalLatex,
-          "نُقلت الإحداثيات الجبرية الدقيقة إلى المصفوفة M، مع جسر عددي متوافق. يمكنك طلب المنقول أو الرتبة أو العودة إلى الأشعة. الأعمدة في الجملة هي معامل t ثم معامل s ثم الطرف الأيمن.",
+          `نُقلت الإحداثيات الجبرية الدقيقة إلى المصفوفة ${alias}، دون استبدال مصفوفة مسماة مختلفة. يمكنك طلب المنقول أو الرتبة أو العودة إلى الأشعة. الأعمدة في الجملة هي معامل t ثم معامل s ثم الطرف الأيمن.`,
         ),
       ];
       break;
@@ -1476,7 +1506,7 @@ export function solveSpaceRequest(
           "تمييز الأبعاد",
           Object.entries(d)
             .map(([k, v]) => `${k}=${v.tex()}`)
-            .join(T`\quad`),
+            .join(T`\quad `),
           s.id === "pyramid"
             ? "هذا هرم رباعي منتظم قاعدته مربعة والارتفاع عمودي، لا هرمًا عامًا بلا معلومات عن القاعدة."
             : s.id === "triangularPrism"

@@ -17,7 +17,55 @@ const fail = (s: string): never => {
 const namedUnary = String.raw`(?:(?:ال)?(?:محدد|اثر|منقول|مبدلة|معكوس|مقلوب|ملحقة|رتبة)(?:\s+(?:ال)?مصفوفة)?\s+[A-Z](?![A-Za-z0-9_])|(?:det|tr|trace|inv|adj|rank)\s*\(\s*[A-Z]\s*\))`;
 /** Split only explicit, independently named unary demands, never an arithmetic AST. */
 export function splitMatrixDemands(text: string): string[] {
-  const demand = mathInstructionText(text);
+  const demand = mathInstructionText(text),
+    at = text.indexOf(demand);
+  const plural = demand.match(
+    /^(?:احسب|جد|اوجد|عين|اكتب)\s+(محدد(?:ي|ات)|اثر(?:ي|ا)|منقول(?:ي|ات)|معكوس(?:ي|ات)|مقلوب(?:ي|ات)|رتب)\s+(?:المصفوفتين|المصفوفات)\s+([A-Zو\s،,]+)[؟?]?$/,
+  );
+  if (plural) {
+    const names = plural[2]
+      .split(/\s*[,،]\s*|\s+و\s*/)
+      .map((n) => n.trim())
+      .filter(Boolean);
+    if (
+      names.length >= 2 &&
+      names.length <= 6 &&
+      new Set(names).size === names.length &&
+      names.every((n) => /^[A-Z]$/.test(n))
+    ) {
+      const unary = plural[1].startsWith("محدد")
+        ? "محدد"
+        : plural[1].startsWith("اثر")
+          ? "اثر"
+          : plural[1].startsWith("منقول")
+            ? "منقول"
+            : plural[1].startsWith("رتب")
+              ? "رتبة"
+              : "معكوس";
+      return names.map(
+        (n, i) =>
+          `${i === 0 && at > 0 ? text.slice(0, at) : ""}احسب ${unary} المصفوفة ${n}`,
+      );
+    }
+  }
+  const arithmetic = demand.replace(/^(?:احسب|جد|اوجد|بسط)\s+/, "");
+  if (!/[=\[\]]/.test(arithmetic) && /\s+و/.test(arithmetic)) {
+    const expressions = arithmetic.split(/\s+و\s*/);
+    if (
+      expressions.length >= 2 &&
+      expressions.length <= 12 &&
+      expressions.every(
+        (e) =>
+          /^[A-Z0-9()+*/^'\s-]+$/.test(e) &&
+          /[A-Z]/.test(e) &&
+          /[+*^'/-]/.test(e),
+      )
+    )
+      return expressions.map(
+        (e, i) =>
+          `${i === 0 && at > 0 ? text.slice(0, at) : ""}احسب ${e.trim()}`,
+      );
+  }
   if (
     !new RegExp(namedUnary).test(demand) ||
     /اثبت|برهن|بين ان|تحقق/.test(demand) ||
@@ -194,10 +242,14 @@ export function prepareMatrixContext(
     /\[\s*\[|\\begin\{[pbvV]?matrix\}|مصفوف|\b[A-Z]\s*=\s*[[(][^\n]*[;؛]/.test(
       text,
     );
-  if (!matrixSyntax && !context.matrices) return context;
+  const systemSyntax =
+    /جملة|نظام/.test(text) &&
+    !/مستقيم|مستوي|شعاع|اشعة|نقطة|نقاط|عقدي|احتمال/.test(text);
+  if (!matrixSyntax && !context.matrices && !systemSyntax) return context;
   const defs = matrixSyntax ? matrixDefinitions(text) : [],
-    factor = scalarFactor(text);
-  if (!defs.length && factor === undefined) return context;
+    factor = scalarFactor(text),
+    system = systemSyntax ? systemFromText(text) : undefined;
+  if (!defs.length && factor === undefined && !system) return context;
   const values = { ...context.matrices?.values };
   for (const d of defs) values[d.name] = d.cells;
   const matrices: MatrixContext = {
@@ -205,7 +257,12 @@ export function prepareMatrixContext(
     values,
     active: defs[0]?.name || context.matrices?.active,
     scalarFactor: factor ?? context.matrices?.scalarFactor,
-    origin: defs.length ? "matrix" : context.matrices?.origin,
+    origin: defs.length
+      ? "matrix"
+      : system
+        ? "system"
+        : context.matrices?.origin,
+    system: system ?? (defs.length ? undefined : context.matrices?.system),
   };
   if (!isMatrixContext(matrices))
     return fail("تجاوزت تعريفات المصفوفات حدود السياق المحفوظ.");
@@ -278,32 +335,34 @@ function systemFromText(text: string): MatrixSystem | undefined {
     .flatMap(mathFragments)
     .filter((s) => s.includes("="));
   if (!equations.length) return;
-  if (equations.length < 2 || equations.length > 3)
-    return fail("اكتب معادلتين أو ثلاث معادلات خطية، كل واحدة في سطر مستقل.");
+  if (equations.length < 2 || equations.length > 6)
+    return fail(
+      "اكتب من معادلتين إلى ست معادلات خطية في مجهولين أو ثلاثة، كل واحدة في سطر مستقل.",
+    );
   const expressions = equations.map((e) => {
     const sides = e.split("=");
     if (sides.length !== 2 || !sides[0] || !sides[1])
       return fail("أكمل طرفي كل معادلة في الجملة.");
     return polynomial(`(${sides[0]})-(${sides[1]})`);
   });
-  const axes = ["10000", "01000", "00100"],
-    names = ["x", "y", "z"];
+  const axes = ["10000", "01000", "00100", "00010", "00001"],
+    names = ["x", "y", "z", "t", "s"];
   if (
     expressions.some((p) =>
       [...p.keys()].some((k) => k !== "00000" && !axes.includes(k)),
     )
   )
     return fail(
-      "طريقة غاوس وكرامر هنا لجمل خطية في x وy وz فقط؛ الجملة المدخلة ليست خطية.",
+      "نحتاج جملة خطية في مجهولين أو ثلاثة من x وy وz وt وs؛ توجد حدود غير خطية أو رموز غير مدعومة.",
     );
   const used = axes.filter((_, i) =>
     equations.some((e) =>
       new RegExp(`(?<![A-Za-z_])${names[i]}(?![A-Za-z_])`).test(e),
     ),
   );
-  if (used.length !== equations.length)
+  if (![2, 3].includes(used.length))
     return fail(
-      "عدد المعادلات يساوي عدد المجاهيل: اثنان أو ثلاثة. لا نضيف مجهولًا أو معادلة افتراضية.",
+      "اختر مجهولين أو ثلاثة معلومَي الرموز؛ لا نضيف مجهولًا أو معادلة افتراضية. غاوس يقبل من معادلتين إلى ست، وكرامر يحتاج جملة مربعة.",
     );
   return {
     coefficients: expressions.map((p) =>
@@ -379,6 +438,13 @@ export function extractMatrixRequest(
     return fail(
       "افصل مساواة التحقق أو تعريف النتيجة عن الطلب الآخر؛ اكتب كل عبارة كاملة في سطر مستقل حتى لا نفترض المقصود.",
     );
+  if (
+    /محددي|اثري|منقولي|معكوسي|مقلوبي/.test(demand) &&
+    /المصفوفتين|المصفوفات/.test(demand)
+  )
+    return fail(
+      "اكتب كل عملية مع اسم مصفوفتها في طلب واضح، أو استعمل قائمة أسماء فقط بعد صيغة المثنى؛ لا نسقط بقية المصفوفات أو شروط الطلب.",
+    );
   const operations: MatrixOperation[] = [];
   const add = (op: MatrixOperation) => {
     if (!operations.includes(op)) operations.push(op);
@@ -395,6 +461,10 @@ export function extractMatrixRequest(
     active ||
     names[0] ||
     "A";
+  if (/\b[A-Z](?:_\{?\d+\}?|\d+)(?=$|[^A-Za-z0-9_])/.test(demand))
+    return fail(
+      "أسماء المصفوفات هنا حرف لاتيني كبير واحد، مثل A أو B. اكتب الاسم المطلوب بوضوح؛ لا نستبدل الاسم ذي الفهرس بمصفوفة قديمة.",
+    );
   const matrices: MatrixContext = {
     ...context.matrices,
     values,
@@ -412,7 +482,7 @@ export function extractMatrixRequest(
   if (
     /غاوس|جاوس|كرامر|كريمر/.test(demand) &&
     (/جملة|نظام|معادل|موسعة|السابق/.test(demand) ||
-      /[xyz][^=]*=/.test(demand) ||
+      /[xyzts][^=]*=/.test(demand) ||
       matrixEquation ||
       matrices.system)
   ) {
@@ -423,31 +493,34 @@ export function extractMatrixRequest(
       if (!coefficients || !rhs)
         return fail("عرّف مصفوفة المعاملات وعمود الطرف الأيمن للجملة AX=B.");
       if (
-        ![2, 3].includes(coefficients.length) ||
-        coefficients[0].length !== coefficients.length ||
+        coefficients.length < 2 ||
+        ![2, 3].includes(coefficients[0].length) ||
         rhs.length !== coefficients.length ||
         rhs[0].length !== 1
       )
         return fail(
-          "للجملة AX=B نحتاج معاملات مربعة2×2 أو3×3 وطرفًا أيمن عمودًا بالطول نفسه.",
+          "للجملة AX=B نحتاج عمودين أو ثلاثة للمجاهيل، ومن سطرين إلى ستة، وطرفًا أيمن عمودًا بالطول نفسه؛ كرامر يتطلب تساوي الأسطر والأعمدة.",
         );
       req.systemName = matrixEquation[1];
       system = {
         coefficients,
         constants: rhs.map((r) => r[0]),
-        variables: ["x", "y", "z"].slice(0, coefficients.length),
+        variables: ["x", "y", "z"].slice(0, coefficients[0].length),
       };
-    } else system = systemFromText(text) || matrices.system;
+    } else
+      system =
+        systemFromText(text) ||
+        (/موسعة/.test(demand) && values[name] ? undefined : matrices.system);
     if (!system && values[name]) {
       const a = values[name];
-      if (![2, 3].includes(a.length) || a[0].length !== a.length + 1)
+      if (a.length < 2 || ![3, 4].includes(a[0].length))
         return fail(
-          "لحل جملة من مصفوفة موسعة نحتاج مقاس 2×3 أو3×4، وآخر عمود هو الطرف الأيمن.",
+          "المصفوفة الموسعة لها من سطرين إلى ستة، وثلاثة أو أربعة أعمدة؛ آخر عمود هو الطرف الأيمن.",
         );
       system = {
         coefficients: a.map((r) => r.slice(0, -1)),
         constants: a.map((r) => r[r.length - 1]),
-        variables: ["x", "y", "z"].slice(0, a.length),
+        variables: ["x", "y", "z"].slice(0, a[0].length - 1),
       };
     }
     if (!system)

@@ -121,6 +121,20 @@ PASS Arabic LaTeX cases reach the actual Cramer Worker with all three deltas
 PASS a last-column demand uses column three and an invalid column never falls back to row one
 PASS the exact named factor k reopens in the board and editing it still needs an explicit solve
 PASS a rectangular determinant failure leaves an independent B trace visible as a partial success
+PASS a completed long geometry question scrolls its requested result into view without a reveal tap
+PASS all seven solid controls retain their selected shape and solve genuinely different examples
+PASS normal and parametric-line examples no longer reload the same effective givens
+PASS the six geometry categories and four-point fields fit phones with readable nonzooming inputs
+PASS a reopened named Q/n plane preserves its names and an edited coordinate changes its actual equation
+PASS one plural coordinate request visibly solves both named arrows in source order
+PASS weighted school givens and median concurrence reach real barycenter reasoning, not probability
+PASS the line-system bridge opens a genuine three-equation two-unknown t/s matrix editor
+PASS editing only a third equation changes Gauss to an empty solution and does not advertise stale geometry
+PASS plural matrix language and two arithmetic expressions both produce their requested answers
+PASS a six-row matrix returns through editable spatial vectors without silently losing the last three rows
+PASS loading geometric-dot examples retains the chosen radians and only solves on the explicit action
+PASS probability P(A) still belongs to events after a spatial A/B conversation
+PASS a rectangular Cramer clarification retains its current equations and offers a working Gauss correction
 PASS no external HTTP requests or uncaught browser errors
 
-Browser: 124 passed, 0 failed
+Browser: 138 passed, 0 failed

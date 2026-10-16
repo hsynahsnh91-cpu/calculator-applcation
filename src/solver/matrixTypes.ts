@@ -37,6 +37,31 @@ export function isMatrixCells(v: unknown): v is MatrixCells {
     )
   );
 }
+/** Reuse an identical bridge table, but never overwrite an unrelated named matrix. */
+export function bridgeMatrixName(
+  values: Record<string, MatrixCells> | undefined,
+  cells: MatrixCells,
+): string {
+  const given = values || {},
+    serial = JSON.stringify(cells);
+  const hasM = Object.prototype.hasOwnProperty.call(given, "M");
+  if (
+    (hasM && JSON.stringify(given.M) === serial) ||
+    (!hasM && Object.keys(given).length < 12)
+  )
+    return "M";
+  const same = Object.entries(given).find(
+    ([, m]) => JSON.stringify(m) === serial,
+  )?.[0];
+  if (same) return same;
+  if (Object.keys(given).length >= 12)
+    throw new Error(
+      "وصل السياق إلى 12 مصفوفة مسماة؛ ابدأ محادثة جديدة قبل إضافة مصفوفة الجسر حتى لا نفقد معطيات سابقة.",
+    );
+  return [...new Set("MNABCDEFGHIJKLMNOPQRSTUVWXYZ")].find(
+    (n) => !Object.prototype.hasOwnProperty.call(given, n),
+  )!;
+}
 export function isMatrixContext(v: unknown): v is MatrixContext {
   return (
     record(v) &&
@@ -57,18 +82,16 @@ export function isMatrixContext(v: unknown): v is MatrixContext {
     (v.system === undefined ||
       (record(v.system) &&
         isMatrixCells(v.system.coefficients) &&
-        [2, 3].includes(v.system.coefficients.length) &&
-        v.system.coefficients.every(
-          (r) => r.length === (v.system as MatrixSystem).coefficients.length,
-        ) &&
+        v.system.coefficients.length >= 2 &&
+        [2, 3].includes(v.system.coefficients[0].length) &&
         Array.isArray(v.system.constants) &&
         v.system.constants.length === v.system.coefficients.length &&
         v.system.constants.every(scalar) &&
         Array.isArray(v.system.variables) &&
-        v.system.variables.length === v.system.constants.length &&
+        v.system.variables.length === v.system.coefficients[0].length &&
         new Set(v.system.variables).size === v.system.variables.length &&
         v.system.variables.every(
-          (n) => typeof n === "string" && /^[xyz]$/.test(n),
+          (n) => typeof n === "string" && /^[xyzts]$/.test(n),
         )))
   );
 }

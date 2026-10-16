@@ -44,7 +44,7 @@ function context(value: unknown, partial = false): boolean {
       (record(value.solutions) &&
         Object.keys(value.solutions).length <= 3 &&
         Object.entries(value.solutions).every(
-          ([key, entry]) => /^[xyz]$/.test(key) && finite(entry),
+          ([key, entry]) => /^[xyzts]$/.test(key) && finite(entry),
         ))) &&
     (value.complex === undefined ||
       (record(value.complex) &&

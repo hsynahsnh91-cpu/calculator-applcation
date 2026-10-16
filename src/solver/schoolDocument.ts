@@ -117,7 +117,9 @@ export function readSchoolDocument(source: string): SchoolDocument | undefined {
         intent: setup ? "setup" : schoolIntent(text),
         depends:
           i > 0 ||
-          /استنتج|النتيجة السابقة|الطلب السابق|بدلالة/.test(normalized),
+          /استنتج|النتيجة السابقة|الطلب السابق|الجملة السابقة|المصفوفة السابقة|الارتفاع السابق|البعد السابق|بدلالة/.test(
+            normalized,
+          ),
         setup,
       });
     });

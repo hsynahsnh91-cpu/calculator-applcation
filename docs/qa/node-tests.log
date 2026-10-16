@@ -713,6 +713,14 @@ PASS school M81: فعل اضرب وجذر حقيقي
 PASS school M82: معامل k ناقص
 PASS school M83: بداية cases غير مكتملة
 PASS school M84: تعريفان مختلفان للمعامل k
+PASS school M85: محددا مصفوفتين
+PASS school M86: أثرا مصفوفتين
+PASS school M87: منقولا مصفوفتين
+PASS school M88: عبارتان حسابيتان مستقلتان
+PASS school M89: مصفوفة بأسطر منقوطة
+PASS school M90: رتبة ومحدد بالاسم نفسه
+PASS school M91: ثلاث معادلات في مجهولين
+PASS school M92: جملة بوسيطي التقاطع
 PASS independent exact determinant/inverse/row reduction, order 1
 PASS independent exact determinant/inverse/row reduction, order 2
 PASS independent exact determinant/inverse/row reduction, order 3
@@ -790,5 +798,108 @@ PASS a given exact factor survives the matrix/vector bridge and its return
 PASS an unrelated coordinate tuple cannot overwrite a previous named matrix when saving k
 PASS preserving the command اضرب does not break spoken multiplication
 PASS complete LaTeX systems render as one mathematical block instead of two hidden fallback messages
+PASS Gauss checks an extra contradictory equation instead of solving only a convenient pair
+PASS two equations in three unknowns produce the entire verified affine family
+PASS free parameters never collide with t and s as actual unknown names
+PASS Cramer explicitly refuses a rectangular system rather than inventing a determinant
+PASS rectangular CX=B uses the actual RHS, coefficient name and every row
+PASS a specifically named augmented operand overrides an unrelated saved system
+PASS school-system givens survive a formatted preamble and both requested methods
+PASS rectangular-system storage remains bounded and saved t/s solutions stay usable in arithmetic
 
-Matrices regression: 161 passed, 0 failed
+Matrices regression: 177 passed, 0 failed
+PASS space S01: معلم متعامد وكتابة الإحداثيات
+PASS space S02: أرقام عربية وفواصل عربية
+PASS space S03: معيار بالرموز
+PASS space S04: نظير شعاع مع LaTeX
+PASS space S05: جمع شعاعين رمزي
+PASS space S06: طرح رمزي يحفظ الترتيب
+PASS space S07: تضريب رمزي كسري
+PASS space S08: طول قطعة
+PASS space S09: إحداثيات شعاعين في طلب
+PASS space S10: طويلتا شعاعين
+PASS space S11: استقلال شعاعين
+PASS space S12: ارتباط ثلاثة أشعة
+PASS space S13: أساس للفراغ
+PASS space S14: رفض استقامة زائفة
+PASS space S15: استواء أربعة رؤوس
+PASS space S16: أربع نقاط غير مستوية
+PASS space S17: لا تقريب للتحديد المستوي
+PASS space S18: معلم غير متعامد
+PASS space S19: جملة مثقلة بوزنين
+PASS space S20: مجموع وزنين معدوم
+PASS space S21: مركز ثلاثة بأوزان سالبة
+PASS space S22: مركز ثقل رباعي الوجوه
+PASS space S23: اسم صريح لمركز الأبعاد
+PASS space S24: تلاقي المتوسطات بتعريف منتصفات
+PASS space S25: جداء تحليلي
+PASS space S26: جداء منقوط بالصيغة الرسمية
+PASS space S27: تحقق من تعامد غير صحيح
+PASS space S28: الصيغة الهندسية بالدرجات
+PASS space S29: طولتان بمعيار LaTeX وزاوية
+PASS space S30: الشعاع المعدوم والزاوية
+PASS space S31: مستقيمان متعامدان متقاطعان
+PASS space S32: اتجاهان متعامدان مع تخالف
+PASS space S33: مركبات ناظم بدون التباس عقدي
+PASS space S34: ناظم مستوي بالرمز اليوناني
+PASS space S35: ثلاث نقاط في مستوي مواز للإحداثي
+PASS space S36: مستوي من نقطة وناظم
+PASS space S37: المستوي المنصف العمودي
+PASS space S38: تمثيل وسيطي من نقطتين
+PASS space S39: مستقيم من نقطة واتجاه
+PASS space S40: تقاطع مستويين
+PASS space S41: توازي مستويين متميزين
+PASS space S42: مستويان منطبقان
+PASS space S43: تقاطع مستقيم ومستوي
+PASS space S44: مستقيم محتوى في مستوي
+PASS space S45: مستقيم مواز دون تقاطع
+PASS space S46: تقاطع مستقيمين
+PASS space S47: مستقيمان متخالفان
+PASS space S48: مستويان بأسماء يونانية
+PASS space S49: البعد المتكرر في مسائل الارتفاع
+PASS space S50: بعد نقطة عن مستقيم
+PASS space S51: مسقط عمودي لا مسافة فقط
+PASS space S52: كرة مركز ونصف قطر
+PASS space S53: كرة من طرفي قطر
+PASS space S54: كرة من معادلتها العامة
+PASS space S55: كرة بمجاهيل عربية
+PASS space S56: حجم رباعي الوجوه
+PASS space S57: ارتفاع رأس عن وجه مسمى
+PASS space S58: حجم هرم من مساحة وارتفاع
+PASS space S59: ارتفاع دقيق يتبعه حجم
+PASS space S60: أشعة ومصفوفة ورتبة في سؤال
+PASS space S61: مصفوفة التقاطع تتبعها غاوس
+PASS space S62: طلب هندسي مستقل بعد فشل غير هندسي
+PASS space S63: ثلاث نقاط مستقيمة لا تعطي مستويا وحيدا
+PASS space S64: مركبة ناقصة لا تستكمل بصفر
+PASS space S65: وسيطان لا يمثلان مستقيم وسيط واحد
+PASS space S66: نقطة لا تفترض مركز كرة
+PASS space S67: لا أوزان رمزية مفترضة
+PASS space S68: لا برهان عام زائف للاستواء
+PASS symbolic vector operations and norms use the actual exact coordinates
+PASS two requested geometric operands stay distinct and preserve their parent label
+PASS plural normal requests bind each named plane instead of reusing the first
+PASS weighted pairs bind weights by point name, reject duplicate points, and detect zero total weight
+PASS two/three/four-point barycenters retain actual input vertices and exact weighted residuals
+PASS midpoints are derived from declarations, never manufactured from a requested proof
+PASS a false basis claim is refuted by rank, not disguised as a scene or an orthonormal basis
+PASS dot-product notation is not a cross product and a false perpendicular claim stays visibly false
+PASS the perpendicular foot satisfies its plane, normal direction and exact distance
+PASS failed geometric parsing cannot leak an earlier height into a numeric follow-up
+PASS an independent geometry demand survives an earlier matrix failure with all givens and source label
+PASS the line-intersection bridge carries all three equations and its actual t/s solution
+PASS every geometry operation has two meaningfully different solved examples
+PASS loading a solid example preserves the selected solid and changes its real dimensions
+PASS geometric-dot examples preserve radians/grads and their explicit unit beats the global setting
+PASS reopening named plane/line/center answers preserves their output aliases as well as input data
+PASS all six matrix rows can be reopened as vectors and returned without silent truncation
+PASS completed submitted answers contain their final result, steps and actions immediately even with animation enabled
+PASS geometry splitting stays bounded and never separates a single algebra/proof expression
+PASS coordinate declarations remain geometry, not an overwrite of a previous named matrix
+PASS vector/statistical bridges choose a free matrix alias and reuse it instead of erasing given M
+PASS real geometry contexts keep valid guards without treating unsupported proof goals as definitions
+PASS probability P(A) definitions remain event data even after a geometric A/B context
+PASS geometric suggestions stop claiming an unchanged line bridge after an equation is edited
+PASS a computed vector r remains explicitly addressable after switching the active vector
+
+Space school: 93 passed, 0 failed

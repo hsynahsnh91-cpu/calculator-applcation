@@ -1,3 +1,4 @@
+import { preserveSpaceOperators } from "./spaceNotation";
 import { readSchoolDocument } from "./schoolDocument";
 import {
   normalizeMathTypography,
@@ -206,6 +207,7 @@ export function decodeLatex(source: string): string {
     .replace(/\bz\s+([A-Z])(?=\s*=)/g, "z_$1");
 }
 export function normalizePrompt(source: string): string {
+  source = preserveSpaceOperators(source);
   let text = decodeLatex(
     stripPromptMarkdown(normalizeMathTypography(normalizeArabic(source))),
   );
@@ -266,7 +268,8 @@ export function normalizePrompt(source: string): string {
     .replace(/نهايتها|نهاياتها|نهايات/g, "نهاية")
     .replace(/بتؤول|بيؤول|يؤول|تقترب|يقترب/g, "تؤول")
     .replace(/مستوى|مستو(?:ٍ|ي)?\b/g, "مستوي")
-    .replace(/مركبة|مركب|عقدية|عقدي/g, "عقدي")
+    .replace(/(^|[^\p{L}\p{N}_])(?:عقدية|عقدي)(?=$|[^\p{L}\p{N}_])/gu, "$1عقدي")
+    .replace(/عدد مركب|العدد المركب/g, (word) => word.replace("مركب", "عقدي"))
     .replace(/سحبنا|سحبناها|انسحبت/g, "سحبت")
     .replace(/سوا|بنفس الوقت/g, "معا")
     .replace(
@@ -405,7 +408,12 @@ export function parsePrompt(
   for (const assignment of initial.matchAll(
     /\b([a-dkmpqrt])\s*=\s*(-?\d+(?:\.\d+)?)(?=\s|[,،;؛]|$)/g,
   ))
-    context.assignments[assignment[1]] = Number(assignment[2]);
+    if (
+      !(
+        assignment[1] === "t" && /جملة|نظام|غاوس|جاوس|كرامر|كريمر/.test(initial)
+      )
+    )
+      context.assignments[assignment[1]] = Number(assignment[2]);
   return {
     original: source,
     text,

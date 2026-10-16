@@ -154,6 +154,9 @@ export default function MatrixBoard({
       ["1", "-1"],
     ],
   );
+  const [variables, setVariables] = useState(
+    context?.system?.variables || ["x", "y"],
+  );
   const [constants, setConstants] = useState(
       context?.system?.constants || ["3", "1"],
     ),
@@ -267,19 +270,23 @@ export default function MatrixBoard({
     try {
       if (category === "systems") {
         const n = system.length;
-        readMatrix(system);
+        const a = system.map((r) => r.map(normalizePrompt));
+        readMatrix(a);
+        if (operation === "cramer" && system.length !== variables.length)
+          throw Error(
+            "كرامر يحتاج عدد المعادلات مساويًا لعدد المجاهيل؛ اختر غاوس لهذه الجملة غير المربعة.",
+          );
         const b = constants.slice(0, n).map((s) => {
           readMatrix([[normalizePrompt(s)]]);
           return normalizePrompt(s);
         });
-        const a = system.map((r) => r.map(normalizePrompt));
         return {
           question:
             `حل الجملة بطريقة ${operation === "cramer" ? "كرامر" : "غاوس"}:\n` +
             a
               .map(
                 (r, i) =>
-                  `${r.map((v, j) => `(${v})*${["x", "y", "z"][j]}`).join("+")}=${b[i]}`,
+                  `${r.map((v, j) => `(${v})*${variables[j]}`).join("+")}=${b[i]}`,
               )
               .join("\n"),
           error: "",
@@ -386,6 +393,7 @@ export default function MatrixBoard({
     index,
     system,
     constants,
+    variables,
     paired,
   ]);
   function example() {
@@ -409,6 +417,7 @@ export default function MatrixBoard({
             ],
       );
       setConstants(odd ? ["6", "-1", "-1"] : ["3", "1"]);
+      setVariables(odd ? ["x", "y", "z"] : ["x", "y"]);
       return;
     }
     let a = odd
@@ -553,12 +562,15 @@ export default function MatrixBoard({
           {category === "systems" ? (
             <>
               <label className="matrix-field">
-                <span>عدد المجاهيل والمعادلات</span>
+                <span>عدد المجاهيل</span>
                 <select
                   aria-label="عدد مجاهيل الجملة"
-                  value={system.length}
+                  value={variables.length}
                   onChange={(e) => {
                     const n = Number(e.target.value);
+                    setVariables((old) =>
+                      old.length === n ? old : ["x", "y", "z"].slice(0, n),
+                    );
                     setSystem((old) =>
                       Array.from({ length: n }, (_, i) =>
                         Array.from({ length: n }, (_, j) => old[i]?.[j] ?? "0"),
@@ -569,8 +581,35 @@ export default function MatrixBoard({
                     );
                   }}
                 >
-                  <option value={2}>مجهولان ومعادلتان</option>
-                  <option value={3}>ثلاثة مجاهيل وثلاث معادلات</option>
+                  <option value={2}>مجهولان</option>
+                  <option value={3}>ثلاثة مجاهيل</option>
+                </select>
+              </label>
+              <label className="matrix-field">
+                <span>عدد المعادلات — غاوس يفحصها جميعًا</span>
+                <select
+                  aria-label="عدد معادلات الجملة"
+                  value={system.length}
+                  onChange={(e) => {
+                    const rows = Number(e.target.value);
+                    setSystem((old) =>
+                      Array.from({ length: rows }, (_, i) =>
+                        Array.from(
+                          { length: variables.length },
+                          (_, j) => old[i]?.[j] ?? "0",
+                        ),
+                      ),
+                    );
+                    setConstants((old) =>
+                      Array.from({ length: rows }, (_, i) => old[i] ?? "0"),
+                    );
+                  }}
+                >
+                  {[2, 3, 4, 5, 6].map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
                 </select>
               </label>
               <div className="matrix-system-grid">
@@ -581,13 +620,13 @@ export default function MatrixBoard({
                       {r.map((v, j) => (
                         <label className="matrix-field" key={j}>
                           <span>
-                            معامل <Tex math={["x", "y", "z"][j]} />
+                            معامل <Tex math={variables[j]} />
                           </span>
                           <input
                             value={v}
                             dir="ltr"
                             maxLength={100}
-                            aria-label={`المعادلة ${i + 1}، معامل ${["x", "y", "z"][j]}`}
+                            aria-label={`المعادلة ${i + 1}، معامل ${variables[j]}`}
                             onChange={(e) =>
                               setSystem((old) =>
                                 old.map((row, a) =>

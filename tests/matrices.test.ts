@@ -82,6 +82,8 @@ async function solved(q: string, context?: SolverContext) {
 for (const c of corpus.cases)
   await test(`school ${c.id}: ${c.title}`, async () => {
     const a = await solve(c.question);
+    if ("resultCount" in c)
+      assert.equal(a.results.length, c.resultCount, JSON.stringify(a.unsolved));
     if (c.expect === "clarify") {
       assert.equal(a.results.length, 0);
       assert(a.unsolved.length > 0);
@@ -720,6 +722,125 @@ await test("complete LaTeX systems render as one mathematical block instead of t
     assert(html.includes("katex-display"));
   }
 });
+await test("Gauss checks an extra contradictory equation instead of solving only a convenient pair", async () => {
+  const a = await solved("حل الجملة بطريقة غاوس: x+y=3، x-y=1، 2x=5");
+  assert(a.results[0].finalLatex.includes("varnothing"));
+  assert(a.results[0].verification.passed);
+  assert.equal(a.context.solutions, undefined);
+});
+await test("two equations in three unknowns produce the entire verified affine family", async () => {
+  const a = await solved("حل الجملة بطريقة غاوس: x+y+z=3، x-y=1");
+  assert(a.results[0].finalLatex.includes("غير منته"));
+  assert(a.results[0].finalLatex.includes("z=t"));
+  assert(a.results[0].verification.passed);
+  assert.equal(a.context.solutions, undefined);
+});
+await test("free parameters never collide with t and s as actual unknown names", async () => {
+  const a = await solved("حل الجملة بطريقة غاوس: t+s=2، 2t+2s=4، 3t+3s=6");
+  assert(a.results[0].finalLatex.includes("s=r"));
+  assert(!a.results[0].finalLatex.includes("s=t"));
+  assert(a.results[0].verification.passed);
+});
+await test("Cramer explicitly refuses a rectangular system rather than inventing a determinant", async () => {
+  const a = await solve("حل الجملة بطريقة كرامر: x+y=3، x-y=1، 2x=4");
+  assert.equal(a.results.length, 0);
+  assert.equal(a.unsolved.length, 1);
+  assert(a.unsolved[0].message.includes("مساويًا"));
+  assert.deepEqual(a.unsolved[0].choices, ["حل الجملة السابقة بطريقة غاوس"]);
+  const b = await solved("حل الجملة السابقة بطريقة غاوس", a.context);
+  assert(b.results[0].finalLatex.includes("x=2"));
+  assert(b.results[0].finalLatex.includes("y=1"));
+});
+await test("rectangular CX=B uses the actual RHS, coefficient name and every row", async () => {
+  const a = await solved(
+    "C=[[1,1],[1,-1],[2,0]]، B=[[3],[1],[4]]، حل CX=B بطريقة غاوس",
+  );
+  assert(a.results[0].finalLatex.includes("x=2"));
+  assert(a.results[0].finalLatex.includes("y=1"));
+  assert.equal(a.context.matrices?.active, "C");
+  assert(a.results[0].verification.passed);
+});
+await test("a specifically named augmented operand overrides an unrelated saved system", async () => {
+  const a = await solved("حل الجملة بطريقة غاوس: x+y=3، x-y=1");
+  const context = {
+    ...a.context,
+    matrices: {
+      ...a.context.matrices!,
+      values: {
+        ...a.context.matrices!.values,
+        M: [
+          ["1", "1", "5"],
+          ["1", "-1", "1"],
+        ],
+      },
+    },
+  };
+  const b = await solved(
+    "حل الجملة من المصفوفة الموسعة M بطريقة غاوس",
+    context,
+  );
+  assert(b.results[0].finalLatex.includes("x=3"));
+  assert(b.results[0].finalLatex.includes("y=2"));
+  assert(b.results[0].verification.passed);
+});
+await test("school-system givens survive a formatted preamble and both requested methods", async () => {
+  const a = await solved(
+    "السؤال الثاني (10 درجات)\nالجملة: x+y=3، x-y=1\nالمطلوب:\nأ) حل بطريقة غاوس\nب) حل بطريقة كرامر",
+  );
+  assert.equal(a.results.length, 2);
+  assert.deepEqual(
+    a.results.map((r) => r.school?.label),
+    ["أ)", "ب)"],
+  );
+  assert(
+    a.results.every(
+      (r) =>
+        r.finalLatex.includes("x=2") &&
+        r.finalLatex.includes("y=1") &&
+        r.verification.passed,
+    ),
+  );
+});
+await test("rectangular-system storage remains bounded and saved t/s solutions stay usable in arithmetic", async () => {
+  assert(
+    !isMatrixContext({
+      values: {},
+      system: {
+        coefficients: Array.from({ length: 7 }, () => ["1", "1"]),
+        constants: Array(7).fill("1"),
+        variables: ["x", "y"],
+      },
+    }),
+  );
+  assert(
+    !isMatrixContext({
+      values: {},
+      system: {
+        coefficients: [
+          ["1", "1", "1", "1"],
+          ["1", "1", "1", "1"],
+        ],
+        constants: ["1", "1"],
+        variables: ["x", "y", "z", "t"],
+      },
+    }),
+  );
+  const a = await solved("حل الجملة بطريقة غاوس: t=1، s=2، t+s=3");
+  const b = await solved("احسب t+s", JSON.parse(JSON.stringify(a.context)));
+  assert.equal(Number(b.results[0].decimal), 3);
+  const named = await solved("احسب محدد المصفوفة A=[[1,2],[3,4]]");
+  for (const name of ["A1", "A_{1}"]) {
+    const unknown = await solve(`احسب محدد المصفوفة ${name}`, named.context);
+    assert.equal(unknown.results.length, 0);
+    assert.equal(unknown.unsolved.length, 1);
+  }
+  const invalid = await solve("حل الجملة بطريقة غاوس: t*s=1، t+s=3", a.context);
+  assert.equal(invalid.results.length, 0);
+  assert.equal(invalid.context.solutions, undefined);
+  assert.equal(invalid.context.matrices?.system, undefined);
+  assert.equal(invalid.context.assignments.t, undefined);
+});
+
 if (process.env.MATRIX_OUTPUT)
   fs.writeFileSync(
     process.env.MATRIX_OUTPUT,

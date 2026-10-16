@@ -494,6 +494,62 @@
       "pass": true
     },
     {
+      "name": "a completed long geometry question scrolls its requested result into view without a reveal tap",
+      "pass": true
+    },
+    {
+      "name": "all seven solid controls retain their selected shape and solve genuinely different examples",
+      "pass": true
+    },
+    {
+      "name": "normal and parametric-line examples no longer reload the same effective givens",
+      "pass": true
+    },
+    {
+      "name": "the six geometry categories and four-point fields fit phones with readable nonzooming inputs",
+      "pass": true
+    },
+    {
+      "name": "a reopened named Q/n plane preserves its names and an edited coordinate changes its actual equation",
+      "pass": true
+    },
+    {
+      "name": "one plural coordinate request visibly solves both named arrows in source order",
+      "pass": true
+    },
+    {
+      "name": "weighted school givens and median concurrence reach real barycenter reasoning, not probability",
+      "pass": true
+    },
+    {
+      "name": "the line-system bridge opens a genuine three-equation two-unknown t/s matrix editor",
+      "pass": true
+    },
+    {
+      "name": "editing only a third equation changes Gauss to an empty solution and does not advertise stale geometry",
+      "pass": true
+    },
+    {
+      "name": "plural matrix language and two arithmetic expressions both produce their requested answers",
+      "pass": true
+    },
+    {
+      "name": "a six-row matrix returns through editable spatial vectors without silently losing the last three rows",
+      "pass": true
+    },
+    {
+      "name": "loading geometric-dot examples retains the chosen radians and only solves on the explicit action",
+      "pass": true
+    },
+    {
+      "name": "probability P(A) still belongs to events after a spatial A/B conversation",
+      "pass": true
+    },
+    {
+      "name": "a rectangular Cramer clarification retains its current equations and offers a working Gauss correction",
+      "pass": true
+    },
+    {
       "name": "no external HTTP requests or uncaught browser errors",
       "pass": true
     }

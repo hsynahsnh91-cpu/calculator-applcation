@@ -9,27 +9,28 @@
     "geometry": 140,
     "curriculum": 83,
     "schoolSafety": 38,
-    "passed": 757,
+    "passed": 866,
     "failed": 0,
-    "matrices": 161
+    "matrices": 177,
+    "spaceSchool": 93
   },
   "browser": {
     "http": {
-      "passed": 124,
+      "passed": 138,
       "failed": 0,
       "externalRequests": 0,
       "uncaughtErrors": 0
     },
     "file": {
-      "passed": 124,
+      "passed": 138,
       "failed": 0,
       "externalRequests": 0,
       "uncaughtErrors": 0
     }
   },
   "build": {
-    "htmlBytes": 17105255,
-    "sha256": "02bf7ee665677fdd1ac73b837993943ddbe99352ab4b27e9065f38a158bf8ca6",
+    "htmlBytes": 17131833,
+    "sha256": "422f705bf34668dfd8b1436ef50f843368a3b7797dd3c5daa13bcb0daeb6ca01",
     "separateRuntimeFiles": 0,
     "embeddedLicenseNotices": 48
   },
@@ -51,10 +52,14 @@
     "School proofs are bounded: affine closed-form induction, selected geometric criteria, and polynomial IVT/monotonicity. Not a general proof or full function-study engine.",
     "School corpus includes 18 expected clarifications and one partial success; passing these tests does not imply support for their unsupported mathematical topics.",
     "Matrix input: dimensions 1–6, up to 12 named matrices, 500 characters/cell. Matrix expressions: 300 characters, 120 tokens, nesting 20, powers −1…12. Exact rational/simple-radical arithmetic is bounded, not a general symbolic matrix algebra system.",
-    "Matrix school-style methods do not certify that these topics occur in an unverified official ministry textbook edition. The 84-case matrix corpus expects 14 clarifications.",
+    "Matrix school-style methods do not certify that these topics occur in an unverified official ministry textbook edition. The 92-case matrix corpus expects 14 clarifications.",
     "All tool categories and reference details start collapsed. Examples/editing do not solve; a probability preview has its own explicit calculation action and is invalidated when its inputs change.",
     "A named real factor k requires an explicit bounded exact numeric value; free symbolic-parameter matrices are not a newly supported general algebra system.",
-    "Only independent explicitly named unary matrix demands are split at conjunctions. Ambiguous compound proof/assignment demands require separate complete statements instead of guessed dependencies."
+    "Only bounded independent named unary lists and unassigned arithmetic expression lists are expanded at conjunctions. Ambiguous compound proof/assignment demands require separate complete statements instead of guessed dependencies.",
+    "Submitted final results and solution steps do not wait for a reveal control; input categories, references and optional numerical approximations remain deliberate disclosures. Editing/loading examples does not submit a solution.",
+    "Gauss systems are bounded to 2–6 equations and 2/3 unknowns from x,y,z,t,s; Cramer requires a square coefficient matrix. Every equation is checked; free-family directions are verified algebraically.",
+    "The 68-case authored space corpus expects 59 full responses, one partial response and 8 clarifications. General synthetic proofs, free symbolic-parameter geometry and arbitrary compound vector norms are not claimed as supported.",
+    "The same live probability comparison regression now explicitly waits for preview invalidation before requesting its new calculation, avoiding a React-effect race in the test harness."
   ],
   "environment": {
     "node": "22.22.3",
@@ -67,7 +72,9 @@
     "geometryPassed": 27,
     "curriculumExamplesPassed": 11,
     "failed": 0,
-    "matrixExamplesPassed": 23
+    "matrixExamplesPassed": 23,
+    "geometryMatrixExamplesPassed": 53,
+    "note": "The 23/27/11 counts in passed/geometryPassed/curriculumExamplesPassed refer to retained earlier-release logs; the current full guide sweep is geometryMatrixExamplesPassed."
   },
   "schoolBaseline": {
     "questions": 83,
@@ -84,11 +91,20 @@
     "failed": 0
   },
   "matrixCorpus": {
-    "questions": 84,
-    "completeExpected": 70,
+    "questions": 92,
+    "completeExpected": 78,
     "clarificationExpected": 14,
-    "suitePassed": 161,
+    "suitePassed": 177,
     "suiteFailed": 0,
     "provenance": "Original authored cases; not official examination questions."
+  },
+  "spaceSchoolCorpus": {
+    "questions": 68,
+    "completeExpected": 59,
+    "partialExpected": 1,
+    "clarificationExpected": 8,
+    "suitePassed": 93,
+    "suiteFailed": 0,
+    "provenance": "Original authored school-style spatial questions; not ministry/examination reproductions or curriculum certification."
   }
 }

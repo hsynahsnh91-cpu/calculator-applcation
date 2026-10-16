@@ -1,3 +1,4 @@
+import { read } from "../utils/spaceGeometryMath";
 import {
   ENGINE_LABELS,
   type Candidate,
@@ -6,6 +7,33 @@ import {
   type SolverResult,
   type UnsolvedPart,
 } from "./types";
+/** A geometric follow-up is offered only while every saved row still describes those two lines. */
+function geometricSystemMatches(context: SolverContext): boolean {
+  const sys = context.matrices?.system,
+    g = context.geometry;
+  if (
+    !sys ||
+    !g ||
+    g.operation !== "line-system" ||
+    g.active.lines.length !== 2 ||
+    sys.variables.join(",") !== "t,s" ||
+    sys.coefficients.length !== 3
+  )
+    return false;
+  const [a, b] = g.active.lines.map((n) => g.lines[n]);
+  if (!a || !b) return false;
+  try {
+    return sys.coefficients.every(
+      (row, i) =>
+        row.length === 2 &&
+        read(row[0]).eq(read(a.direction[i])) &&
+        read(row[1]).eq(read(b.direction[i]).neg()) &&
+        read(sys.constants[i]).eq(read(b.point[i]).sub(read(a.point[i]))),
+    );
+  } catch {
+    return false;
+  }
+}
 const samples: Record<string, string> = {
   mathEngine: "احسب sin(30°)+√2",
   equationSolver: "حل المعادلة 2x^2-5x+3=0",
@@ -180,11 +208,15 @@ export function composeAnswer(
       n = m.active;
     const follow: string[] = [];
     if (m.lastScalar) follow.push("احسب النتيجة السابقة * 2");
-    if (m.system)
-      follow.push(
-        "حل الجملة السابقة بطريقة كرامر",
-        "حل الجملة السابقة بطريقة غاوس",
-      );
+    if (m.system) {
+      if (m.system.coefficients.length === m.system.variables.length)
+        follow.push("حل الجملة السابقة بطريقة كرامر");
+      follow.push("حل الجملة السابقة بطريقة غاوس");
+      if (context.geometry && geometricSystemMatches(context))
+        follow.unshift(
+          `جد تقاطع المستقيمين ${context.geometry.active.lines.join(" و")}`,
+        );
+    }
     if (n && m.values[n]) {
       const a = m.values[n];
       follow.push(`جد منقول المصفوفة ${n}`);

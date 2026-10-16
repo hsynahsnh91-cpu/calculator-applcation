@@ -1,6 +1,16 @@
 import { normalizePrompt } from "../../solver/parser";
 import { useId, useMemo, useRef, useState } from "react";
-import { ArrowUp, BookOpen, FlaskConical } from "lucide-react";
+import {
+  ArrowUp,
+  BookOpen,
+  FlaskConical,
+  Cuboid,
+  Move3D,
+  MapPin,
+  Layers3,
+  MoveDiagonal2,
+  Circle,
+} from "lucide-react";
 import { Tex, RichText } from "../common/Tex";
 import type { GeometryContext, SpaceRequest } from "../../solver/geometryTypes";
 import type { AngleMode } from "../../types";
@@ -27,6 +37,14 @@ const tabs: [Category, string][] = [
   ["lines", "المستقيمات"],
   ["sphere", "الكرة"],
 ];
+const tabIcons = {
+  solids: Cuboid,
+  vectors: Move3D,
+  points: MapPin,
+  planes: Layers3,
+  lines: MoveDiagonal2,
+  sphere: Circle,
+};
 const operations: Operation[] = [
   {
     id: "solid",
@@ -324,6 +342,10 @@ const solidDemand: Record<string, string> = {
 function defaults(): Form {
   const f: Form = {
     count: "3",
+    vectorCount: "3",
+    outputPlane: "P",
+    outputLine: "D",
+    centerName: "G",
     solid: "cube",
     unit: "DEG",
     theta: "60",
@@ -356,8 +378,16 @@ function defaults(): Form {
     [1, 2, 3],
     [2, -1, 0],
     [0, 0, 1],
-  ].forEach((v, i) => v.forEach((c, k) => (f[`v${i}${k}`] = String(c))));
+    [1, 1, 0],
+    [0, 1, 1],
+    [1, 0, 1],
+  ].forEach((v, i) => {
+    f[`vn${i}`] = "uvwabc"[i];
+    v.forEach((c, k) => (f[`v${i}${k}`] = String(c)));
+  });
   for (let i = 0; i < 2; i++) {
+    f[`ln${i}`] = `D${i + 1}`;
+    f[`qn${i}`] = "PQ"[i];
     [0, i, i].forEach((v, k) => (f[`l${i}p${k}`] = String(v)));
     [i ? 0 : 1, 1, i ? 0 : 1].forEach((v, k) => (f[`l${i}u${k}`] = String(v)));
   }
@@ -365,6 +395,12 @@ function defaults(): Form {
 }
 function chooseOperation(context?: GeometryContext): string {
   if (!context) return "vector";
+  if (
+    context.operation === "plot" &&
+    context.inputs?.vectors.length &&
+    !context.inputs.points.length
+  )
+    return "matrix";
   if (context.operation === "plane")
     return context.inputs?.vectors.length ? "plane-normal" : "plane-three";
   if (context.operation === "line")
@@ -391,20 +427,29 @@ function initial(context?: GeometryContext): Form {
   const f = defaults();
   if (!context) return f;
   const input = context.inputs || context.active;
+  if (context.operation === "plane" || context.operation === "bisector")
+    f.outputPlane = context.active.planes[0] || "P";
+  if (context.operation === "line")
+    f.outputLine = context.active.lines[0] || "D";
+  if (context.operation === "barycenter")
+    f.centerName = context.active.points[0] || "G";
   input.points.slice(0, 4).forEach((name, i) => {
     f[`pn${i}`] = name;
     context.points[name].forEach((c, k) => (f[`p${i}${k}`] = c));
   });
-  input.vectors
-    .slice(0, 3)
-    .forEach((name, i) =>
-      context.vectors[name].forEach((c, k) => (f[`v${i}${k}`] = c)),
-    );
+  input.vectors.slice(0, 6).forEach((name, i) => {
+    f[`vn${i}`] = name;
+    context.vectors[name].forEach((c, k) => (f[`v${i}${k}`] = c));
+  });
+  if (input.vectors.length)
+    f.vectorCount = String(Math.min(6, input.vectors.length));
   input.lines.slice(0, 2).forEach((name, i) => {
+    f[`ln${i}`] = name;
     context.lines[name].point.forEach((c, k) => (f[`l${i}p${k}`] = c));
     context.lines[name].direction.forEach((c, k) => (f[`l${i}u${k}`] = c));
   });
   input.planes.slice(0, 2).forEach((name, i) => {
+    f[`qn${i}`] = name;
     const p = context.planes[name];
     f[`plane${i}`] =
       `(${p.normal[0]})*x+(${p.normal[1]})*y+(${p.normal[2]})*z+(${p.offset})=0`;
@@ -447,48 +492,47 @@ function question(op: Operation, f: Form): string {
     points = Array.from({ length: pc }, (_, i) => f[`pn${i}`]);
   const p = points.map((name, i) => `${name}${tuple(f, "p" + i)}`);
   const vectors = Array.from(
-      { length: op.v || 0 },
-      (_, i) => `${"uvw"[i]}=${tuple(f, "v" + i)}`,
+      { length: op.id === "matrix" ? Number(f.vectorCount) : op.v || 0 },
+      (_, i) => `${f["vn" + i]}=${tuple(f, "v" + i)}`,
     ),
     lines = Array.from(
       { length: op.l || 0 },
       (_, i) =>
-        `D${i + 1}: (x,y,z)=${tuple(f, "l" + i + "p")}+${i ? "s" : "t"}*${tuple(f, "l" + i + "u")}`,
+        `${f["ln" + i]}: (x,y,z)=${tuple(f, "l" + i + "p")}+${i ? "s" : "t"}*${tuple(f, "l" + i + "u")}`,
     ),
     planes = Array.from(
       { length: op.q || 0 },
-      (_, i) => `${"PQ"[i]}: ${f["plane" + i]}`,
+      (_, i) => `${f["qn" + i]}: ${f["plane" + i]}`,
     );
   const definitions = [...p, ...vectors, ...lines, ...planes].join("، ");
   const demands: Record<string, string> = {
     vector: `جد الشعاع ${points.join("")}`,
     distance: "جد المسافة بين النقطتين",
-    opposite: "جد نظير الشعاع u",
-    add: "اجمع الشعاعين u وv",
-    subtract: "اطرح v من u",
-    scale: `جد تضريب الشعاع u بالعدد k=${f.coefficient}`,
-    dot: "احسب الجداء السلمي للشعاعين u وv",
-    norm: "احسب طويلة الشعاع u",
-    cross: "احسب الجداء الشعاعي للشعاعين u وv",
-    dependence2: "ادرس الارتباط الخطي للشعاعين u وv",
-    dependence3: "ادرس الارتباط الخطي للأشعة u وv وw",
+    opposite: `جد نظير الشعاع ${f.vn0}`,
+    add: `اجمع الشعاعين ${f.vn0} و${f.vn1}`,
+    subtract: `اطرح ${f.vn1} من ${f.vn0}`,
+    scale: `جد تضريب الشعاع ${f.vn0} بالعدد k=${f.coefficient}`,
+    dot: `احسب الجداء السلمي للشعاعين ${f.vn0} و${f.vn1}`,
+    norm: `احسب طويلة الشعاع ${f.vn0}`,
+    cross: `احسب الجداء الشعاعي للشعاعين ${f.vn0} و${f.vn1}`,
+    dependence2: `ادرس الارتباط الخطي للشعاعين ${f.vn0} و${f.vn1}`,
+    dependence3: `ادرس الارتباط الخطي للأشعة ${f.vn0} و${f.vn1} و${f.vn2}`,
     collinear: "هل النقاط على استقامة واحدة؟",
     coplanar: "هل النقاط الأربع مستوية؟",
-    barycenter: `جد مركز الأبعاد المتناسبة وأثبت التلاقي بالتجميع، الأوزان=[${points.map((_, i) => f["weight" + i]).join(",")}]`,
-    normal: "جد ناظم المستوي P",
-    "plane-three": "جد معادلة المستوي المار بالنقاط المعطاة",
-    "plane-normal": "جد معادلة المستوي من النقطة المعطاة والشعاع الناظم u",
+    barycenter: `جد مركز الأبعاد المتناسبة ${f.centerName} وأثبت التلاقي بالتجميع، الأوزان=[${points.map((_, i) => f["weight" + i]).join(",")}]`,
+    normal: `جد ناظم المستوي ${f.qn0}`,
+    "plane-three": `جد معادلة المستوي ${f.outputPlane} المار بالنقاط المعطاة`,
+    "plane-normal": `جد معادلة المستوي ${f.outputPlane} من النقطة المعطاة والشعاع الناظم ${f.vn0}`,
     bisector: "جد معادلة المستوي المنصف العمودي للقطعة",
-    planes: "جد تقاطع المستويين P وQ ووضعهما النسبي",
-    "distance-plane": "جد بعد النقطة عن المستوي P ومسقطها العمودي",
-    "line-existing": "اكتب التمثيل البارامتري للمستقيم D1",
-    "line-points": "جد التمثيل البارامتري للمستقيم المار بالنقطتين",
-    "line-direction":
-      "جد التمثيل البارامتري للمستقيم من النقطة والشعاع الموجه u",
-    "line-plane": "جد تقاطع المستقيم D1 والمستوي P ووضعهما النسبي",
-    lines: "جد الوضع النسبي للمستقيمين D1 وD2",
-    "distance-line": "جد بعد النقطة عن المستقيم D1 ومسقطها",
-    "line-system": "اكتب جملة التقاطع للوسيطين للمستقيمين D1 وD2",
+    planes: `جد تقاطع المستويين ${f.qn0} و${f.qn1} ووضعهما النسبي`,
+    "distance-plane": `جد بعد النقطة عن المستوي ${f.qn0} ومسقطها العمودي`,
+    "line-existing": `اكتب التمثيل البارامتري للمستقيم ${f.ln0}`,
+    "line-points": `جد التمثيل البارامتري للمستقيم ${f.outputLine} المار بالنقطتين`,
+    "line-direction": `جد التمثيل البارامتري للمستقيم ${f.outputLine} من النقطة والشعاع الموجه ${f.vn0}`,
+    "line-plane": `جد تقاطع المستقيم ${f.ln0} والمستوي ${f.qn0} ووضعهما النسبي`,
+    lines: `جد الوضع النسبي للمستقيمين ${f.ln0} و${f.ln1}`,
+    "distance-line": `جد بعد النقطة عن المستقيم ${f.ln0} ومسقطها`,
+    "line-system": `اكتب جملة التقاطع للوسيطين للمستقيمين ${f.ln0} و${f.ln1}`,
     matrix: "حول الأشعة المعطاة إلى مصفوفة",
     tetrahedron: "احسب حجم رباعي الوجوه وارتفاعه",
     parallelepiped: "احسب حجم متوازي السطوح",
@@ -507,7 +551,7 @@ function question(op: Operation, f: Form): string {
     return `جد مركز ونصف قطر الكرة ${f.sphereEquation}`;
   return `${definitions}، ${demands[op.id]}`;
 }
-function example(op: Operation, index: number): Form {
+function example(op: Operation, index: number, current?: Form): Form {
   const f = defaults(),
     second = index % 2 === 1;
   const points =
@@ -564,9 +608,40 @@ function example(op: Operation, index: number): Form {
     vectors[1] = second ? [0, 1, 0] : [2, 0, 0];
   }
   vectors.forEach((v, i) => v.forEach((c, k) => (f[`v${i}${k}`] = String(c))));
+  if (current) {
+    f.solid = current.solid;
+    f.unit = current.unit;
+    f.vectorCount = current.vectorCount;
+  }
+  if (op.id === "plane-three" && second)
+    [0, 1, 2].forEach((i) => (f[`p${i}2`] = "1"));
+  if (op.id === "normal" && second) f.plane0 = "x+2y-3z+4=0";
+  if (op.id === "line-existing" && second) {
+    [1, 0, 0].forEach((v, i) => (f[`l0p${i}`] = String(v)));
+    [0, 1, 1].forEach((v, i) => (f[`l0u${i}`] = String(v)));
+  }
+  if ((op.id === "lines" || op.id === "line-system") && second)
+    [1, 1, 1].forEach((v, i) => (f[`l1p${i}`] = String(v)));
   f.a = second ? "4" : "3";
+  f.b = second ? "5" : "4";
+  f.c = second ? "6" : "5";
+  f.r = second ? "3" : "2";
+  f.h = second ? "4" : "6";
+  f.area = second ? "8" : "6";
+  f.perimeter = second ? "14" : "12";
   f.radius = second ? "3" : "2";
-  f.theta = second ? "90" : "60";
+  f.theta =
+    f.unit === "RAD"
+      ? second
+        ? "pi/2"
+        : "pi/3"
+      : f.unit === "GRAD"
+        ? second
+          ? "100"
+          : "200/3"
+        : second
+          ? "90"
+          : "60";
   if (op.id === "planes") {
     f.plane0 = "x+y+z=1";
     f.plane1 = second ? "2x+2y+2z=4" : "x-y=0";
@@ -628,6 +703,8 @@ export {
   operations as geometryFormOperations,
   example as geometryFormExample,
   question as geometryFormQuestion,
+  initial as geometryFormInitial,
+  chooseOperation as geometryFormOperation,
 };
 export default function GeometryBoard({
   context,
@@ -658,7 +735,8 @@ export default function GeometryBoard({
   const op = operations.find((o) => o.id === operation)!,
     set = (key: string, value: string) =>
       setForm((f) => ({ ...f, [key]: value })),
-    pointCount = op.id === "barycenter" ? Number(form.count) : op.p || 0;
+    pointCount = op.id === "barycenter" ? Number(form.count) : op.p || 0,
+    vectorCount = op.id === "matrix" ? Number(form.vectorCount) : op.v || 0;
   const preview = useMemo(() => {
     if (!category) return { question: "", error: "" };
     try {
@@ -670,6 +748,15 @@ export default function GeometryBoard({
           .size !== pointCount
       )
         throw Error("أسماء النقاط مختلفة؛ عدّل الاسم المكرر.");
+      const vectorNames = Array.from(
+        { length: vectorCount },
+        (_, i) => form["vn" + i],
+      );
+      if (
+        new Set(vectorNames).size !== vectorNames.length ||
+        vectorNames.some((n) => !/^(?:[uvwnabcr]|[A-Z]{2})$/.test(n))
+      )
+        throw Error("أسماء الأشعة مختلفة ومن الأسماء الهندسية المدعومة.");
       const q = question(op, form),
         r = extractSpaceRequest(
           normalizePrompt(q),
@@ -684,7 +771,7 @@ export default function GeometryBoard({
         error: e instanceof Error ? e.message : "أكمل المعطيات.",
       };
     }
-  }, [op, form, pointCount, angleMode, category]);
+  }, [op, form, pointCount, vectorCount, angleMode, category]);
   const chooseTab = (tab: Category) => {
     setCategory(tab);
     if (operations.find((o) => o.id === operation)?.category !== tab)
@@ -726,48 +813,55 @@ export default function GeometryBoard({
     <div className="geometry-board" data-testid="geometry-board">
       <p className="space-board-intro">
         ابنِ المسألة هنا، ثم حلّها أو أدرجها في المحادثة. تغيير أي خانة يغيّر
-        السؤال والنتيجة التالية.
+        السؤال والنتيجة التالية. بعد زر الحل تظهر النتيجة الجديدة مباشرة في
+        المحادثة مع خطواتها.
       </p>
       <div
         className="space-tabs"
         role="tablist"
         aria-label="أدوات الهندسة الفراغية"
       >
-        {tabs.map(([tab, label], i) => (
-          <button
-            type="button"
-            key={tab}
-            ref={(e) => {
-              refs.current[i] = e;
-            }}
-            role="tab"
-            aria-selected={category === tab}
-            aria-expanded={category === tab}
-            tabIndex={category === tab || (!category && i === 0) ? 0 : -1}
-            id={`${id}-${tab}`}
-            aria-controls={`${id}-panel`}
-            onClick={() => chooseTab(tab)}
-            onKeyDown={(e) => {
-              if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) {
-                e.preventDefault();
-                const next =
-                  e.key === "Home"
-                    ? 0
-                    : e.key === "End"
-                      ? tabs.length - 1
-                      : (i + (e.key === "ArrowLeft" ? 1 : -1) + tabs.length) %
-                        tabs.length;
-                setCategory(tabs[next][0]);
-                setOperation(
-                  operations.find((o) => o.category === tabs[next][0])!.id,
-                );
-                refs.current[next]?.focus();
-              }
-            }}
-          >
-            {label}
-          </button>
-        ))}
+        {tabs.map(([tab, label], i) => {
+          const Icon = tabIcons[tab];
+          return (
+            <button
+              type="button"
+              key={tab}
+              ref={(e) => {
+                refs.current[i] = e;
+              }}
+              role="tab"
+              aria-selected={category === tab}
+              aria-expanded={category === tab}
+              tabIndex={category === tab || (!category && i === 0) ? 0 : -1}
+              id={`${id}-${tab}`}
+              aria-controls={`${id}-panel`}
+              onClick={() => chooseTab(tab)}
+              onKeyDown={(e) => {
+                if (
+                  ["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)
+                ) {
+                  e.preventDefault();
+                  const next =
+                    e.key === "Home"
+                      ? 0
+                      : e.key === "End"
+                        ? tabs.length - 1
+                        : (i + (e.key === "ArrowLeft" ? 1 : -1) + tabs.length) %
+                          tabs.length;
+                  setCategory(tabs[next][0]);
+                  setOperation(
+                    operations.find((o) => o.category === tabs[next][0])!.id,
+                  );
+                  refs.current[next]?.focus();
+                }
+              }}
+            >
+              <Icon size={17} aria-hidden="true" />
+              <span>{label}</span>
+            </button>
+          );
+        })}
       </div>
       {!category && (
         <p className="tool-disclosure-hint">
@@ -803,7 +897,7 @@ export default function GeometryBoard({
                 type="button"
                 className="space-example"
                 onClick={() => {
-                  setForm(example(op, exampleIndex));
+                  setForm(example(op, exampleIndex, form));
                   setExampleIndex((i) => i + 1);
                 }}
               >
@@ -811,6 +905,7 @@ export default function GeometryBoard({
                 <span>تحميل مثال {(exampleIndex % 2) + 1}</span>
               </button>
             </div>
+            <h3 className="space-operation-title">{op.title}</h3>
             {op.id === "solid" && (
               <>
                 <label className="space-field">
@@ -874,26 +969,49 @@ export default function GeometryBoard({
                   field(`وزن ${form["pn" + i]}`, "weight" + i)}
               </fieldset>
             ))}
-            {Array.from({ length: op.v || 0 }, (_, i) => (
+            {op.id === "matrix" && (
+              <label className="space-field">
+                <span>عدد الأشعة التي ستُنقل كاملةً</span>
+                <select
+                  aria-label="عدد أشعة المصفوفة"
+                  value={form.vectorCount}
+                  onChange={(e) => set("vectorCount", e.target.value)}
+                >
+                  {[1, 2, 3, 4, 5, 6].map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {Array.from({ length: vectorCount }, (_, i) => (
               <fieldset className="space-coordinate-card" key={i}>
                 <legend>
-                  <Tex math={`\\vec{${"uvw"[i]}}`} className="space-math" />
+                  <Tex
+                    math={
+                      /^[A-Z]{2}$/.test(form["vn" + i])
+                        ? `\\overrightarrow{${form["vn" + i]}}`
+                        : `\\vec{${form["vn" + i]}}`
+                    }
+                    className="space-math"
+                  />
                   {op.id === "plane-normal" ? " — الناظم" : ""}
                 </legend>
-                {triple("v" + i, "uvw"[i])}
+                {triple("v" + i, form["vn" + i])}
               </fieldset>
             ))}
             {Array.from({ length: op.l || 0 }, (_, i) => (
               <fieldset className="space-coordinate-card" key={i}>
-                <legend>المستقيم D{i + 1}</legend>
+                <legend>المستقيم {form["ln" + i]}</legend>
                 <p>نقطة منه</p>
-                {triple("l" + i + "p", `نقطة D${i + 1}`)}
+                {triple("l" + i + "p", `نقطة ${form["ln" + i]}`)}
                 <p>شعاع توجيهه — غير معدوم</p>
-                {triple("l" + i + "u", `اتجاه D${i + 1}`)}
+                {triple("l" + i + "u", `اتجاه ${form["ln" + i]}`)}
               </fieldset>
             ))}
             {Array.from({ length: op.q || 0 }, (_, i) =>
-              field(`معادلة المستوي ${"PQ"[i]}`, "plane" + i),
+              field(`معادلة المستوي ${form["qn" + i]}`, "plane" + i),
             )}
             {op.id === "scale" && field("المعامل k", "coefficient")}
             {op.id === "sphere-center" && field("نصف قطر الكرة R", "radius")}

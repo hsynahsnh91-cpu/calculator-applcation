@@ -1589,6 +1589,11 @@ kbd {
   padding: 5px;
 }
 .space-tabs button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   font-size: 12px;
   color: #93a5b7;
   min-height: 43px;
@@ -1861,7 +1866,8 @@ kbd {
   }
   .space-tabs button {
     font-size: 11px;
-    min-height: 42px;
+    min-height: 54px;
+    font-weight: 600;
   }
   .space-operation-row {
     align-items: stretch;
@@ -2320,4 +2326,35 @@ kbd {
 .matrix-grid-scroll {
   min-width: 0;
   width: 100%;
+}
+
+/* Submitted results are immediately visible; only inputs/reference tools are disclosed on demand. */
+.final-answer,
+.clarification-card {
+  scroll-margin-block-start: 18px;
+}
+.space-tabs button span {
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.geometry-board input,
+.geometry-board select,
+.geometry-board button {
+  min-height: 44px;
+}
+
+.space-operation-title {
+  font-size: 13px;
+  color: #c7ded8;
+  line-height: 1.9;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .space-field input,
+  .space-field select,
+  .space-coordinates input,
+  .space-name input {
+    font-size: 16px;
+  }
 }

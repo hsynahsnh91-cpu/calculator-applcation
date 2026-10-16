@@ -11,7 +11,7 @@
 {"question":"حل الجملة بطريقة كرأمر: x+y=3، x-y=1","engines":["matricesEngine"],"final":["x=2\\qquad y=1"],"unsolved":[]}
 {"question":"A=[[1,1],[1,-1]]، B=[[3],[1]]، حل AX=B بطريقة كرأمر","engines":["matricesEngine"],"final":["x=2\\qquad y=1"],"unsolved":[]}
 {"question":"لتكن المصفوفة A=[[1,0,0],[0,1,0]]، حول أسطر المصفوفة A إلى أشعة","engines":["matricesEngine"],"final":["\\begin{aligned}\\vec{u}=\\left(1,0,0\\right)\\\\[6pt]\\vec{v}=\\left(0,1,0\\right)\\end{aligned}"],"unsolved":[]}
-{"question":"احسب الجداء السلمي للشعاعين u وv","engines":["geometryEngine"],"final":["\\vec{u}\\cdot\\vec{v}=0"],"unsolved":[]}
+{"question":"احسب الجداء السلمي للشعاعين u وv","engines":["geometryEngine"],"final":["\\begin{aligned}\\vec{u}\\cdot\\vec{v}=0\\\\[5pt]\\text{الشعاعان متعامدان}\\end{aligned}"],"unsolved":[]}
 {"question":"لتكن المصفوفة A=[[1,2],[3,4]]، حول كل عناصر المصفوفة A إلى بيانات إحصائية","engines":["matricesEngine"],"final":["x_i\\in\\left\\{1,2,3,4\\right\\}"],"unsolved":[]}
 {"question":"احسب متوسط البيانات السابقة","engines":["probabilityEngine"],"final":["\\overline x=\\frac{5}{2}"],"unsolved":[]}
 {"question":"لتكن A=[[1,2,3],[0,4,5],[1,0,6]]\nالمطلوب:\n1) احسب محدد المصفوفة A بطريقة ساروس\n2) احسب محدد المصفوفة A بالنشر حسب العمود 2","engines":["matricesEngine","matricesEngine"],"final":["\\text{محدد المصفوفة }A=22","\\text{محدد المصفوفة }A=22"],"unsolved":[]}

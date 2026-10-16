@@ -1,16 +1,16 @@
 {
   "format": 1,
-  "sourceFiles": 262,
+  "sourceFiles": 276,
   "artifacts": [
     {
       "file": "calculator.html",
-      "bytes": 17105255,
-      "sha256": "02bf7ee665677fdd1ac73b837993943ddbe99352ab4b27e9065f38a158bf8ca6"
+      "bytes": 17131833,
+      "sha256": "422f705bf34668dfd8b1436ef50f843368a3b7797dd3c5daa13bcb0daeb6ca01"
     },
     {
       "file": "calculator-source.zip",
-      "bytes": 11732602,
-      "sha256": "11d33b3440931ff24dbdcb9b0c54a21e8e3e8cd2d182c799c932d13f95035dc0"
+      "bytes": 13377952,
+      "sha256": "bc38d89d2ab58826b19394133fdfad7ea6fb17cf879ac5a401ee508692bc2501"
     }
   ]
 }

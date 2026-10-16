@@ -154,6 +154,25 @@ export default function App() {
     fileInput = useRef<HTMLInputElement>(null),
     menuRoot = useRef<HTMLDivElement>(null),
     pendingElement = useRef<HTMLDivElement>(null);
+  const latestTurn = turns[turns.length - 1]?.id;
+  const lastTurnElement = useRef<HTMLElement>(null),
+    displayedTurn = useRef(latestTurn);
+  useEffect(() => {
+    if (!latestTurn || latestTurn === displayedTurn.current) {
+      displayedTurn.current = latestTurn;
+      return;
+    }
+    displayedTurn.current = latestTurn;
+    const frame = requestAnimationFrame(() => {
+      const section = lastTurnElement.current;
+      const target =
+        section?.querySelector<HTMLElement>(
+          ".final-answer,.clarification-card",
+        ) || section;
+      target?.scrollIntoView({ block: "start", behavior: "auto" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [latestTurn]);
   const controller = useRef<AbortController | null>(null),
     token = useRef(0);
   const sendRef = useRef<(text: string) => Promise<void>>(async () => {});
@@ -429,7 +448,11 @@ export default function App() {
         {chatting && (
           <div className="conversation" aria-label="المحادثة الرياضية">
             {turns.map((turn, index) => (
-              <section className="conversation-turn" key={turn.id}>
+              <section
+                className="conversation-turn"
+                key={turn.id}
+                ref={index === turns.length - 1 ? lastTurnElement : undefined}
+              >
                 <div className="user-message" dir="auto">
                   {turn.image && (
                     <img

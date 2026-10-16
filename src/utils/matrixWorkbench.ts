@@ -192,10 +192,15 @@ function solveSystem(
     )!;
   const a = readMatrix(system.coefficients),
     b = system.constants.map(read),
-    n = a.length,
+    n = a[0].length,
+    square = a.length === n,
     augmented = a.map((r, i) => [...r, b[i]]),
     reduction = rowReduce(augmented, n),
-    d = determinant(a);
+    d = square ? determinant(a) : zero();
+  if (request.operations.includes("cramer") && !square)
+    return matrixError(
+      "كرامر يحتاج عدد المعادلات مساويًا لعدد المجاهيل؛ اختر غاوس للجملة غير المربعة مع فحص جميع معادلاتها.",
+    );
   out.title = request.operations.includes("cramer")
     ? "حل الجملة بطريقة كرامر"
     : "حل الجملة بطريقة غاوس";
@@ -215,7 +220,7 @@ function solveSystem(
   const inconsistent = reduction.reduced.some(
     (r) => r.slice(0, n).every((c) => c.zero()) && !r[n].zero(),
   );
-  if (d.zero()) {
+  if (inconsistent || reduction.pivots.length < n) {
     if (request.operations.includes("cramer"))
       out.steps.push(
         step(
@@ -241,7 +246,9 @@ function solveSystem(
       const free = Array.from({ length: n }, (_, i) => i).filter(
         (i) => !reduction.pivots.includes(i),
       );
-      const params = ["t", "s", "r"],
+      const params = ["t", "s", "r", "q", "p"].filter(
+          (p) => !system.variables.includes(p),
+        ),
         parameter = (i: number) => params[free.indexOf(i)];
       const lines = system.variables.map((v, i) => {
         const pivot = reduction.pivots.indexOf(i);
@@ -249,6 +256,32 @@ function solveSystem(
           ? `${v}=${parameter(i)}`
           : `${v}=${reduction.reduced[pivot][n].tex()}${free.map((j) => (reduction.reduced[pivot][j].zero() ? "" : T`-\left(${reduction.reduced[pivot][j].tex()}\right)${parameter(j)}`)).join("")}`;
       });
+      const particular = system.variables.map((_, i) => {
+        const pivot = reduction.pivots.indexOf(i);
+        return pivot < 0 ? zero() : reduction.reduced[pivot][n];
+      });
+      const homogeneous = free.map((j) =>
+        system.variables.map((_, i) => {
+          const pivot = reduction.pivots.indexOf(i);
+          return i === j
+            ? G.integer(1)
+            : pivot < 0
+              ? zero()
+              : reduction.reduced[pivot][j].neg();
+        }),
+      );
+      checks.push(
+        a.every((r, i) =>
+          r
+            .reduce((sum, c, j) => sum.add(c.mul(particular[j])), zero())
+            .eq(b[i]),
+        ) &&
+          homogeneous.every((v) =>
+            a.every((r) =>
+              r.reduce((sum, c, j) => sum.add(c.mul(v[j])), zero()).zero(),
+            ),
+          ),
+      );
       finals.push(
         T`\text{عدد غير منته من الحلول}\qquad\begin{cases}${lines.join(T`\\`)}\end{cases}`,
       );
@@ -306,7 +339,7 @@ function solveSystem(
   request.context.active = coefficientName;
   out.contextPatch!.matrix = numericMatrix(a);
   out.verification.method =
-    "فحص تكافؤ العمليات السطرية بضرب مصفوفة التحويل الأصلية، وتعويض الحل الفريد في جميع معادلات الجملة؛ مع مطابقة كرامر عند طلبها";
+    "فحص تكافؤ العمليات السطرية بضرب مصفوفة التحويل الأصلية، وتعويض الحل الفريد أو الحل الخاص واتجاهات أسرة الحلول في جميع المعادلات؛ مع مطابقة كرامر عند طلبها";
 }
 export async function solveMatrixRequest(
   request: MatrixRequest,

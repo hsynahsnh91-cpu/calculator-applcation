@@ -1,3 +1,5 @@
+import { isSpaceIntent } from "./spaceNotation";
+import { splitSpaceDemands } from "./spaceDemands";
 import {
   prepareSchoolContext,
   runSchoolProbability,
@@ -6,6 +8,8 @@ import {
 } from "./schoolRuntime";
 import {
   matrixDefinitionOnly,
+  extractMatrixRequest,
+  matrixIntent,
   splitMatrixDemands,
 } from "./extractors/matrices";
 import { schoolIntent } from "./schoolDocument";
@@ -23,6 +27,30 @@ import {
   type UnsolvedPart,
 } from "./types";
 
+/** Preserve valid system givens on method failure, never its stale numerical solution. */
+function matrixFailureContext(
+  request: string,
+  context: import("./types").SolverContext,
+): import("./types").SolverContext {
+  const systemRequest = /غاوس|جاوس|كرامر|كريمر/.test(request);
+  let matrices = context.matrices
+    ? { ...context.matrices, lastScalar: undefined }
+    : undefined;
+  if (systemRequest) {
+    try {
+      const parsed = extractMatrixRequest(request, context);
+      if (parsed.operations.some((op) => op === "gauss" || op === "cramer"))
+        matrices = { ...parsed.context, lastScalar: undefined };
+    } catch {
+      if (matrices) matrices = { ...matrices, system: undefined };
+    }
+  }
+  return {
+    ...context,
+    matrices,
+    solutions: systemRequest ? undefined : context.solutions,
+  };
+}
 /** Independent requests run together; successive groups consume the previous context patch. */
 export async function solvePrompt(
   question: string,
@@ -56,6 +84,20 @@ export async function solvePrompt(
   try {
     context = await prepareSchoolContext(parsed.preamble || "", context);
   } catch (error) {
+    if (
+      /غاوس|جاوس|كرامر|كريمر/.test(question) &&
+      matrixIntent(question, context)
+    )
+      context = matrixFailureContext(question, context);
+    if (context.geometry && isSpaceIntent(parsed.preamble || question, context))
+      context = {
+        ...context,
+        geometry: {
+          ...context.geometry,
+          lastScalar: undefined,
+          lastScalarExpression: undefined,
+        },
+      };
     return composeAnswer(
       question,
       [],
@@ -82,10 +124,15 @@ export async function solvePrompt(
       label: "",
       intent: schoolIntent(text),
       setup: false,
-      depends: /استنتج|النتيجة السابقة|الطلب السابق/.test(text),
+      depends:
+        /استنتج|النتيجة السابقة|الطلب السابق|الجملة السابقة|المصفوفة السابقة|الارتفاع السابق|البعد السابق/.test(
+          text,
+        ),
     }));
   const orderedParts = parts.flatMap((part) => {
-    const demands = part.setup ? [part.text] : splitMatrixDemands(part.text);
+    const demands = part.setup
+      ? [part.text]
+      : splitMatrixDemands(part.text).flatMap(splitSpaceDemands);
     return demands.length === 1
       ? [part]
       : demands.map((text, i) => ({
@@ -117,6 +164,21 @@ export async function solvePrompt(
       context = await prepareSchoolContext(request, context);
       schoolUnimplemented(request, context);
     } catch (error) {
+      if (
+        /غاوس|جاوس|كرامر|كريمر/.test(request) &&
+        matrixIntent(request, context)
+      )
+        context = matrixFailureContext(request, context);
+      if (context.geometry && isSpaceIntent(request, context))
+        context = {
+          ...context,
+          geometry: {
+            ...context.geometry,
+            lastScalar: undefined,
+            lastScalarExpression: undefined,
+          },
+          lastPrompt: request,
+        };
       unsolved.push({
         request,
         school: info,
@@ -221,10 +283,19 @@ export async function solvePrompt(
         };
       } else {
         previousFailed = true;
-        if (selected[index] === "matricesEngine" && context.matrices)
+        if (selected[index] === "matricesEngine")
+          context = matrixFailureContext(request, context);
+        if (
+          ["geometryEngine", "geometryTools"].includes(selected[index]) &&
+          context.geometry
+        )
           context = {
             ...context,
-            matrices: { ...context.matrices, lastScalar: undefined },
+            geometry: {
+              ...context.geometry,
+              lastScalar: undefined,
+              lastScalarExpression: undefined,
+            },
           };
         const error: unknown = value.reason;
         const message =
@@ -239,7 +310,13 @@ export async function solvePrompt(
           choices:
             error instanceof ClarificationError && error.choices.length
               ? error.choices
-              : clarificationChoices(ranked),
+              : selected[index] === "matricesEngine" &&
+                  /كرامر|كريمر/.test(request) &&
+                  context.matrices?.system &&
+                  context.matrices.system.coefficients.length !==
+                    context.matrices.system.variables.length
+                ? ["حل الجملة السابقة بطريقة غاوس"]
+                : clarificationChoices(ranked),
         });
         if (!results.length)
           context = {

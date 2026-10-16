@@ -105,23 +105,7 @@ export const AnswerBubble = memo(function AnswerBubble({
 }) {
   const schoolCards = answer.results.some((r) => !!r.school?.label);
   const [copied, setCopied] = useState(false),
-    [phase, setPhase] = useState(animate ? 0 : 2),
     [copyError, setCopyError] = useState("");
-  useEffect(() => {
-    if (
-      !animate ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      setPhase(2);
-      return;
-    }
-    const a = setTimeout(() => setPhase(1), 55),
-      b = setTimeout(() => setPhase(2), 110);
-    return () => {
-      clearTimeout(a);
-      clearTimeout(b);
-    };
-  }, [animate]);
   const copy = async () => {
     if (await copyToClipboard(answerAsText(answer))) {
       setCopied(true);
@@ -220,8 +204,8 @@ export const AnswerBubble = memo(function AnswerBubble({
           </div>
         )}
         <TypedIntro text={answer.intro} animate={animate} />
-        {phase >= 1 && answer.results.length > 0 && (
-          <div className="steps-block reveal-section">
+        {answer.results.length > 0 && (
+          <div className="steps-block">
             <h3>خطوات الحل</h3>
             {answer.results.map((result) => (
               <SectionErrorBoundary
@@ -258,7 +242,7 @@ export const AnswerBubble = memo(function AnswerBubble({
                       <RichText text={result.note} />
                     </p>
                   )}
-                  {schoolCards && phase >= 2 && result.visuals.length > 0 && (
+                  {schoolCards && result.visuals.length > 0 && (
                     <Suspense
                       fallback={
                         <p className="text-xs text-slate-500">تجهيز الرسم…</p>
@@ -275,8 +259,8 @@ export const AnswerBubble = memo(function AnswerBubble({
             ))}
           </div>
         )}
-        {phase >= 2 && (
-          <div className="space-y-4 reveal-section">
+        {
+          <div className="space-y-4">
             {answer.results
               .filter((result) => result.visuals.length && !schoolCards)
               .map((result) => {
@@ -298,7 +282,7 @@ export const AnswerBubble = memo(function AnswerBubble({
                 );
               })}
           </div>
-        )}
+        }
         {answer.unsolved.slice(0, 1).map((part, index) => (
           <div className="clarification-card" key={index} role="status">
             {part.school?.label && (
@@ -347,7 +331,7 @@ export const AnswerBubble = memo(function AnswerBubble({
             </div>
           </div>
         ))}
-        {phase >= 2 && (
+        {
           <>
             <div className="answer-actions">
               {onMatrices &&
@@ -441,7 +425,7 @@ export const AnswerBubble = memo(function AnswerBubble({
               </div>
             )}
           </>
-        )}
+        }
       </div>
     </article>
   );

@@ -1,5 +1,5 @@
 {
-  "provenance": "64 original authored school/exam-style cases; not reproduced official exam questions or a claim of whole-curriculum conformity.",
+  "provenance": "92 original authored school/exam-style cases; not reproduced official exam questions or a claim of whole-curriculum conformity.",
   "cases": [
     {
       "id": "M01",
@@ -758,6 +758,94 @@
       "question": "لتكن A=[[1,2],[3,4]] وk=1/2 وk=1/3، احسب k*A",
       "expect": "clarify",
       "contains": []
+    },
+    {
+      "id": "M85",
+      "title": "محددا مصفوفتين",
+      "question": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب محددي المصفوفتين A وB",
+      "expect": "answer",
+      "contains": [
+        "A=-2",
+        "B=1"
+      ],
+      "resultCount": 2
+    },
+    {
+      "id": "M86",
+      "title": "أثرا مصفوفتين",
+      "question": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب أثري المصفوفتين A وB",
+      "expect": "answer",
+      "contains": [
+        "A=5",
+        "B=8"
+      ],
+      "resultCount": 2
+    },
+    {
+      "id": "M87",
+      "title": "منقولا مصفوفتين",
+      "question": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، جد منقولي المصفوفتين A وB",
+      "expect": "answer",
+      "contains": [
+        "A^T",
+        "B^T"
+      ],
+      "resultCount": 2
+    },
+    {
+      "id": "M88",
+      "title": "عبارتان حسابيتان مستقلتان",
+      "question": "لتكن A=[[1,2],[3,4]] وB=[[1,2],[3,7]]، احسب A+B وA-B",
+      "expect": "answer",
+      "contains": [
+        "A+B",
+        "A-B"
+      ],
+      "resultCount": 2
+    },
+    {
+      "id": "M89",
+      "title": "مصفوفة بأسطر منقوطة",
+      "question": "لتكن A=(1,2;3,4)، جد معكوس المصفوفة A",
+      "expect": "answer",
+      "contains": [
+        "A^{-1}",
+        "-2"
+      ],
+      "resultCount": 1
+    },
+    {
+      "id": "M90",
+      "title": "رتبة ومحدد بالاسم نفسه",
+      "question": "لتكن A=[[1,2],[3,4]]، جد رتبة A ومحدد A",
+      "expect": "answer",
+      "contains": [
+        "2",
+        "A=-2"
+      ],
+      "resultCount": 2
+    },
+    {
+      "id": "M91",
+      "title": "ثلاث معادلات في مجهولين",
+      "question": "حل الجملة بطريقة غاوس: x+y=3، x-y=1، 2x=4",
+      "expect": "answer",
+      "contains": [
+        "x=2",
+        "y=1"
+      ],
+      "resultCount": 1
+    },
+    {
+      "id": "M92",
+      "title": "جملة بوسيطي التقاطع",
+      "question": "حل الجملة بالحذف الغاوسي: \\begin{cases}t=1\\\\t-s=0\\\\t=1\\end{cases}",
+      "expect": "answer",
+      "contains": [
+        "t=1",
+        "s=1"
+      ],
+      "resultCount": 1
     }
   ]
 }

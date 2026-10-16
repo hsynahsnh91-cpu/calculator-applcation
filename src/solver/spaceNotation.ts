@@ -1,7 +1,21 @@
 import type { SolverContext } from "./types";
+/** Preserve explicit vector operators before the generic arithmetic decoder loses dot/cross meaning. */
+export function preserveSpaceOperators(source: string): string {
+  return source.replace(
+    /\\(?:vec|overrightarrow)\s*\{\s*([uvwnabcr]|[A-Z]{2})\s*\}\s*(\\cdot|\\times|·|×)\s*\\(?:vec|overrightarrow)\s*\{\s*([uvwnabcr]|[A-Z]{2})\s*\}/g,
+    (_, a: string, operator: string, b: string) =>
+      `الجداء ${operator === "\\times" || operator === "×" ? "الشعاعي" : "السلمي"} للشعاعين ${a} و${b}`,
+  );
+}
 /** Spatial basis glyphs are not imaginary-unit evidence or separate questions. */
 export function spaceNotation(source: string): string {
   return source
+    .replace(
+      /\\(?:lVert|Vert)\s*([uvwnabcr]|[A-Z]{2})\s*\\(?:rVert|Vert)|‖\s*([uvwnabcr]|[A-Z]{2})\s*‖|\|\|\s*([uvwnabcr]|[A-Z]{2})\s*\|\|/g,
+      (_, a: string, b: string, c: string) => `طويلة الشعاع ${a || b || c}`,
+    )
+    .replace(/\\perp(?![A-Za-z])|⊥|⟂/g, " تعامد ")
+    .replace(/\\(?:cdot|times)/g, "*")
     .replace(/ا\*/g, "اضرب")
     .replace(/ال\*/g, "الضرب")
     .replace(
@@ -18,8 +32,8 @@ export function spaceNotation(source: string): string {
     .replace(/\\beta(?![A-Za-z])|β/g, "beta")
     .replace(/_\{?([1-6])\}?/g, "$1")
     .replace(
-      /\\begin\s*\{(?:cases|aligned|align\*?)\}|\\end\s*\{(?:cases|aligned|align\*?)\}/g,
-      "",
+      /\\begin\s*\{(cases|aligned|align\*?)\}([\s\S]*?)\\end\s*\{\1\}/g,
+      (_, _environment: string, body: string) => body,
     )
     .replace(/\\\\(?:\[[^\]]{0,30}\])?/g, "\n")
     .replace(/&(?=\s*=)|(?<==\s*)&/g, "")
@@ -30,6 +44,8 @@ export function isSpaceIntent(
   context?: SolverContext,
 ): boolean {
   const text = spaceNotation(source);
+  if (/\bP\s*\(\s*[A-Z]/.test(text) && !/فراغ|مستوي|ناظم|مستقيم/.test(text))
+    return false;
   if (
     /احتمال|السحب|كرات|كرت|كيس|الالوان/.test(text) &&
     !/الهندسة|فراغ|ناظم/.test(text)
@@ -57,12 +73,21 @@ export function isSpaceIntent(
     ];
     if (names.some((n) => new RegExp(`\\b${n}\\b`).test(text))) return true;
   }
+  if (
+    context?.geometry &&
+    /مستقل|مرتبط|ارتباط/.test(text) &&
+    !/حدث|احتمال|متغير|متحول/.test(text) &&
+    Object.keys(context.geometry.vectors).some((n) =>
+      new RegExp(`\\b${n}\\b`).test(text),
+    )
+  )
+    return true;
   const triples =
     /\([^()\n]*[,،;][^()\n]*[,،;][^()\n]*\)|\[[^\[\]\n]*,[^\[\]\n]*,[^\[\]\n]*\]/.test(
       text,
     );
   const strong =
-    /فراغ|مجسم|مستوي|مستقيم|مركز\s+(?:ال)?ابعاد|ابعاد متناسبة|مركز الثقل|سلمي|ارتباط خطي|استقامة|استواء|مستوية|بارامتري|بارامتر|وسيطي|ناظم|قطر الكرة|معادلة الكرة|كرة.*معادلة|متخالف|متوازي السطوح|رباعي الوجوه/.test(
+    /فراغ|مجسم|مستوي|مستقيم|شعاع|اشعة|متجه|طويلة|طول القطعة|مركز\s+(?:ال)?ابعاد|مركز (?:ال)?ثقل|مرجح|متوسطات المثلث|ابعاد متناسبة|مركز الثقل|سلمي|ارتباط خطي|استقامة|استواء|مستوية|بارامتري|بارامتر|وسيطي|ناظم|قطر الكرة|معادلة الكرة|كرة.*معادلة|متخالف|متوازي السطوح|رباعي الوجوه/.test(
       text,
     );
   const explicitlyComplex =

@@ -2,13 +2,14 @@ import type { AngleMode } from "../../types";
 import { ClarificationError, type SolverContext } from "../types";
 import {
   emptySpaceModel,
+  isGeometryContext,
   type SpaceRequest,
   type SpaceVector,
   type SpaceModel,
   type SpaceOperation,
 } from "../geometryTypes";
 import { spaceNotation } from "../spaceNotation";
-import { mathInstructionText } from "../textbook";
+import { mathInstructionText, hasMathInstruction } from "../textbook";
 import {
   read,
   vector,
@@ -154,9 +155,21 @@ export function extractSpaceRequest(
   source: string,
   context: SolverContext,
   angleMode: AngleMode,
+  definitionsOnly = false,
 ): SpaceRequest {
-  const text = spaceNotation(source),
+  const normalized = /كرة|مستوي|مستقيم/.test(source)
+    ? source.replace(
+        /(^|[^\p{L}])([سصع])(?=$|[^\p{L}])/gu,
+        (_, before: string, v: string) =>
+          before + ({ س: "x", ص: "y", ع: "z" } as Record<string, string>)[v],
+      )
+    : source;
+  const text = spaceNotation(normalized),
     old = context.geometry;
+  if (/\\(?:begin|end)\s*\{(?:cases|aligned|align\*?)\}/.test(text))
+    throw new ClarificationError(
+      "أكمل بداية التمثيل البارامتري ونهايته؛ لا نكمل تنسيقًا ناقصًا بالتخمين.",
+    );
   const model: SpaceModel = {
     points: { ...old?.points },
     vectors: { ...old?.vectors },
@@ -234,7 +247,7 @@ export function extractSpaceRequest(
   // Points and vectors; names are case-sensitive, dimensionality is never filled in.
   const coordinateSpans: { start: number; end: number }[] = [];
   for (const m of rest.matchAll(
-    /\b([A-Z]{2}|[A-Z][1-4]?|[uvwnabc])\s*(?:=|:)?\s*(?=[(\[])/g,
+    /\b([A-Z]{2}|[A-Z][1-4]?|[uvwnabcr])\s*(?:=|:)?\s*(?=[(\[])/g,
   )) {
     const start = m.index! + m[0].length,
       t = tuple(rest, start);
@@ -294,7 +307,53 @@ export function extractSpaceRequest(
       rest = rest.replace(m[0], " ");
     }
   }
+  const instruction = mathInstructionText(text),
+    instructionAt = text.indexOf(instruction);
+  const declarations =
+    instructionAt > 0
+      ? text.slice(0, instructionAt)
+      : hasMathInstruction(text)
+        ? ""
+        : text;
+  for (const m of declarations.matchAll(
+    /\b([A-Z][1-4]?)\s+(?:هي\s+|هو\s+)?منتصف\s+(?:القطعة\s*)?[[(]?\s*([A-Z][1-4]?)\s*(?:و\s*)?([A-Z][1-4]?)(?:[)\]])?/g,
+  )) {
+    const [name, a, b] = m.slice(1);
+    if (!model.points[a] || !model.points[b])
+      throw new ClarificationError(
+        `عرّف طرفي القطعة ${a}${b} قبل تعريف منتصفها.`,
+      );
+    verifyDuplicate(
+      model.points,
+      fresh.points,
+      name,
+      serial(
+        vector(model.points[a]).map((v, i) =>
+          v.add(read(model.points[b][i])).div(read("2")),
+        ) as ReturnType<typeof vector>,
+      ),
+    );
+  }
+  if (definitionsOnly)
+    return {
+      operation: "plot",
+      model,
+      points: unique(fresh.points),
+      vectors: unique(fresh.vectors),
+      lines: unique(fresh.lines),
+      planes: unique(fresh.planes),
+      sphere,
+    };
   rest = mathInstructionText(rest);
+  const barycentric =
+    /مركز (?:ال)?ابعاد|مركز (?:ال)?ثقل|مرجح|تلاقي.*متوسط|متوسط.*تلاقي/.test(
+      rest,
+    );
+  const baryName = barycentric
+    ? rest.match(
+        /(?:مركز (?:ال)?ابعاد(?: المتناسبة)?|مركز (?:ال)?ثقل|مرجح(?: الجملة)?)\s+([A-Z][1-4]?)\b/,
+      )?.[1]
+    : undefined;
   // Requested AB/AC/AD vectors are built from the actual named points.
   for (const m of rest.matchAll(/\b([A-Z])([A-Z])\b/g))
     if (model.points[m[1]] && model.points[m[2]]) {
@@ -303,10 +362,12 @@ export function extractSpaceRequest(
         sub(vector(model.points[m[2]]), vector(model.points[m[1]])),
       );
     }
-  let outputName: string | undefined;
+  let outputName: string | undefined = baryName;
   const normOnly =
-    /الطويلت|طويلتان|norms|normU|normV|(?:طويلة|طول)\s+[uv]/.test(text);
-  for (const m of rest.matchAll(/\b([A-Z]{2}|[A-Z][1-6]?|[uvwnabc])\b/g)) {
+    /الطويلت|طويلتان|norms|normU|normV|(?:طويلة(?: الشعاع)?|طول)\s+[uv]\s*=/.test(
+      text,
+    );
+  for (const m of rest.matchAll(/\b([A-Z]{2}|[A-Z][1-6]?|[uvwnabcr])\b/g)) {
     const name = m[1];
     if (
       Object.values(model).some((map) =>
@@ -315,6 +376,16 @@ export function extractSpaceRequest(
     )
       continue;
     if (normOnly && /^[uv]$/.test(name)) continue;
+    if (
+      name === "r" &&
+      /كرة|اسطوان|مخروط/.test(text) &&
+      /نصف قطر|\br\s*=/.test(text)
+    )
+      continue;
+    if (name === baryName) {
+      outputName = name;
+      continue;
+    }
     if (
       /^[abc]$/.test(name) &&
       !/شعاع|متجه|ارتباط|سلمي|نظير|معاكس|اجمع|اطرح/.test(rest)
@@ -346,10 +417,18 @@ export function extractSpaceRequest(
       `ما معطيات ${name}؟ عرّفه بدل استعمال أول عنصر معطى أو نتيجة قديمة.`,
     );
   }
+  if (
+    /شعاع|متجه|طويلة|سلمي|ارتباط/.test(rest) &&
+    /\b[a-z](?:_\{?\d+\}?|\d+)(?=$|[^A-Za-z0-9_])/.test(rest)
+  )
+    throw new ClarificationError(
+      "اسم الشعاع ذي الفهرس غير معرّف هنا؛ استعمل الاسم اللاتيني المفرد المعطى أو عرّف مركباته، ولا نختار شعاعًا قديمًا بديلًا.",
+    );
   const active = old?.active;
   const follow =
     !!old &&
-    (context.lastEngine === "geometryEngine" ||
+    (old.operation === "plot" ||
+      context.lastEngine === "geometryEngine" ||
       context.lastEngine === "geometryTools" ||
       /السابق|المعطاة|المعطى/.test(text));
   const hasNew =
@@ -371,7 +450,7 @@ export function extractSpaceRequest(
       model.vectors,
       fresh.vectors,
       active?.vectors,
-      /\b([uvwnabc]|[A-Z]{2})\b/g,
+      /\b([uvwnabcr]|[A-Z]{2})\b/g,
       follow && !hasNew,
     ),
     lines = selectNames(
@@ -390,10 +469,22 @@ export function extractSpaceRequest(
       /\b(Pi[1-6]?|[PQR][1-6]?|alpha|beta)\b/g,
       follow && !hasNew,
     );
+  const namedSegments = [...rest.matchAll(/\b([A-Z])([A-Z])\b/g)].filter(
+    (m) => model.points[m[1]] && model.points[m[2]],
+  );
+  if (
+    namedSegments.length === 1 &&
+    /شعاع|متجه|احداثيات|مركبات|طول|قطر|منصف|المسافة/.test(rest)
+  )
+    points = [namedSegments[0][1], namedSegments[0][2]];
   const request = (operation: SpaceOperation): SpaceRequest => {
     if (/معلم[^.\n]*غير\s*متعامد/.test(text) && operation !== "theory")
       throw new ClarificationError(
         "في المعلم غير المتعامد نحتاج جداءات أشعة الأساس أو مصفوفة غرام للصيغ المترية؛ لا أفترضها متعامدة.",
+      );
+    if (operation === "plot" && /اثبت|برهن|بين ان|تحقق/.test(rest))
+      throw new ClarificationError(
+        "هذا المطلوب يحتاج برهانًا أو تحققًا محددًا؛ عرض المعطيات وحده ليس حلًا له. حدّد العلاقة المراد فحصها.",
       );
     return { operation, outputName, model, points, vectors, lines, planes };
   };
@@ -589,10 +680,56 @@ export function extractSpaceRequest(
     );
   }
   if (
-    /مركز (?:ال)?ابعاد|مركز الثقل|باري|bary|اوزان|منتصف|تلاقي.*متوسط|مراكز الوجوه/.test(
+    /مركز (?:ال)?ابعاد|مركز (?:ال)?ثقل|مرجح|باري|bary|اوزان|منتصف|تلاقي.*متوسط|مراكز الوجوه/.test(
       rest,
     )
   ) {
+    const weighted: { name: string; weight: string }[] = [];
+    for (const m of text.matchAll(/\(\s*[A-Z][1-4]?\s*[,،;؛]/g)) {
+      const pair = tuple(text, m.index!);
+      if (pair?.values.length === 2 && /^[A-Z][1-4]?$/.test(pair.values[0]))
+        weighted.push({
+          name: pair.values[0],
+          weight: bounded(read(pair.values[1])).text(),
+        });
+    }
+    if (weighted.length) {
+      if (
+        weighted.length < 2 ||
+        weighted.length > 4 ||
+        new Set(weighted.map((w) => w.name)).size !== weighted.length
+      )
+        throw new ClarificationError(
+          "اكتب نقطتين إلى أربع نقاط مختلفة مع وزن واحد محدد لكل نقطة.",
+        );
+      for (const w of weighted)
+        if (!model.points[w.name])
+          throw new ClarificationError(
+            `ما إحداثيات النقطة ${w.name} في الجملة المثقلة؟`,
+          );
+      points = weighted.map((w) => w.name);
+    }
+    const triangle = rest.match(/المثلث\s+([A-Z]{3})\b/);
+    if (triangle && /متوسط|مركز (?:ال)?ثقل/.test(rest)) {
+      const names = [...triangle[1]];
+      if (new Set(names).size !== 3 || names.some((n) => !model.points[n]))
+        throw new ClarificationError(
+          "عرّف رؤوس المثلث الثلاثة المختلفة قبل طلب مركزه أو متوسطاته.",
+        );
+      points = names;
+    }
+    if (baryName) {
+      if (weighted.some((w) => w.name === baryName))
+        throw new ClarificationError(
+          "اسم المركز المطلوب يطابق اسم إحدى نقاط الجملة؛ اختر اسمًا مختلفًا أو صغ تحققًا مستقلاً واضحًا.",
+        );
+      if (/^(?:اثبت|برهن|تحقق|بين ان)/.test(rest) && model.points[baryName])
+        throw new ClarificationError(
+          "للتحقق من مركز معطى، افصل الجملة المثقلة وإحداثيات النقطة المراد التحقق منها عن طلب الإنشاء؛ لا نستبدل النقطة المعطاة بمركز مفترض.",
+        );
+      points = points.filter((n) => n !== baryName);
+      if (!points.length) points = fresh.points.filter((n) => n !== baryName);
+    }
     const explicitPoints = [...rest.matchAll(/\b([A-Z][1-4]?)\b/g)].some(
       (m) => !!model.points[m[1]],
     );
@@ -604,8 +741,10 @@ export function extractSpaceRequest(
     )
       points = [...old.inputs.points];
     const weights =
-      list(text, "اوزان|weights|معاملات") ??
-      (/مركز الثقل|متساوي|منتصف|متوسطات|مراكز الوجوه/.test(rest)
+      (weighted.length
+        ? weighted.map((w) => w.weight)
+        : list(text, "اوزان|weights|معاملات")) ??
+      (/مركز (?:ال)?ثقل|متساوي|منتصف|متوسطات|مراكز الوجوه/.test(rest)
         ? points.map(() => "1")
         : follow && (!fresh.points.length || /الاوزان السابقة/.test(rest))
           ? old?.weights
@@ -629,20 +768,20 @@ export function extractSpaceRequest(
     if (lines.length) return request("distance-line");
     return request("distance");
   }
-  if (/تقاطع|وضع|نسبية|متخالف|متوازي|متعامد/.test(rest)) {
+  if (/تقاطع|وضع|نسبية|متخالف|متوازي|متعامد|تعامد|توازي/.test(rest)) {
     if (lines.length && planes.length) return request("line-plane");
     if (planes.length >= 2) return request("planes");
     if (lines.length >= 2) return request("lines");
   }
-  if (/استواء|مستوية|مستو واحد|مستوي واحد|coplanar/.test(rest))
+  if (/استواء|مستوية|مستو(?:ي)? (?:واحد|1)|coplanar/.test(rest))
     return request("coplanar");
   if (/استقامة|مستقيم واحد|collinear/.test(rest)) return request("collinear");
-  if (/ارتباط|مرتبط|استقلال|مستقلة?|مستقلين/.test(rest))
+  if (/ارتباط|مرتبط|استقلال|مستقلة?|مستقلين|اساس.*فراغ/.test(rest))
     return request("dependence");
   if (/سلمي|زاوية|تعامد/.test(rest)) {
     const norms = list(text, "طويلتان|الطويلتان|طويلتين|norms");
-    const normU = assigned(text, "طويلة u|طول u|normU"),
-      normV = assigned(text, "طويلة v|طول v|normV");
+    const normU = assigned(text, "طويلة(?: الشعاع)? u|طول u|normU"),
+      normV = assigned(text, "طويلة(?: الشعاع)? v|طول v|normV");
     if (norms || normU || normV) {
       const theta = assigned(text, "theta|زاوية(?:هما)?|الزاوية");
       if (!theta || (norms?.length !== 2 && (!normU || !normV)))
@@ -704,7 +843,7 @@ export function extractSpaceRequest(
         vectors = ["n"];
         outputName = outputName || "Q";
       } else {
-        const desired = rest.match(/المستوي\s+([PQR][1-6]?)\b/)?.[1];
+        const desired = rest.match(/(?:ال|لل)?مستوي\s+([PQR][1-6]?)\b/)?.[1];
         outputName = outputName || desired;
         if (points.length >= 3 && !fresh.vectors.length && !explicitVector)
           vectors = [];
@@ -733,9 +872,51 @@ export function extractSpaceRequest(
       vectors = [];
       return request("line");
     }
-    if (!fresh.lines.length) lines = [];
+    if (!fresh.lines.length) {
+      lines = [];
+      outputName =
+        outputName || rest.match(/(?:ال|لل)?مستقيم\s+([DLd][1-6]?)\b/)?.[1];
+    }
     return request("line");
   }
+  const algebra = rest
+    .replace(/^(?:احسب|جد|اوجد|عين|اكتب|بسط)\s+/, "")
+    .replace(/^(?:احداثيات|مركبات)\s+(?:الشعاع\s+)?/, "")
+    .replace(/[؟?]$/, "")
+    .trim();
+  const binary = algebra.match(
+    /^([uvwnabcr]|[A-Z]{2})\s*([+-])\s*([uvwnabcr]|[A-Z]{2})$/,
+  );
+  if (binary) {
+    vectors = [binary[1], binary[3]];
+    return {
+      ...request("vector-arithmetic"),
+      arithmetic: binary[2] === "+" ? "add" : "subtract",
+    };
+  }
+  const scaled = algebra.match(
+    /^([0-9+*/^().\s-]+)\s*\*?\s*([uvwnabcr]|[A-Z]{2})$/,
+  );
+  if (scaled) {
+    vectors = [scaled[2]];
+    return {
+      ...request("vector-arithmetic"),
+      arithmetic: "scale",
+      coefficient: bounded(read(scaled[1].trim().replace(/\*$/, ""))).text(),
+    };
+  }
+  if (/طول القطعة|طول\s+[A-Z]{2}/.test(rest) && points.length >= 2)
+    return request("distance");
+  if (
+    /طويلة|طول الشعاع|معيار|norm/.test(rest) &&
+    (/([uvwnabcr]|[A-Z]{2})\s*[+-]\s*([uvwnabcr]|[A-Z]{2})/.test(rest) ||
+      /(?:\d|\))\s*\*?\s*([uvwnabcr]|[A-Z]{2})\b|([uvwnabcr]|[A-Z]{2})\s*\^/.test(
+        rest,
+      ))
+  )
+    throw new ClarificationError(
+      "احسب الشعاع المركب أولًا ثم اطلب طويلة النتيجة؛ لا نعرض طويلة أول شعاع بدل طويلة التعبير المركب.",
+    );
   if (
     /طويلة|طول الشعاع|معيار|norm/.test(rest) &&
     vectors.length &&
@@ -799,3 +980,70 @@ export const emptyGeometryInput = () => ({
   lines: [],
   planes: [],
 });
+
+/** Persist only typed declarations, without solving a question or harvesting its conclusion. */
+export function prepareSpaceContext(
+  source: string,
+  context: SolverContext,
+): SolverContext {
+  const text = source
+    .replace(/\b[A-Z]\s*=\s*\[\s*\[[\s\S]*?\]\s*\]/g, " ")
+    .replace(/\b[A-Z]\s*=\s*\([^()]*[,،][^()]*[;؛][^()]*\)/g, " ");
+  if (
+    /عقدي|احتمال|صندوق|كيس|سحب|كرات|كرت/.test(text) ||
+    /\bP\s*\(\s*[A-Z]/.test(text) ||
+    /(?:^|\s)(?:القيم|التكرارات|البيانات)\s*[:=]/.test(text)
+  )
+    return context;
+  const triples = [
+    ...text.matchAll(/\b(?:[A-Z][1-4]?|[uvwnabcr])\s*(?:=|:)?\s*(?=[(\[])/g),
+  ].some((m) => {
+    try {
+      return tuple(text, m.index! + m[0].length)?.values.length === 3;
+    } catch {
+      return false;
+    }
+  });
+  if (!triples && !/\b(?:[DLdPQR][1-6]?|Pi[1-6]?|alpha|beta)\s*:/.test(text))
+    return context;
+  const r = extractSpaceRequest(text, context, "DEG", true);
+  if (
+    !r.points.length &&
+    !r.vectors.length &&
+    !r.lines.length &&
+    !r.planes.length &&
+    !r.sphere
+  )
+    return context;
+  const model = r.model;
+  for (const [key, max] of [
+    ["points", 16],
+    ["vectors", 12],
+    ["lines", 6],
+    ["planes", 6],
+  ] as const) {
+    const names = [
+      ...new Set([...r[key], ...Object.keys(model[key]).reverse()]),
+    ].slice(0, max);
+    for (const name of Object.keys(model[key]))
+      if (!names.includes(name)) delete model[key][name];
+  }
+  const active = {
+    points: r.points,
+    vectors: r.vectors,
+    lines: r.lines,
+    planes: r.planes,
+  };
+  const geometry = {
+    ...model,
+    operation: "plot" as const,
+    active,
+    inputs: active,
+    sphere: r.sphere,
+  };
+  if (!isGeometryContext(geometry))
+    throw new ClarificationError(
+      "تجاوزت المعطيات الهندسية حدود عدد الأسماء أو طول الإحداثيات المحفوظة.",
+    );
+  return { ...context, geometry };
+}
