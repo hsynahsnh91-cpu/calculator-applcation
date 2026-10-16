@@ -629,3 +629,129 @@ PASS a proof conclusion cannot redefine an unknown z and verify its own assertio
 PASS an independence proof requires data and never treats the requested conclusion as a given assumption
 
 School safety: 38 passed, 0 failed
+PASS school M01: محدد2×2
+PASS school M02: الأرقام العربية والفارسية
+PASS school M03: اسم الأثر
+PASS school M04: الأثر الكسري
+PASS school M05: منقول مستطيل
+PASS school M06: الجمع المستطيل
+PASS school M07: الطرح المستطيل
+PASS school M08: جداء سلمي ضمني
+PASS school M09: معامل صفري
+PASS school M10: جداء2×3ب3×2
+PASS school M11: ترتيبBA
+PASS school M12: عدم التبديل فعليا
+PASS school M13: دحض مساواة خاطئة
+PASS school M14: تبديل في مثال خاص
+PASS school M15: الواحدية لها أنواع متعددة
+PASS school M16: صفرية مستطيلة
+PASS school M17: مثلثية عليا
+PASS school M18: مثلثية سفلى
+PASS school M19: قطرية
+PASS school M20: متماثلة
+PASS school M21: تمييز القياس عن الرتبة
+PASS school M22: رتبة مستطيلة
+PASS school M23: مبادلة غاوس
+PASS school M24: مدرجة مختزلة شاذة
+PASS school M25: ساروس
+PASS school M26: نشر بحسب سطر
+PASS school M27: نشر بحسب عمود
+PASS school M28: معكوس كسري
+PASS school M29: معكوس3×3
+PASS school M30: عدم وجود معكوس
+PASS school M31: ملحقة الشاذة موجودة
+PASS school M32: غاوس بمجهولين
+PASS school M33: كرامر بمجهولين
+PASS school M34: غاوس بثلاثة مجاهيل
+PASS school M35: كرامر بثلاثة مجاهيل
+PASS school M36: حلول غير منتهية
+PASS school M37: محدد معدوم وتناقض
+PASS school M38: طرفان غير مرتبَين مسبقا
+PASS school M39: متغيرات عربية
+PASS school M40: عشري دقيق
+PASS school M41: محدد جذري
+PASS school M42: معكوس جذري
+PASS school M43: مصفوفة بصيغة لاتكس
+PASS school M44: منقول لاتكس مع سطر جديد
+PASS school M45: فواصل منقوطة داخل أقواس
+PASS school M46: أسطر بفراغات
+PASS school M47: كثيرة حدود مصفوفية
+PASS school M48: أس سالب واحد
+PASS school M49: قوة صفرية
+PASS school M50: تسمية نتيجة ونقلها للفقرة التالية
+PASS school M51: ترقيم مدرسي
+PASS school M52: رمز الأثر المدعوم بإجابة عربية
+PASS school M53: عبارة عددية من المصفوفات
+PASS school M54: محدد4×4
+PASS school M55: رتبة6×2
+PASS school M56: مصفوفة غير معرفة
+PASS school M57: جمع بقياسين مختلفين
+PASS school M58: جداء غير معرف
+PASS school M59: أثر غير مربعة
+PASS school M60: محدد غير مربعة
+PASS school M61: ساروس لا تعمم
+PASS school M62: جملة غير خطية
+PASS school M63: معادلة ناقصة
+PASS school M64: التعاريف ليست نتائج
+PASS independent exact determinant/inverse/row reduction, order 1
+PASS independent exact determinant/inverse/row reduction, order 2
+PASS independent exact determinant/inverse/row reduction, order 3
+PASS independent exact determinant/inverse/row reduction, order 4
+PASS independent exact determinant/inverse/row reduction, order 5
+PASS independent exact determinant/inverse/row reduction, order 6
+PASS dependent exact rational rows, shape 2×1
+PASS dependent exact rational rows, shape 3×2
+PASS dependent exact rational rows, shape 4×3
+PASS dependent exact rational rows, shape 5×4
+PASS dependent exact rational rows, shape 6×5
+PASS tiny nonzero determinant is not treated as singular by an epsilon
+PASS inverse fractions and radicals stay exact through JSON round-trip
+PASS named matrix result C is the actual operand in the next demand
+PASS scalar quantities produced by matrices flow to scientific arithmetic
+PASS single determinant ans flows to scientific engine, not an unrelated probability
+PASS a nonscalar matrix answer never inherits the old determinant ans
+PASS failed matrix demand invalidates scalar ans rather than consuming stale success
+PASS school source labels, dependent failure and independent success survive
+PASS false square and false identity claims are tested rather than assumed
+PASS a concrete polynomial-matrix identity is actually evaluated, not copied as a given
+PASS proof conclusions cannot define missing matrices
+PASS arbitrary matrix proof and symbolic parameters ask for clarification
+PASS Gauss records actual row swaps, coefficients and augmented matrices
+PASS Cramer replaces each column and independently agrees with Gauss and substitution
+PASS singular systems clear stale named numerical solutions
+PASS geometry-to-matrix bridge retains exact fractions/radicals and both contexts
+PASS matrix-to-geometry bridge supplies the real named vectors for later dot products
+PASS statistics-to-matrix rectangular bridge is exact and transposable
+PASS matrix-to-statistics bridge keeps duplicates and never invents frequencies
+PASS radical statistics bridge asks rather than silently approximating
+PASS eigenvalue approximation remains an available unverified supplemental tool
+PASS unrelated probability and complex prompts are never swallowed by matrix follow-up
+PASS safety: missing cell
+PASS safety: ragged rows
+PASS safety: bad bracket
+PASS safety: duplicate name
+PASS safety: nonfinite
+PASS safety: oversized value
+PASS safety: division by zero
+PASS safety: unreviewed OCR
+PASS safety: nonreal
+PASS safety: unknown second
+PASS safety: bad expansion index
+PASS safety: fractional power
+PASS safety: oversized power
+PASS safety: matrix division
+PASS safety: singular negative power
+PASS safety: unsafe expression
+PASS matrix storage guard rejects ragged, huge, malformed and prototype-shaped metadata
+PASS school method honors the requested column instead of hardcoding the first row
+PASS raw det/tr abbreviations do not replace the requested Arabic matrix names in final answers
+PASS the expression parser is bounded and cannot run property access or arbitrary functions
+PASS extractor normalizes a custom requested determinant method and retains the actual operand
+PASS named matrices in the question use mathematical brackets, fractions and radicals
+PASS matrix-form AX=B uses the actual RHS column instead of reducing A alone
+PASS identities and explicitly zero coefficient columns retain the free unknown
+PASS inline givens before a bridge verb are not mistaken for a setup-only declaration
+PASS a derived coefficient matrix never overwrites the user's previous A
+PASS CX=B uses and labels C without renaming it to a different existing A
+
+Matrices regression: 124 passed, 0 failed

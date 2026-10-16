@@ -472,6 +472,14 @@ export function solveProbabilityRequest(
           "جسر المصفوفات محدود بستة صفوف. اطلب إحصاء الجدول كاملًا أو اختر ست قيم مميزة.",
         );
       contextPatch.matrix = v.rows.map(([x, f]) => [x, f]);
+      contextPatch.matrices = {
+        values: {
+          ...context.matrices?.values,
+          M: v.rows.map(([, f], i) => [v.exactValues[i].text(), String(f)]),
+        },
+        active: "M",
+        origin: "statistics",
+      };
       finalLatex = `M=\\begin{pmatrix}${v.rows.map(([, f], i) => `${v.exactValues[i].tex()}&${f}`).join("\\\\")}\\end{pmatrix}`;
       v.steps.push({
         title: "الجسر إلى أدوات المصفوفات",

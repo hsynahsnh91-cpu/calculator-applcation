@@ -14,6 +14,7 @@ import {
   Info,
   Dices,
   Cuboid,
+  Grid2X2,
 } from "lucide-react";
 import { Tex, RichText } from "../common/Tex";
 import { Step } from "../common/Step";
@@ -27,6 +28,7 @@ import { copyToClipboard } from "../../utils/cn";
 import { answerAsText } from "../../solver/composer";
 import type { ProbabilityContext } from "../../solver/probabilityTypes";
 import type { GeometryContext } from "../../solver/geometryTypes";
+import type { MatrixContext } from "../../solver/matrixTypes";
 import type { ResultViewProps } from "./ResultVisuals";
 const Scientific = lazy(() => import("../scientific/ScientificCalculator"));
 const Equations = lazy(() => import("../equations/EquationSolver"));
@@ -88,6 +90,7 @@ export const AnswerBubble = memo(function AnswerBubble({
   onSave,
   onProbability,
   onGeometry,
+  onMatrices,
   saved,
   animate = false,
 }: {
@@ -96,6 +99,7 @@ export const AnswerBubble = memo(function AnswerBubble({
   onSave: (answer: SolverAnswer) => void;
   onProbability?: (context?: ProbabilityContext) => void;
   onGeometry?: (context?: GeometryContext) => void;
+  onMatrices?: (context?: MatrixContext) => void;
   saved: boolean;
   animate?: boolean;
 }) {
@@ -144,8 +148,12 @@ export const AnswerBubble = memo(function AnswerBubble({
                 resetKey={result.id}
                 label="النتيجة النهائية"
               >
-                <section className="final-result">
-                  {(answer.results.length > 1 || result.school?.label) && (
+                <section
+                  className={`final-result ${result.mode === "matrices" ? "matrix-answer" : ""}`}
+                >
+                  {(answer.results.length > 1 ||
+                    result.school?.label ||
+                    result.mode === "matrices") && (
                     <p className="school-result-heading">
                       {result.school?.label && (
                         <bdi className="school-request-label">
@@ -222,7 +230,7 @@ export const AnswerBubble = memo(function AnswerBubble({
                 resetKey={result.id}
               >
                 <section
-                  className={schoolCards ? "school-request-card" : "space-y-3"}
+                  className={`${schoolCards ? "school-request-card" : "space-y-3"} ${result.mode === "matrices" ? "matrix-answer" : ""}`}
                   data-request-label={result.school?.label || undefined}
                 >
                   {(schoolCards || answer.results.length > 1) && (
@@ -342,8 +350,24 @@ export const AnswerBubble = memo(function AnswerBubble({
         {phase >= 2 && (
           <>
             <div className="answer-actions">
+              {onMatrices &&
+                (answer.results.some((r) => r.mode === "matrices") ||
+                  answer.unsolved.some((r) => r.engine === "matricesEngine") ||
+                  answer.results.some((r) => !!r.contextPatch?.matrices)) && (
+                  <button
+                    type="button"
+                    className="answer-action"
+                    aria-label="تعديل معطيات المصفوفات"
+                    onClick={() => onMatrices(answer.context.matrices)}
+                  >
+                    <Grid2X2 size={15} />
+                    <span>لوحة المصفوفات</span>
+                  </button>
+                )}
               {onGeometry &&
-                (answer.results.some((r) => r.mode === "geometry") ||
+                (answer.results.some(
+                  (r) => r.mode === "geometry" || !!r.contextPatch?.geometry,
+                ) ||
                   answer.unsolved.some(
                     (r) =>
                       r.engine === "geometryEngine" ||
@@ -360,7 +384,10 @@ export const AnswerBubble = memo(function AnswerBubble({
                   </button>
                 )}
               {onProbability &&
-                (answer.results.some((r) => r.mode === "probability") ||
+                (answer.results.some(
+                  (r) =>
+                    r.mode === "probability" || !!r.contextPatch?.probability,
+                ) ||
                   answer.unsolved.some(
                     (r) => r.engine === "probabilityEngine",
                   )) && (

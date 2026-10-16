@@ -6,6 +6,7 @@ import type {
 import type { AngleMode, AppMode } from "../types";
 import type { ProbabilityContext } from "./probabilityTypes";
 import type { GeometryContext } from "./geometryTypes";
+import type { MatrixContext } from "./matrixTypes";
 
 export const ENGINE_LABELS = {
   mathEngine: "الحساب العلمي",
@@ -37,6 +38,7 @@ export interface SolverContext {
   assignments: Record<string, number>;
   solutions?: Record<string, number>;
   matrix?: number[][];
+  matrices?: MatrixContext;
   probability?: ProbabilityContext;
   geometry?: GeometryContext;
   school?: SchoolContext;

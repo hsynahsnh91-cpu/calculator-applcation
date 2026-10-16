@@ -646,9 +646,7 @@ export default function GeometryBoard({
     refs = useRef<(HTMLButtonElement | null)[]>([]),
     initialOp = chooseOperation(context);
   const [operation, setOperation] = useState(initialOp),
-    [category, setCategory] = useState<Category>(
-      operations.find((o) => o.id === initialOp)!.category,
-    ),
+    [category, setCategory] = useState<Category | null>(null),
     [form, setForm] = useState<Form>(() => ({
       ...initial(context),
       unit: context?.geometricDot?.unit || angleMode,
@@ -662,6 +660,7 @@ export default function GeometryBoard({
       setForm((f) => ({ ...f, [key]: value })),
     pointCount = op.id === "barycenter" ? Number(form.count) : op.p || 0;
   const preview = useMemo(() => {
+    if (!category) return { question: "", error: "" };
     try {
       for (let i = 0; i < pointCount; i++)
         if (!/^[A-Z][1-4]?$/.test(form["pn" + i]))
@@ -685,10 +684,11 @@ export default function GeometryBoard({
         error: e instanceof Error ? e.message : "أكمل المعطيات.",
       };
     }
-  }, [op, form, pointCount, angleMode]);
+  }, [op, form, pointCount, angleMode, category]);
   const chooseTab = (tab: Category) => {
     setCategory(tab);
-    setOperation(operations.find((o) => o.category === tab)!.id);
+    if (operations.find((o) => o.id === operation)?.category !== tab)
+      setOperation(operations.find((o) => o.category === tab)!.id);
   };
   const field = (label: string, key: string) => (
     <label className="space-field" key={key}>
@@ -742,7 +742,8 @@ export default function GeometryBoard({
             }}
             role="tab"
             aria-selected={category === tab}
-            tabIndex={category === tab ? 0 : -1}
+            aria-expanded={category === tab}
+            tabIndex={category === tab || (!category && i === 0) ? 0 : -1}
             id={`${id}-${tab}`}
             aria-controls={`${id}-panel`}
             onClick={() => chooseTab(tab)}
@@ -756,7 +757,10 @@ export default function GeometryBoard({
                       ? tabs.length - 1
                       : (i + (e.key === "ArrowLeft" ? 1 : -1) + tabs.length) %
                         tabs.length;
-                chooseTab(tabs[next][0]);
+                setCategory(tabs[next][0]);
+                setOperation(
+                  operations.find((o) => o.category === tabs[next][0])!.id,
+                );
                 refs.current[next]?.focus();
               }
             }}
@@ -765,194 +769,204 @@ export default function GeometryBoard({
           </button>
         ))}
       </div>
-      <section
-        id={`${id}-panel`}
-        role="tabpanel"
-        aria-labelledby={`${id}-${category}`}
-        className="space-board-panel"
-      >
-        <div className="space-operation-row">
-          <label className="space-field">
-            <span>المطلوب</span>
-            <select
-              aria-label="العملية الهندسية"
-              value={operation}
-              onChange={(e) => setOperation(e.target.value)}
-            >
-              {operations
-                .filter((o) => o.category === category)
-                .map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.title}
-                  </option>
-                ))}
-            </select>
-          </label>
-          <button
-            type="button"
-            className="space-example"
-            onClick={() => {
-              setForm(example(op, exampleIndex));
-              setExampleIndex((i) => i + 1);
-            }}
+      {!category && (
+        <p className="tool-disclosure-hint">
+          اختر خانة هندسية لإظهار حقولها؛ لا يبدأ الحل قبل طلبه.
+        </p>
+      )}
+      {category && (
+        <>
+          <section
+            id={`${id}-panel`}
+            role="tabpanel"
+            aria-labelledby={`${id}-${category}`}
+            className="space-board-panel"
           >
-            <FlaskConical size={15} />
-            <span>تحميل مثال {(exampleIndex % 2) + 1}</span>
-          </button>
-        </div>
-        {op.id === "solid" && (
-          <>
-            <label className="space-field">
-              <span>نوع المجسم</span>
-              <select
-                aria-label="نوع المجسم"
-                value={form.solid}
-                onChange={(e) => set("solid", e.target.value)}
-              >
-                {Object.entries(solidLabels).map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="space-fields-grid">
-              {dims(form.solid).map((k) => field(dimensionLabels[k], k))}
-            </div>
-          </>
-        )}
-        {op.id === "pyramid-volume" && (
-          <div className="space-fields-grid">
-            {field("مساحة القاعدة", "area")}
-            {field("الارتفاع العمودي h", "h")}
-          </div>
-        )}
-        {op.id === "barycenter" && (
-          <label className="space-field">
-            <span>عدد النقاط</span>
-            <select
-              aria-label="عدد نقاط مركز الأبعاد"
-              value={form.count}
-              onChange={(e) => set("count", e.target.value)}
-            >
-              {[2, 3, 4].map((n) => (
-                <option key={n} value={n}>
-                  {n} نقاط
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        {Array.from({ length: pointCount }, (_, i) => (
-          <fieldset className="space-coordinate-card" key={i}>
-            <legend>النقطة {form["pn" + i]}</legend>
-            <div className="space-point-row">
-              <label className="space-name">
-                <span>الاسم</span>
-                <input
-                  dir="ltr"
-                  aria-label={`اسم النقطة ${i + 1}`}
-                  value={form["pn" + i]}
-                  maxLength={2}
-                  onChange={(e) => set("pn" + i, e.target.value)}
-                />
-              </label>
-              {triple("p" + i, form["pn" + i])}
-            </div>
-            {op.id === "barycenter" &&
-              field(`وزن ${form["pn" + i]}`, "weight" + i)}
-          </fieldset>
-        ))}
-        {Array.from({ length: op.v || 0 }, (_, i) => (
-          <fieldset className="space-coordinate-card" key={i}>
-            <legend>
-              <Tex math={`\\vec{${"uvw"[i]}}`} className="space-math" />
-              {op.id === "plane-normal" ? " — الناظم" : ""}
-            </legend>
-            {triple("v" + i, "uvw"[i])}
-          </fieldset>
-        ))}
-        {Array.from({ length: op.l || 0 }, (_, i) => (
-          <fieldset className="space-coordinate-card" key={i}>
-            <legend>المستقيم D{i + 1}</legend>
-            <p>نقطة منه</p>
-            {triple("l" + i + "p", `نقطة D${i + 1}`)}
-            <p>شعاع توجيهه — غير معدوم</p>
-            {triple("l" + i + "u", `اتجاه D${i + 1}`)}
-          </fieldset>
-        ))}
-        {Array.from({ length: op.q || 0 }, (_, i) =>
-          field(`معادلة المستوي ${"PQ"[i]}`, "plane" + i),
-        )}
-        {op.id === "scale" && field("المعامل k", "coefficient")}
-        {op.id === "sphere-center" && field("نصف قطر الكرة R", "radius")}
-        {op.id === "sphere-equation" && field("معادلة الكرة", "sphereEquation")}
-        {op.id === "geometric-dot" && (
-          <>
-            <div className="space-fields-grid">
-              {field("طويلة u", "normU")}
-              {field("طويلة v", "normV")}
-              {field("الزاوية بين الشعاعين", "theta")}
+            <div className="space-operation-row">
               <label className="space-field">
-                <span>وحدة الزاوية</span>
+                <span>المطلوب</span>
                 <select
-                  aria-label="وحدة زاوية الجداء"
-                  value={form.unit}
-                  onChange={(e) => set("unit", e.target.value)}
+                  aria-label="العملية الهندسية"
+                  value={operation}
+                  onChange={(e) => setOperation(e.target.value)}
                 >
-                  <option value="DEG">درجة</option>
-                  <option value="RAD">راديان</option>
-                  <option value="GRAD">غراد</option>
+                  {operations
+                    .filter((o) => o.category === category)
+                    .map((o) => (
+                      <option key={o.id} value={o.id}>
+                        {o.title}
+                      </option>
+                    ))}
                 </select>
               </label>
+              <button
+                type="button"
+                className="space-example"
+                onClick={() => {
+                  setForm(example(op, exampleIndex));
+                  setExampleIndex((i) => i + 1);
+                }}
+              >
+                <FlaskConical size={15} />
+                <span>تحميل مثال {(exampleIndex % 2) + 1}</span>
+              </button>
             </div>
-          </>
-        )}
-        <details className="space-guide">
-          <summary>
-            <BookOpen size={14} />
-            القانون وطريقة الدرس
-          </summary>
-          <Tex math={op.formula} display className="space-math" />
-          <p>
-            نعمل في معلم متعامد متجانس للصيغ المترية. الأطوال لا تُستنتج من
-            الرسم، والشعاع المعدوم لا يحدد اتجاه مستقيم. الكسور والجذور البسيطة
-            مقبولة في الخانات.
-          </p>
-        </details>
-        {!preview.error && (
-          <details className="space-question-preview">
-            <summary>مراجعة السؤال الذي سيُرسل</summary>
-            <p data-testid="geometry-question-preview">
-              <RichText text={preview.question} autoMath />
-            </p>
-          </details>
-        )}
-      </section>
-      <div className="space-board-actions">
-        {!!preview.error && (
-          <p className="space-input-error" role="alert">
-            {preview.error}
-          </p>
-        )}
-        <button
-          type="button"
-          className="primary-button"
-          disabled={!!preview.error || busy}
-          onClick={() => onSolve(preview.question)}
-        >
-          <ArrowUp size={16} />
-          حل في المحادثة
-        </button>
-        <button
-          type="button"
-          className="suggestion-button"
-          disabled={!!preview.error}
-          onClick={() => onInsert(preview.question)}
-        >
-          إدراج في السؤال
-        </button>
-      </div>
+            {op.id === "solid" && (
+              <>
+                <label className="space-field">
+                  <span>نوع المجسم</span>
+                  <select
+                    aria-label="نوع المجسم"
+                    value={form.solid}
+                    onChange={(e) => set("solid", e.target.value)}
+                  >
+                    {Object.entries(solidLabels).map(([key, label]) => (
+                      <option key={key} value={key}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="space-fields-grid">
+                  {dims(form.solid).map((k) => field(dimensionLabels[k], k))}
+                </div>
+              </>
+            )}
+            {op.id === "pyramid-volume" && (
+              <div className="space-fields-grid">
+                {field("مساحة القاعدة", "area")}
+                {field("الارتفاع العمودي h", "h")}
+              </div>
+            )}
+            {op.id === "barycenter" && (
+              <label className="space-field">
+                <span>عدد النقاط</span>
+                <select
+                  aria-label="عدد نقاط مركز الأبعاد"
+                  value={form.count}
+                  onChange={(e) => set("count", e.target.value)}
+                >
+                  {[2, 3, 4].map((n) => (
+                    <option key={n} value={n}>
+                      {n} نقاط
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {Array.from({ length: pointCount }, (_, i) => (
+              <fieldset className="space-coordinate-card" key={i}>
+                <legend>النقطة {form["pn" + i]}</legend>
+                <div className="space-point-row">
+                  <label className="space-name">
+                    <span>الاسم</span>
+                    <input
+                      dir="ltr"
+                      aria-label={`اسم النقطة ${i + 1}`}
+                      value={form["pn" + i]}
+                      maxLength={2}
+                      onChange={(e) => set("pn" + i, e.target.value)}
+                    />
+                  </label>
+                  {triple("p" + i, form["pn" + i])}
+                </div>
+                {op.id === "barycenter" &&
+                  field(`وزن ${form["pn" + i]}`, "weight" + i)}
+              </fieldset>
+            ))}
+            {Array.from({ length: op.v || 0 }, (_, i) => (
+              <fieldset className="space-coordinate-card" key={i}>
+                <legend>
+                  <Tex math={`\\vec{${"uvw"[i]}}`} className="space-math" />
+                  {op.id === "plane-normal" ? " — الناظم" : ""}
+                </legend>
+                {triple("v" + i, "uvw"[i])}
+              </fieldset>
+            ))}
+            {Array.from({ length: op.l || 0 }, (_, i) => (
+              <fieldset className="space-coordinate-card" key={i}>
+                <legend>المستقيم D{i + 1}</legend>
+                <p>نقطة منه</p>
+                {triple("l" + i + "p", `نقطة D${i + 1}`)}
+                <p>شعاع توجيهه — غير معدوم</p>
+                {triple("l" + i + "u", `اتجاه D${i + 1}`)}
+              </fieldset>
+            ))}
+            {Array.from({ length: op.q || 0 }, (_, i) =>
+              field(`معادلة المستوي ${"PQ"[i]}`, "plane" + i),
+            )}
+            {op.id === "scale" && field("المعامل k", "coefficient")}
+            {op.id === "sphere-center" && field("نصف قطر الكرة R", "radius")}
+            {op.id === "sphere-equation" &&
+              field("معادلة الكرة", "sphereEquation")}
+            {op.id === "geometric-dot" && (
+              <>
+                <div className="space-fields-grid">
+                  {field("طويلة u", "normU")}
+                  {field("طويلة v", "normV")}
+                  {field("الزاوية بين الشعاعين", "theta")}
+                  <label className="space-field">
+                    <span>وحدة الزاوية</span>
+                    <select
+                      aria-label="وحدة زاوية الجداء"
+                      value={form.unit}
+                      onChange={(e) => set("unit", e.target.value)}
+                    >
+                      <option value="DEG">درجة</option>
+                      <option value="RAD">راديان</option>
+                      <option value="GRAD">غراد</option>
+                    </select>
+                  </label>
+                </div>
+              </>
+            )}
+            <details className="space-guide">
+              <summary>
+                <BookOpen size={14} />
+                القانون وطريقة الدرس
+              </summary>
+              <Tex math={op.formula} display className="space-math" />
+              <p>
+                نعمل في معلم متعامد متجانس للصيغ المترية. الأطوال لا تُستنتج من
+                الرسم، والشعاع المعدوم لا يحدد اتجاه مستقيم. الكسور والجذور
+                البسيطة مقبولة في الخانات.
+              </p>
+            </details>
+            {!preview.error && (
+              <details className="space-question-preview">
+                <summary>مراجعة السؤال الذي سيُرسل</summary>
+                <p data-testid="geometry-question-preview">
+                  <RichText text={preview.question} autoMath />
+                </p>
+              </details>
+            )}
+          </section>
+          <div className="space-board-actions">
+            {!!preview.error && (
+              <p className="space-input-error" role="alert">
+                {preview.error}
+              </p>
+            )}
+            <button
+              type="button"
+              className="primary-button"
+              disabled={!!preview.error || busy}
+              onClick={() => onSolve(preview.question)}
+            >
+              <ArrowUp size={16} />
+              حل في المحادثة
+            </button>
+            <button
+              type="button"
+              className="suggestion-button"
+              disabled={!!preview.error}
+              onClick={() => onInsert(preview.question)}
+            >
+              إدراج في السؤال
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

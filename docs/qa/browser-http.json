@@ -398,6 +398,82 @@
       "pass": true
     },
     {
+      "name": "matrix board is collapsed on demand with five categories and no automatic solving",
+      "pass": true
+    },
+    {
+      "name": "matrix cards, six-column fields, keyboard tabs and Gauss title fit 320/360/390px phones",
+      "pass": true
+    },
+    {
+      "name": "editing B uses B's real determinant and Arabic label in the Worker answer",
+      "pass": true
+    },
+    {
+      "name": "reopening an older matrix answer restores its own B instead of the latest A",
+      "pass": true
+    },
+    {
+      "name": "trace has its own Arabic operation and never falls back to a determinant",
+      "pass": true
+    },
+    {
+      "name": "rectangular product examples change the actual ordered matrix result",
+      "pass": true
+    },
+    {
+      "name": "algebra controls preserve fractions and multiply every matrix element",
+      "pass": true
+    },
+    {
+      "name": "undefined dimensions stop the matrix action instead of returning a padded or stale answer",
+      "pass": true
+    },
+    {
+      "name": "Sarrus and a chosen cofactor column have different real calculation steps",
+      "pass": true
+    },
+    {
+      "name": "Gauss system fields alter the actual solution and expose verified line operations on a phone",
+      "pass": true
+    },
+    {
+      "name": "Cramer three-variable controls compute Delta_x, Delta_y and Delta_z",
+      "pass": true
+    },
+    {
+      "name": "matrix definitions and mathematical preview open only their designated details",
+      "pass": true
+    },
+    {
+      "name": "matrix rows bridge into the geometry engine without losing names or fractions",
+      "pass": true
+    },
+    {
+      "name": "matrix elements bridge to statistics as real data, with duplicates and no assumed weights",
+      "pass": true
+    },
+    {
+      "name": "numbered matrix exam-style input preserves B's trace, AB order and the following determinant",
+      "pass": true
+    },
+    {
+      "name": "fraction/radical inputs have typeset matrices and the solution stays exact",
+      "pass": true
+    },
+    {
+      "name": "matrix history remains manual and the exact named input survives reloading",
+      "pass": true
+    },
+    {
+      "name": "other tool categories are also collapsed and probability calculations need a separate explicit tap",
+      "pass": true
+    },
+    {
+      "name": "capability and formula details remain hidden until their own titles are pressed",
+      "pass": true
+    },
+    {
       "name": "no external HTTP requests or uncaught browser errors",
       "pass": true
     }

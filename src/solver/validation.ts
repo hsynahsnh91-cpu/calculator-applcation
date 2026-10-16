@@ -1,3 +1,4 @@
+import { isMatrixContext } from "./matrixTypes";
 import { isSchoolContext, isSchoolResultInfo } from "./schoolTypes";
 import { isGeometryContext, spaceSolidDimensions } from "./geometryTypes";
 import { isProbabilityContext } from "./probabilityTypes";
@@ -65,7 +66,8 @@ function context(value: unknown, partial = false): boolean {
     (value.probability === undefined ||
       isProbabilityContext(value.probability)) &&
     (value.lastEngine === undefined || engine(value.lastEngine)) &&
-    (value.matrix === undefined || matrix(value.matrix))
+    (value.matrix === undefined || matrix(value.matrix)) &&
+    (value.matrices === undefined || isMatrixContext(value.matrices))
   );
 }
 function tree(

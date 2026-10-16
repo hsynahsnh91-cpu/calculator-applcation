@@ -112,6 +112,8 @@ function readGroup(text: string, start: number): [string, number] | null {
 /** A balanced, deterministic LaTeX decoder, not a language model. */
 export function decodeLatex(source: string): string {
   let out = "";
+  const implicitFactor = () =>
+    /[A-Za-z0-9_)\]}]$/.test(out) && !/\\begin\{[pbvV]?matrix\}\s*$/.test(out);
   const text = source
     .replace(/\^\{\\circ\}|\^\\circ(?![a-zA-Z])|\\degree(?![a-zA-Z])/g, "°")
     .replace(/\\(?:left|right|displaystyle|limits)\b/g, "")
@@ -159,14 +161,14 @@ export function decodeLatex(source: string): string {
         out += text[index++];
         continue;
       }
-      out += `${/[A-Za-z0-9_)\]}]$/.test(out) ? "*" : ""}((${decodeLatex(first[0])})/(${decodeLatex(second[0])}))`;
+      out += `${implicitFactor() ? "*" : ""}((${decodeLatex(first[0])})/(${decodeLatex(second[0])}))`;
       index = second[1];
     } else {
       out +=
         command[1] === "sqrt"
           ? rootIndex === "2"
-            ? `${/[A-Za-z0-9_)\]}]$/.test(out) ? "*" : ""}sqrt(${decodeLatex(first[0])})`
-            : `${/[A-Za-z0-9_)\]}]$/.test(out) ? "*" : ""}((${decodeLatex(first[0])})^(1/(${rootIndex})))`
+            ? `${implicitFactor() ? "*" : ""}sqrt(${decodeLatex(first[0])})`
+            : `${implicitFactor() ? "*" : ""}((${decodeLatex(first[0])})^(1/(${rootIndex})))`
           : decodeLatex(first[0]);
       index = first[1];
     }

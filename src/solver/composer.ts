@@ -175,6 +175,37 @@ export function composeAnswer(
     follow.push("ارسم المعطيات الهندسية السابقة");
     suggestions.unshift(...follow);
   }
+  if (results.some((r) => r.mode === "matrices") && context.matrices) {
+    const m = context.matrices,
+      n = m.active;
+    const follow: string[] = [];
+    if (m.lastScalar) follow.push("احسب النتيجة السابقة * 2");
+    if (m.system)
+      follow.push(
+        "حل الجملة السابقة بطريقة كرامر",
+        "حل الجملة السابقة بطريقة غاوس",
+      );
+    if (n && m.values[n]) {
+      const a = m.values[n];
+      follow.push(`جد منقول المصفوفة ${n}`);
+      if (a.length === a[0].length)
+        follow.push(`احسب أثر المصفوفة ${n}`, `احسب محدد المصفوفة ${n}`);
+      if (a[0].length === 3) follow.push(`حول أسطر المصفوفة ${n} إلى أشعة`);
+    }
+    if (results.some((r) => r.contextPatch?.geometry)) {
+      const v = context.geometry?.active.vectors || [];
+      if (v.length >= 2)
+        follow.unshift(
+          `ادرس الارتباط الخطي للأشعة ${v.slice(0, 3).join(" و")}`,
+        );
+      if (v.length) follow.unshift(`احسب طويلة الشعاع ${v[0]}`);
+    }
+    if (
+      results.some((r) => r.contextPatch?.probability?.active === "statistics")
+    )
+      follow.unshift("احسب المتوسط فقط", "احسب التباين فقط");
+    suggestions.unshift(...follow);
+  }
   if (results.length) suggestions.push("اشرح الخطوات بتفصيل أكثر");
   const intro = results.length
     ? unsolved.length

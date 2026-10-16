@@ -1,3 +1,4 @@
+import { matrixIntent } from "./extractors/matrices";
 import { isSpaceIntent } from "./spaceNotation";
 import { isComplexIntent } from "./complexTypes";
 import {
@@ -41,6 +42,8 @@ export function routePrompt(
     /مصفوف|محدد|مقلوب|مدرج(?! (?:ال)?تكراري)|رتبة|قيم ذاتية|\[\s*\[/.test(text)
   )
     give("matricesEngine", 0.99, "مصفوفة أو عملية عليها");
+  if (matrixIntent(text, context))
+    give("matricesEngine", 1, "طلب مصفوفي محدد أو متابعة لمصفوفات مسماة");
   if (/متتالي|حدها|حدودها|اساسها|الحد الاول|\bu_?\{?n|\bu\([n0-9]/.test(text))
     give("sequences", 0.99, "معطيات متتالية أو مجموع حدودها");
   const sequenceIntent =
@@ -136,7 +139,8 @@ export function routePrompt(
     (/\d/.test(stripped) ||
       (/\bans\b/.test(stripped) &&
         (context?.probability?.lastScalar !== undefined ||
-          context?.geometry?.lastScalar !== undefined)) ||
+          context?.geometry?.lastScalar !== undefined ||
+          context?.matrices?.lastScalar !== undefined)) ||
       Object.keys(context?.solutions ?? context?.assignments ?? {}).some(
         (key) => new RegExp(`\\b${key}\\b`).test(stripped),
       )) &&
@@ -161,6 +165,10 @@ export function selectEngines(
   let selected = candidates
     .filter((candidate) => candidate.confidence >= 0.9)
     .map((candidate) => candidate.engine);
+  if (
+    candidates.some((c) => c.engine === "matricesEngine" && c.confidence === 1)
+  )
+    return ["matricesEngine"];
   for (const engine of [
     "sequences",
     "integrationEngine",

@@ -4,6 +4,7 @@ import {
   schoolUnimplemented,
   partInfo,
 } from "./schoolRuntime";
+import { matrixDefinitionOnly } from "./extractors/matrices";
 import { schoolIntent } from "./schoolDocument";
 import type { SchoolPart } from "./schoolTypes";
 import { parsePrompt } from "./parser";
@@ -99,7 +100,7 @@ export async function solvePrompt(
     try {
       context = parsePrompt(request, context).context;
       context = await prepareSchoolContext(request, context);
-      schoolUnimplemented(request);
+      schoolUnimplemented(request, context);
     } catch (error) {
       unsolved.push({
         request,
@@ -113,7 +114,7 @@ export async function solvePrompt(
       previousFailed = true;
       continue;
     }
-    if (part.setup) continue;
+    if (part.setup || matrixDefinitionOnly(request)) continue;
     previousFailed = false;
     if (
       /^(?:(?:لتكن|ضع|حيث)\s*)?[a-dkmpqrt]\s*=\s*-?\d+(?:\.\d+)?$/.test(request)
@@ -205,6 +206,11 @@ export async function solvePrompt(
         };
       } else {
         previousFailed = true;
+        if (selected[index] === "matricesEngine" && context.matrices)
+          context = {
+            ...context,
+            matrices: { ...context.matrices, lastScalar: undefined },
+          };
         const error: unknown = value.reason;
         const message =
           error instanceof Error && /[\u0600-\u06ff]/.test(error.message)

@@ -1,3 +1,4 @@
+import type { MatrixContext } from "../solver/matrixTypes";
 import type {
   GeometryContext,
   SpaceAnswer,
@@ -221,7 +222,10 @@ function scene(input: SpaceRequest): SpaceVisual {
   }
   return result;
 }
-export function solveSpaceRequest(input: SpaceRequest): SpaceAnswer {
+export function solveSpaceRequest(
+  input: SpaceRequest,
+  previousMatrices?: MatrixContext,
+): SpaceAnswer {
   const model = {
     points: { ...input.model.points },
     vectors: { ...input.model.vectors },
@@ -1345,12 +1349,22 @@ export function solveSpaceRequest(input: SpaceRequest): SpaceAnswer {
           return n;
         }),
       );
-      out.contextPatch = { matrix };
+      out.contextPatch = {
+        matrix,
+        matrices: {
+          values: {
+            ...previousMatrices?.values,
+            M: rows.map((r) => r.map((c) => c.text())),
+          },
+          active: "M",
+          origin: "geometry",
+        },
+      };
       out.steps = [
         step(
           "جسر إلى محرك المصفوفات",
           out.finalLatex,
-          "المصفوفة النشطة عددية؛ تبقى الإحداثيات الجبرية الدقيقة في سياق الهندسة. يمكنك طلب المنقول أو الرتبة. الأعمدة في الجملة هي معامل t ثم معامل s ثم الطرف الأيمن.",
+          "نُقلت الإحداثيات الجبرية الدقيقة إلى المصفوفة M، مع جسر عددي متوافق. يمكنك طلب المنقول أو الرتبة أو العودة إلى الأشعة. الأعمدة في الجملة هي معامل t ثم معامل s ثم الطرف الأيمن.",
         ),
       ];
       break;

@@ -11,7 +11,6 @@ import {
   extractEquation,
   extractExpression,
   extractLimit,
-  extractMatrices,
   extractScientific,
   extractSequence,
 } from "./extractors";
@@ -43,7 +42,6 @@ export async function runEngine(
     canonical,
     expressionTex,
     numberTex,
-    matrixTex,
     parseExpression,
     polynomialCoefficients,
     angularExpression,
@@ -90,6 +88,13 @@ export async function runEngine(
         throw new ClarificationError(
           "لا توجد قيمة عددية محددة لهذه النتيجة السابقة.",
         );
+      scalar = undefined;
+    } else if (genericPrevious && context.lastEngine === "matricesEngine") {
+      if (!context.matrices?.lastScalar)
+        throw new ClarificationError(
+          "النتيجة المصفوفية السابقة ليست عددًا واحدًا؛ اطلب المحدد أو الأثر أو اكتب العنصر المقصود.",
+        );
+      exactScalar = context.matrices.lastScalar;
       scalar = undefined;
     } else if (
       genericPrevious &&
@@ -671,64 +676,9 @@ export async function runEngine(
     return out;
   }
   if (engine === "matricesEngine") {
-    const [matrix, second] = extractMatrices(text, context);
-    const { solveMatrixOperations } = await import("../utils/matricesEngine");
-    const solution = solveMatrixOperations(matrix, second);
-    const out = result(engine, "matrices", "عمليات المصفوفة");
-    const finals: string[] = [];
-    if (/محدد/.test(text) || !/مقلوب|منقول|رتبة|جداء|ضرب|ذاتي/.test(text))
-      finals.push(`\\det A = ${numberTex(solution.detA!)}`);
-    if (/مقلوب/.test(text))
-      finals.push(
-        solution.inverseA
-          ? `A^{-1} = ${matrixTex(solution.inverseA)}`
-          : "\\det A=0 \\implies \\text{لا يوجد مقلوب}",
-      );
-    if (/منقول/.test(text))
-      finals.push(`A^{T} = ${matrixTex(solution.transposeA!)}`);
-    if (/رتبة/.test(text))
-      finals.push(`\\operatorname{rg}(A)=${solution.rankA}`);
-    if (/جداء|ضرب/.test(text)) {
-      if (!solution.productAB)
-        throw new ClarificationError("ما المصفوفة الثانية لحساب الجداء؟");
-      finals.push(`AB=${matrixTex(solution.productAB)}`);
-    }
-    if (/ذاتي/.test(text))
-      finals.push(`\\lambda \\in \\{${solution.eigenvaluesA?.join(",")}\\}`);
-    out.finalLatex = `\\begin{aligned}${finals.join("\\\\[6pt]")}\\end{aligned}`;
-    out.steps = solution.steps.map((step) => ({
-      title: step.title,
-      text: step.text,
-      latex: step.latex,
-    }));
-    const independent = math.det(matrix);
-    let error = Math.abs(independent - (solution.detA ?? NaN));
-    if (solution.inverseA) {
-      const product = math.multiply(matrix, solution.inverseA) as number[][];
-      error = Math.max(
-        error,
-        ...product.flatMap((row, i) =>
-          row.map((value, j) => Math.abs(value - (i === j ? 1 : 0))),
-        ),
-      );
-    }
-    out.verification = {
-      passed:
-        !/منقول|رتبة|جداء|ضرب|ذاتي/.test(text) &&
-        Number.isFinite(error) &&
-        error < 1e-7,
-      maxError: Number.isFinite(error) ? error : undefined,
-      method:
-        "مطابقة المحدد بمحرك mathjs والتحقق من حاصل ضرب المصفوفة بمقلوبها؛ لا تشمل الشارة عمليات أخرى",
-    };
-    if (solution.gauss)
-      out.visuals.push({
-        kind: "table",
-        title: "الشكل المدرج المختزل",
-        latex: solution.gauss.rrefLatex,
-      });
-    out.contextPatch = { matrix };
-    return out;
+    const { extractMatrixRequest } = await import("./extractors/matrices");
+    const { solveMatrixRequest } = await import("../utils/matrixWorkbench");
+    return solveMatrixRequest(extractMatrixRequest(text, context), context);
   }
   if (engine === "geometryEngine" || engine === "geometryTools") {
     const { schoolSphereTangency } = await import("../utils/schoolAnalysis");
@@ -741,7 +691,10 @@ export async function runEngine(
     );
     return {
       ...result(engine, "geometry", "الهندسة الفراغية"),
-      ...solveSpaceRequest(extractSpaceRequest(text, context, angleMode)),
+      ...solveSpaceRequest(
+        extractSpaceRequest(text, context, angleMode),
+        context.matrices,
+      ),
     };
   }
   if (engine === "probabilityEngine" || engine === "probabilityTools") {

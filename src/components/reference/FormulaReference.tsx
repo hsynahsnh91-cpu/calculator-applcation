@@ -648,6 +648,7 @@ const FORMULA_DATABASE: FormulaItem[] = [
   },
   {
     id: "mat_inv2",
+    description: "يشترط أن يكون المحدد ad−bc غير معدوم.",
     category: "المصفوفات",
     title: "مقلوب مصفوفة 2 × 2",
     latex:
@@ -655,20 +656,23 @@ const FORMULA_DATABASE: FormulaItem[] = [
   },
   {
     id: "mat_inv",
+    description:
+      "للمصفوفة المربعة ذات المحدد غير المعدوم. الملحقة منقول مصفوفة العوامل المرافقة.",
     category: "المصفوفات",
-    title: "المقلوب بالمصفوفة المرافقة",
+    title: "المعكوس بالمصفوفة الملحقة",
     latex:
-      "A^{-1} = \\dfrac{1}{\\det(A)}\\, \\operatorname{adj}(A) \\quad , \\quad A\\, A^{-1} = I",
+      "A^{-1} = \\dfrac{1}{|A|}\\, \\operatorname{adj}(A) \\quad , \\quad A\\, A^{-1} = I",
   },
   {
     id: "mat_det_prod",
     category: "المصفوفات",
     title: "خواص المحدد",
-    latex:
-      "\\det(AB) = \\det(A)\\det(B) \\ , \\ \\det(A^{T}) = \\det(A) \\ , \\ \\det(kA) = k^{n}\\det(A)",
+    latex: "|AB| = |A|\\det(B) \\ , \\ |A^T| = |A| \\ , \\ |kA| = k^{n}|A|",
   },
   {
     id: "mat_transpose",
+    description:
+      "المنقول للجداء المعرف؛ قانون معكوس الجداء عندما تكون A وB مربعتين قابلتين للعكس.",
     category: "المصفوفات",
     title: "خواص المنقول والمقلوب",
     latex: "(AB)^{T} = B^{T} A^{T} \\quad , \\quad (AB)^{-1} = B^{-1} A^{-1}",
@@ -678,13 +682,47 @@ const FORMULA_DATABASE: FormulaItem[] = [
     category: "المصفوفات",
     title: "المعادلة المميزة",
     latex:
-      "\\det(A - \\lambda I) = 0 \\quad , \\quad \\lambda_{1} + \\lambda_{2} = \\operatorname{tr}(A) \\ , \\ \\lambda_{1}\\lambda_{2} = \\det(A)",
+      "|A-\\lambda I| = 0 \\quad , \\quad \\lambda_{1} + \\lambda_{2} = \\text{أثر المصفوفة }A \\ , \\ \\lambda_{1}\\lambda_{2} = |A|",
   },
   {
     id: "mat_system",
+    description:
+      "هذه الصيغة عندما تكون مصفوفة المعاملات مربعة قابلة للعكس؛ غاوس يميز أيضًا الجمل دون حل أو ذات حلول غير منتهية.",
     category: "المصفوفات",
     title: "حل جملة بالمصفوفات",
     latex: "AX = B \\implies X = A^{-1} B",
+  },
+
+  {
+    id: "mat_trace",
+    category: "المصفوفات",
+    title: "أثر المصفوفة A",
+    latex: String.raw`\text{أثر المصفوفة }A=\sum_{i=1}^{n}a_{ii}`,
+    description: "مجموع عناصر القطر الرئيسي، للمصفوفة المربعة فقط.",
+  },
+  {
+    id: "mat_product",
+    category: "المصفوفات",
+    title: "شرط جداء مصفوفتين وحساب عناصره",
+    latex: String.raw`A_{m\times p}B_{p\times n}=C_{m\times n},\quad c_{ij}=\sum_{k=1}^{p}a_{ik}b_{kj}`,
+    description:
+      "عدد أعمدة الأولى يساوي عدد أسطر الثانية. لا يلزم AB=BA؛ الجمع والطرح يحتاجان نفس القياس تمامًا.",
+  },
+  {
+    id: "mat_cramer",
+    category: "المصفوفات",
+    title: "طريقة كرامر ومحددات المجاهيل",
+    latex: String.raw`\Delta=|A|\ne0,\quad x=\frac{\Delta_x}{\Delta},\quad y=\frac{\Delta_y}{\Delta}`,
+    description:
+      "نستبدل عمود المجهول وحده بعمود الطرف الأيمن؛ إذا كان المحدد صفرًا لا نقسم عليه، بل نصنف الجملة بغاوس.",
+  },
+  {
+    id: "mat_gauss",
+    category: "المصفوفات",
+    title: "طريقة غاوس — المصفوفة الموسعة والمدرجة",
+    latex: String.raw`[A\mid b]\xrightarrow{L_i\leftrightarrow L_j,\ L_i\leftarrow kL_i,\ L_i\leftarrow L_i+kL_j}[U\mid c]`,
+    description:
+      "المبادلة، والضرب بعدد غير معدوم، وجمع مضاعف سطر إلى آخر. نقرأ الحل أو المجاهيل الحرة أو سطر التناقض.",
   },
 
   // Complex numbers
@@ -787,6 +825,7 @@ export const FormulaReference: React.FC = () => {
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("الكل");
+  const [expanded, setExpanded] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const categories = [
@@ -908,67 +947,78 @@ export const FormulaReference: React.FC = () => {
       {activeTab === "formulas" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredFormulas.map((f) => (
-            <div
+            <details
               key={f.id}
-              className="bg-slate-900 p-4 rounded-2xl border border-slate-800 hover:border-slate-700 shadow-xl space-y-2.5 flex flex-col justify-between transition-all group"
+              onToggle={(e) => {
+                const isOpen = e.currentTarget.open;
+                setExpanded((all) =>
+                  isOpen
+                    ? [...new Set([...all, f.id])]
+                    : all.filter((id) => id !== f.id),
+                );
+              }}
+              className="reference-entry bg-slate-900 p-4 rounded-2xl border border-slate-800 hover:border-slate-700 shadow-xl space-y-2.5 flex flex-col justify-between transition-all group"
             >
-              <div>
-                <div className="flex items-center justify-between border-b border-slate-800/80 pb-2 mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                    <span className="text-xs font-bold text-slate-200">
-                      {f.title}
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-800">
-                    {f.category}
+              <summary className="flex items-center justify-between border-b border-slate-800/80 pb-2 mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span className="text-xs font-bold text-slate-200">
+                    {f.title}
                   </span>
                 </div>
-
-                {/* font shrinks with formula length; the box itself scrolls sideways to the end of long formulas */}
-                <div
-                  dir="ltr"
-                  className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 overflow-x-auto overflow-y-hidden my-2 touch-pan-x"
-                  style={{ WebkitOverflowScrolling: "touch" }}
-                >
+                <span className="text-[10px] text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-800">
+                  {f.category}
+                </span>
+              </summary>
+              {expanded.includes(f.id) && (
+                <div>
+                  {/* font shrinks with formula length; the box itself scrolls sideways to the end of long formulas */}
                   <div
-                    className="w-max min-w-full flex justify-center"
-                    style={{
-                      fontSize:
-                        f.latex.length > 170
-                          ? "0.72rem"
-                          : f.latex.length > 120
-                            ? "0.82rem"
-                            : f.latex.length > 80
-                              ? "0.92rem"
-                              : "1rem",
-                    }}
+                    dir="ltr"
+                    className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 overflow-x-auto overflow-y-hidden my-2 touch-pan-x"
+                    style={{ WebkitOverflowScrolling: "touch" }}
                   >
-                    <Tex math={f.latex} />
+                    <div
+                      className="w-max min-w-full flex justify-center"
+                      style={{
+                        fontSize:
+                          f.latex.length > 170
+                            ? "0.72rem"
+                            : f.latex.length > 120
+                              ? "0.82rem"
+                              : f.latex.length > 80
+                                ? "0.92rem"
+                                : "1rem",
+                      }}
+                    >
+                      <Tex math={f.latex} />
+                    </div>
                   </div>
-                </div>
 
-                {f.description && (
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
-                    {f.description}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-end pt-2 border-t border-slate-800/80">
-                <button
-                  onClick={() => handleCopy(f.id, f.latex)}
-                  className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center gap-1.5 transition-all"
-                >
-                  {copiedId === f.id ? (
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  ) : (
-                    <Copy className="w-3.5 h-3.5" />
+                  {f.description && (
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      {f.description}
+                    </p>
                   )}
-                  <span>{copiedId === f.id ? "تم النسخ" : "نسخ الصيغة"}</span>
-                </button>
-              </div>
-            </div>
+                </div>
+              )}
+
+              {expanded.includes(f.id) && (
+                <div className="flex items-center justify-end pt-2 border-t border-slate-800/80">
+                  <button
+                    onClick={() => handleCopy(f.id, f.latex)}
+                    className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center gap-1.5 transition-all"
+                  >
+                    {copiedId === f.id ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                    <span>{copiedId === f.id ? "تم النسخ" : "نسخ الصيغة"}</span>
+                  </button>
+                </div>
+              )}
+            </details>
           ))}
         </div>
       )}

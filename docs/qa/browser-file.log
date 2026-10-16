@@ -97,6 +97,25 @@ PASS speech policy: available
 PASS speech policy: downloadable
 PASS speech policy: unavailable
 PASS speech policy: server-only
+PASS matrix board is collapsed on demand with five categories and no automatic solving
+PASS matrix cards, six-column fields, keyboard tabs and Gauss title fit 320/360/390px phones
+PASS editing B uses B's real determinant and Arabic label in the Worker answer
+PASS reopening an older matrix answer restores its own B instead of the latest A
+PASS trace has its own Arabic operation and never falls back to a determinant
+PASS rectangular product examples change the actual ordered matrix result
+PASS algebra controls preserve fractions and multiply every matrix element
+PASS undefined dimensions stop the matrix action instead of returning a padded or stale answer
+PASS Sarrus and a chosen cofactor column have different real calculation steps
+PASS Gauss system fields alter the actual solution and expose verified line operations on a phone
+PASS Cramer three-variable controls compute Delta_x, Delta_y and Delta_z
+PASS matrix definitions and mathematical preview open only their designated details
+PASS matrix rows bridge into the geometry engine without losing names or fractions
+PASS matrix elements bridge to statistics as real data, with duplicates and no assumed weights
+PASS numbered matrix exam-style input preserves B's trace, AB order and the following determinant
+PASS fraction/radical inputs have typeset matrices and the solution stays exact
+PASS matrix history remains manual and the exact named input survives reloading
+PASS other tool categories are also collapsed and probability calculations need a separate explicit tap
+PASS capability and formula details remain hidden until their own titles are pressed
 PASS no external HTTP requests or uncaught browser errors
 
-Browser: 100 passed, 0 failed
+Browser: 119 passed, 0 failed

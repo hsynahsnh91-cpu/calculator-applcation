@@ -9,26 +9,27 @@
     "geometry": 140,
     "curriculum": 83,
     "schoolSafety": 38,
-    "passed": 596,
-    "failed": 0
+    "passed": 720,
+    "failed": 0,
+    "matrices": 124
   },
   "browser": {
     "http": {
-      "passed": 100,
+      "passed": 119,
       "failed": 0,
       "externalRequests": 0,
       "uncaughtErrors": 0
     },
     "file": {
-      "passed": 100,
+      "passed": 119,
       "failed": 0,
       "externalRequests": 0,
       "uncaughtErrors": 0
     }
   },
   "build": {
-    "htmlBytes": 17025877,
-    "sha256": "7f57bdfb8ea7678349572a65a9d6a346f28356ad744f90a0058e69543dd60248",
+    "htmlBytes": 17100942,
+    "sha256": "b6afdc5d9bbf1e3a721c6d8243c0aaad0340534f483611989af5ba629775c9c8",
     "separateRuntimeFiles": 0,
     "embeddedLicenseNotices": 48
   },
@@ -45,10 +46,13 @@
     "Textbook image test uses real local OCR followed by explicit human review/correction. The radical was recognized as Vv3 in the printed fixture; mathematical OCR is not assumed infallible.",
     "Spatial geometry assumes an orthonormal frame for metric formulas; a nonorthonormal frame without Gram data is not silently treated as orthonormal.",
     "Spatial algebra is bounded: at most three radical primes/eight terms; finite inputs up to 1e9; drawing values up to 1e12. Unsupported nested radicals and excess expression complexity require clarification.",
-    "Spatial diagrams are projections, not geometric proofs. Matrix bridges are explicitly numerical while exact coordinate models remain stored.",
+    "Spatial diagrams are projections, not geometric proofs. Vector/matrix bridges preserve the bounded exact coordinate models; approximate eigenvalues remain supplemental and unverified.",
     "Curriculum conformity is not certified: official catalog access did not provide a complete verified ministry textbook edition.",
     "School proofs are bounded: affine closed-form induction, selected geometric criteria, and polynomial IVT/monotonicity. Not a general proof or full function-study engine.",
-    "School corpus includes 18 expected clarifications and one partial success; passing these tests does not imply support for their unsupported mathematical topics."
+    "School corpus includes 18 expected clarifications and one partial success; passing these tests does not imply support for their unsupported mathematical topics.",
+    "Matrix input: dimensions 1–6, up to 12 named matrices, 500 characters/cell. Matrix expressions: 300 characters, 120 tokens, nesting 20, powers −1…12. Exact rational/simple-radical arithmetic is bounded, not a general symbolic matrix algebra system.",
+    "Matrix school-style methods do not certify that these topics occur in an unverified official ministry textbook edition. The 64-case matrix corpus expects 9 clarifications.",
+    "All tool categories and reference details start collapsed. Examples/editing do not solve; a probability preview has its own explicit calculation action and is invalidated when its inputs change."
   ],
   "environment": {
     "node": "22.22.3",
@@ -60,7 +64,8 @@
     "passed": 23,
     "geometryPassed": 27,
     "curriculumExamplesPassed": 11,
-    "failed": 0
+    "failed": 0,
+    "matrixExamplesPassed": 17
   },
   "schoolBaseline": {
     "questions": 83,
@@ -75,5 +80,13 @@
     "clarificationExpected": 18,
     "passed": 83,
     "failed": 0
+  },
+  "matrixCorpus": {
+    "questions": 64,
+    "completeExpected": 55,
+    "clarificationExpected": 9,
+    "suitePassed": 124,
+    "suiteFailed": 0,
+    "provenance": "Original authored cases; not official examination questions."
   }
 }

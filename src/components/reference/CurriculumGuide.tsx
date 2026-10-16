@@ -60,10 +60,10 @@ const sections = [
   {
     title: "المصفوفات والجمل — أدوات إضافية",
     works:
-      "محدد ومقلوب ورتبة ومنقول وجداء لمصفوفات مربعة من الرتب2–4، وجمل خطية بمجهولين أو ثلاثة. جسور عددية من البيانات والأشعة.",
+      "مصفوفات مربعة ومستطيلة حتى6×6: أنواع وأبعاد وجمع وطرح وضرب بعدد وجداء مرتب وأثر ومحدد ومعكوس وملحقة ومنقول ورتبة واختزال دقيق. ساروس3×3 أو النشر، وغاوس وكرامر بمجهولين أو ثلاثة. جسور دقيقة من الأشعة والبيانات وإليهما.",
     limits:
-      "لا أصف وجود الأداة بأنه إثبات لورودها في الكتاب السوري، ولا يوجد مسار عام لقوى المصفوفات أو الجمل غير الخطية.",
-    example: "حل الجملة x+y=3، x-y=1",
+      "نفهم صيغًا مدرسية وامتحانية محددة مع حفظ الأسماء والترقيم، لكن وجود الأداة ليس إثباتًا لورودها في طبعة الكتاب الرسمية. القوى صحيحة من−1 إلى12، ولا معاملات رمزية عامة أو جمل غير خطية. القيم الذاتية تقريب إضافي.",
+    example: "حل الجملة بطريقة غاوس: x+y=3، x-y=1",
   },
   {
     title: "المعادلات التفاضلية — غير مدعومة",
@@ -92,23 +92,27 @@ export default function CurriculumGuide({
       </p>
       {sections.map((s) => (
         <section key={s.title}>
-          <h3>{s.title}</h3>
-          <p>
-            <strong>المتاح: </strong>
-            {s.works}
-          </p>
-          <p>
-            <strong>الحدود: </strong>
-            {s.limits}
-          </p>
-          {s.example && (
-            <button
-              className="suggestion-button"
-              onClick={() => onInsert(s.example)}
-            >
-              <RichText text={s.example} autoMath />
-            </button>
-          )}
+          <details>
+            <summary>
+              <h3>{s.title}</h3>
+            </summary>
+            <p>
+              <strong>المتاح: </strong>
+              {s.works}
+            </p>
+            <p>
+              <strong>الحدود: </strong>
+              {s.limits}
+            </p>
+            {s.example && (
+              <button
+                className="suggestion-button"
+                onClick={() => onInsert(s.example)}
+              >
+                <RichText text={s.example} autoMath />
+              </button>
+            )}
+          </details>
         </section>
       ))}
       <p>

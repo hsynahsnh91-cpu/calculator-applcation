@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   History,
   Dices,
+  Grid2X2,
   Cuboid,
   ImagePlus,
   Keyboard,
@@ -52,6 +53,7 @@ import {
 import type { AngleMode, HistoryEntry } from "./types";
 import type { ProbabilityContext } from "./solver/probabilityTypes";
 import type { GeometryContext } from "./solver/geometryTypes";
+import type { MatrixContext } from "./solver/matrixTypes";
 import type { NaturalMathFieldHandle } from "./components/common/NaturalMathField";
 const NaturalMathField = lazy(() =>
   import("./components/common/NaturalMathField").then((module) => ({
@@ -81,11 +83,13 @@ const ImageAttachment = lazy(() =>
 const ProbabilityBoard = lazy(
   () => import("./components/probability/ProbabilityBoard"),
 );
+const MatrixBoard = lazy(() => import("./components/matrices/MatrixBoard"));
 const GeometryBoard = lazy(() => import("./components/geometry/GeometryBoard"));
 const CurriculumGuide = lazy(
   () => import("./components/reference/CurriculumGuide"),
 );
 type Modal =
+  | "matrices"
   | "curriculum"
   | "geometry"
   | "math"
@@ -113,6 +117,12 @@ export default function App() {
     [error, setError] = useState("");
   const [menu, setMenu] = useState(false),
     [modal, setModal] = useState<Modal>(null);
+  const [matrixDraft, setMatrixDraft] = useState<MatrixContext>();
+  const openMatrices = useCallback((value?: MatrixContext) => {
+    setMatrixDraft(value);
+    setMenu(false);
+    setModal("matrices");
+  }, []);
   const [geometryDraft, setGeometryDraft] = useState<GeometryContext>();
   const openGeometry = useCallback((value?: GeometryContext) => {
     setGeometryDraft(value);
@@ -224,6 +234,18 @@ export default function App() {
     setMenu(false);
     if (value === "name") setEditName(name);
     if (value === "math") setMathLatex("");
+    if (value === "matrices") {
+      const stored = context.current;
+      setMatrixDraft(
+        stored.matrices ||
+          (stored.matrix
+            ? {
+                values: { M: stored.matrix.map((r) => r.map(String)) },
+                active: "M",
+              }
+            : undefined),
+      );
+    }
     if (value === "geometry") setGeometryDraft(context.current.geometry);
     if (value === "probability")
       setProbabilityDraft(context.current.probability);
@@ -426,6 +448,7 @@ export default function App() {
                     onSave={save}
                     onProbability={openProbability}
                     onGeometry={openGeometry}
+                    onMatrices={openMatrices}
                     saved={history.some((entry) =>
                       entry.tags?.includes(turn.answer.id),
                     )}
@@ -550,6 +573,11 @@ export default function App() {
                       <ImagePlus size={17} />
                       <span>إرفاق صورة للمسألة</span>
                       <span className="menu-tag">OCR محلي</span>
+                    </button>
+                    <button role="menuitem" onClick={() => open("matrices")}>
+                      <Grid2X2 size={17} />
+                      <span>لوحة المصفوفات والجمل</span>
+                      <ChevronLeft size={14} />
                     </button>
                     <button role="menuitem" onClick={() => open("geometry")}>
                       <Cuboid size={17} />
@@ -737,24 +765,27 @@ export default function App() {
       {modal && (
         <ToolModal
           title={
-            modal === "curriculum"
-              ? "قدرات التطبيق وحدود الدعم"
-              : modal === "geometry"
-                ? "الهندسة الفراغية"
-                : modal === "probability"
-                  ? "لوحة الاحتمالات والإحصاء"
-                  : modal === "math"
-                    ? "لوحة المفاتيح الرياضية"
-                    : modal === "reference"
-                      ? "بنك القوانين"
-                      : modal === "history"
-                        ? "السجل"
-                        : modal === "name"
-                          ? "كيف أناديك؟"
-                          : "مسح المحادثة"
+            modal === "matrices"
+              ? "المصفوفات والجمل الخطية"
+              : modal === "curriculum"
+                ? "قدرات التطبيق وحدود الدعم"
+                : modal === "geometry"
+                  ? "الهندسة الفراغية"
+                  : modal === "probability"
+                    ? "لوحة الاحتمالات والإحصاء"
+                    : modal === "math"
+                      ? "لوحة المفاتيح الرياضية"
+                      : modal === "reference"
+                        ? "بنك القوانين"
+                        : modal === "history"
+                          ? "السجل"
+                          : modal === "name"
+                            ? "كيف أناديك؟"
+                            : "مسح المحادثة"
           }
           onClose={() => setModal(null)}
           wide={
+            modal === "matrices" ||
             modal === "curriculum" ||
             modal === "reference" ||
             modal === "history" ||
@@ -762,11 +793,13 @@ export default function App() {
             modal === "geometry"
           }
           className={
-            modal === "geometry"
-              ? "geometry-modal"
-              : modal === "probability"
-                ? "probability-modal"
-                : ""
+            modal === "matrices"
+              ? "matrix-modal"
+              : modal === "geometry"
+                ? "geometry-modal"
+                : modal === "probability"
+                  ? "probability-modal"
+                  : ""
           }
         >
           <SectionErrorBoundary label="الأداة" resetKey={modal}>
@@ -803,6 +836,20 @@ export default function App() {
                     إدراج في السؤال
                   </button>
                 </div>
+              )}
+              {modal === "matrices" && (
+                <MatrixBoard
+                  context={matrixDraft}
+                  busy={busy}
+                  onInsert={(question) => {
+                    prompt.current?.setValue(question);
+                    setModal(null);
+                  }}
+                  onSolve={(question) => {
+                    setModal(null);
+                    void sendRef.current(question);
+                  }}
+                />
               )}
               {modal === "geometry" && (
                 <GeometryBoard

@@ -2022,3 +2022,302 @@ kbd {
   white-space: normal;
   overflow-wrap: anywhere;
 }
+
+/* On-demand matrix workbench: no permanent section navigation and no GPU layers. */
+.tool-disclosure-hint {
+  color: #94a3b8;
+  font-size: 0.83rem;
+  line-height: 1.9;
+  padding: 16px 4px;
+}
+.matrix-board {
+  min-width: 0;
+  color: #e2e8f0;
+}
+.matrix-intro,
+.matrix-rule {
+  color: #a4b4c7;
+  font-size: 0.83rem;
+  line-height: 1.95;
+}
+.matrix-intro {
+  margin-bottom: 16px;
+}
+.matrix-categories {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.matrix-categories button {
+  min-height: 48px;
+  padding: 10px 8px;
+  border: 1px solid #293747;
+  background: #111d2b;
+  border-radius: 12px;
+  color: #bfccd9;
+  font-size: 0.83rem;
+  line-height: 1.7;
+}
+.matrix-categories button[aria-selected="true"] {
+  border-color: #34d399;
+  color: #a7f3d0;
+  background: #0d2a27;
+}
+.matrix-categories button:focus-visible {
+  outline: 2px solid #6ee7b7;
+  outline-offset: 2px;
+}
+.matrix-operation-panel {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.matrix-operation-row {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.matrix-operation-row > label {
+  flex: 1 1 240px;
+}
+.matrix-operation-title {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.matrix-field {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  font-size: 0.78rem;
+  color: #aebed0;
+}
+.matrix-field input,
+.matrix-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid #344357;
+  border-radius: 10px;
+  background: #101b29;
+  color: #f1f5f9;
+  padding: 8px 10px;
+}
+.matrix-field select {
+  font-family: var(--font-cairo);
+  font-size: 0.82rem;
+}
+.matrix-field input {
+  font-family: "KaTeX_Main", "Cambria Math", serif;
+  font-size: 1.15rem;
+}
+.matrix-names,
+.matrix-dimensions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.matrix-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+.matrix-card {
+  min-width: 0;
+  border: 1px solid #2a394c;
+  border-radius: 14px;
+  padding: 14px 12px;
+  background: #0d1825;
+}
+.matrix-card legend {
+  font-size: 0.8rem;
+  color: #b9cfdf;
+  padding: 0 6px;
+}
+.matrix-grid-scroll {
+  overflow-x: auto;
+  padding: 13px 4px 7px;
+  max-width: 100%;
+}
+.matrix-input-grid {
+  display: grid;
+  gap: 7px;
+  border-inline: 2px solid #91bdb8;
+  border-radius: 9px;
+  padding: 10px 8px;
+  min-width: max-content;
+}
+.matrix-input-grid input {
+  width: 100%;
+  min-width: 48px;
+  min-height: 46px;
+  text-align: center;
+  border: 1px solid #304256;
+  border-radius: 8px;
+  color: #e0faf3;
+  background: #131f2e;
+  font-family: "KaTeX_Main", "Cambria Math", serif;
+  font-size: 1.18rem;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.matrix-input-grid input:focus,
+.matrix-field input:focus,
+.matrix-field select:focus {
+  outline: 2px solid #34d399;
+  outline-offset: 1px;
+}
+.matrix-preview,
+.matrix-reference {
+  min-width: 0;
+  border: 1px solid #293b48;
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+.matrix-preview {
+  margin-top: 12px;
+}
+.matrix-preview summary,
+.matrix-reference summary {
+  padding: 10px 12px;
+  color: #b1d3ca;
+  cursor: pointer;
+  min-height: 42px;
+}
+.matrix-preview > :not(summary),
+.matrix-reference > :not(summary) {
+  padding: 8px 12px;
+}
+.matrix-preview .katex {
+  font-size: 1.2em;
+}
+.matrix-reference section {
+  border-top: 1px solid #233440;
+  line-height: 1.9;
+}
+.matrix-reference h4 {
+  color: #d4e5ec;
+  font-weight: 600;
+}
+.matrix-reference p {
+  color: #9cabbf;
+}
+.matrix-reference .katex {
+  color: #a7f3d0;
+}
+.matrix-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  position: sticky;
+  bottom: -20px;
+  margin-top: 6px;
+  padding: 12px 0 2px;
+  background: #0f172a;
+  border-top: 1px solid #273447;
+  z-index: 1;
+}
+.matrix-actions > button {
+  flex: 1 1 160px;
+  justify-content: center;
+  min-height: 44px;
+}
+.matrix-error {
+  color: #fda4af;
+  background: #301b2b;
+  border: 1px solid #713145;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  line-height: 1.9;
+  padding: 10px;
+}
+.matrix-system-grid {
+  display: grid;
+  gap: 12px;
+}
+.matrix-system-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+.matrix-answer .step-heading h4 {
+  font-size: 0.86rem;
+  line-height: 1.8;
+}
+.matrix-answer .katex {
+  font-size: 1.15em;
+}
+.matrix-answer .school-result-heading {
+  font-size: 0.88rem;
+  line-height: 1.9;
+}
+@media (max-width: 640px) {
+  .matrix-categories {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .matrix-categories button {
+    font-size: 0.76rem;
+    padding: 9px 6px;
+  }
+  .matrix-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .matrix-operation-title,
+  .matrix-answer .step-heading h4 {
+    font-size: 0.78rem;
+  }
+  .matrix-field select {
+    font-size: 0.76rem;
+  }
+  .matrix-system-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .matrix-answer .katex {
+    font-size: 1.06em;
+  }
+  .matrix-answer .step-math {
+    max-width: 100%;
+  }
+}
+.reference-entry {
+  align-self: start;
+}
+.reference-entry > summary {
+  cursor: pointer;
+  min-height: 44px;
+  line-height: 1.8;
+}
+.reference-entry > summary > .flex {
+  flex-wrap: wrap;
+}
+.curriculum-guide summary {
+  cursor: pointer;
+  min-height: 44px;
+  color: #d2e3ee;
+}
+.curriculum-guide summary h3 {
+  display: inline;
+  font-size: 0.9rem;
+  line-height: 1.9;
+}
+.curriculum-guide details[open] summary {
+  margin-bottom: 12px;
+}
+/* Constrain intrinsic fieldset/grid width; only the six-column editor may scroll. */
+.matrix-operation-panel {
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  max-width: 100%;
+}
+.matrix-card {
+  min-inline-size: 0;
+  max-width: 100%;
+  width: 100%;
+}
+.matrix-grid-scroll {
+  min-width: 0;
+  width: 100%;
+}

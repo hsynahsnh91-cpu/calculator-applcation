@@ -1114,8 +1114,8 @@
       "passed": true,
       "results": [
         {
-          "title": "عمليات المصفوفة",
-          "latex": "\\begin{aligned}\\det A = 3\\end{aligned}"
+          "title": "محدد المصفوفة A",
+          "latex": "\\text{محدد المصفوفة }A=3"
         }
       ],
       "unsolved": []
@@ -1126,8 +1126,8 @@
       "passed": true,
       "results": [
         {
-          "title": "عمليات المصفوفة",
-          "latex": "\\begin{aligned}A^{-1} = \\begin{pmatrix}1 & 0 \\\\ 0 & \\frac{1}{2}\\end{pmatrix}\\end{aligned}"
+          "title": "معكوس المصفوفة A",
+          "latex": "A^{-1}=\\begin{pmatrix}1&0\\\\0&\\frac{1}{2}\\end{pmatrix}"
         }
       ],
       "unsolved": []
