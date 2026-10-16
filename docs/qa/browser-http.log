@@ -1,0 +1,70 @@
+PASS single RTL conversation; no header, section pages, or bottom navigation
+PASS editable name is stored only locally
+PASS browser acceptance 1: calculusEngine
+PASS browser acceptance 2: equationSolver
+PASS browser acceptance 3: integrationEngine
+PASS browser acceptance 4: limitsEngine
+PASS browser acceptance 5: matricesEngine
+PASS browser acceptance 6: complexTools
+PASS browser acceptance 7: probabilityEngine
+PASS browser acceptance 8: sequences
+PASS browser acceptance 9: geometryEngine
+PASS browser acceptance 10: mathEngine
+PASS answer order is final → steps → applicable visuals → suggestions
+PASS manual save, guarded history, and a nested confirmation Escape
+PASS copy action uses the composed answer and solution text
+PASS conversation and context survive reload
+PASS new conversation resets the shared function but keeps saved history
+PASS physical ^ creates an editable exponent, not visible raw notation
+PASS Shift+Enter creates a new line without sending, including inside math
+PASS mathematical keypad inserts a genuine fraction in the mixed composer
+PASS local formula bank is a modal, not a navigation page
+PASS menu arrows, modal focus trap, and reduced-motion preferences
+PASS angle selection persists and affects only unmarked scientific angles
+PASS compound request shares its definition and retains partial success
+PASS follow-up buttons are live and use the current conversation context
+PASS clear conversation is explicit and does not delete saved history
+PASS phone and narrow viewport have no horizontal document overflow
+PASS unwanted solving/composer captions are absent; keyboard shortcuts are retained
+PASS three exact complex forms stack on a narrow phone without document overflow
+PASS complex forms and aliases survive reload, and conjugate follow-up is live
+PASS Euler exponential gives the correct exact real and imaginary parts in the Worker
+PASS large De Moivre powers stay compact and never overflow the mobile answer
+PASS multiple-angle and power-reduction identities are genuine mobile KaTeX
+PASS negative discriminant is impossible in R; an explicit follow-up solves it in C
+PASS complex plane distance and three-point ratio angles use arrowed segments
+PASS translation, homothety and centered rotation produce checked image coordinates
+PASS nth roots lie on the plotted circle, remain reviewable and persist
+PASS probability board is quiet and on demand, not a restored section page
+PASS changing the target colour or counts immediately updates p and its colour
+PASS all added colours participate in live urn feedback and remain editable
+PASS shuffle randomizes only bounded ball positions, never counts or probabilities
+PASS drawing dropdown explains all three counting modes and recomputes n(Omega)
+PASS exactly, at least and less-than are distinct live events with ordered wording
+PASS the board inserts a complete editable question without sending it
+PASS direct board solve uses the real Worker and stores structured probability context
+PASS an answer opens its own older experiment, not a newer unrelated distribution
+PASS event controls expose independent and disjoint assumptions only on selection
+PASS Bayes controls appear immediately and the rendered tree is normalized
+PASS a law built in the board has complete moments and a live calculus bridge
+PASS joint-law controls check every cell rather than confusing zero covariance with independence
+PASS binomial p changes update the coloured meter without changing the meaning of tails
+PASS statistics produce a real frequency histogram with readable underlying data
+PASS the frequency-table matrix bridge is usable by the existing matrix engine
+PASS ordered urn conditional controls calculate the correct restricted space
+PASS invalid urn controls never show a stale live probability or allow a solve
+PASS probability context and histogram visuals survive an offline reload
+PASS probability board tabs, focus and floating layout work at narrow phone widths
+PASS local OCR returns reviewable text and never solves before approval
+PASS cancelling OCR initialization leaves the composer and solver usable
+PASS malformed saved answer is ignored instead of crashing React
+PASS solver stop terminates a stalled Worker and the next question works
+PASS watchdog returns an honest clarification, not a fake numerical answer
+PASS Worker failure becomes an Arabic clarification without crashing the chat
+PASS speech policy: available
+PASS speech policy: downloadable
+PASS speech policy: unavailable
+PASS speech policy: server-only
+PASS no external HTTP requests or uncaught browser errors
+
+Browser: 68 passed, 0 failed

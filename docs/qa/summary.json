@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-16",
+  "nodeTests": {
+    "engine": 92,
+    "chat": 46,
+    "complex": 52,
+    "probability": 108,
+    "passed": 298,
+    "failed": 0
+  },
+  "browser": {
+    "http": {
+      "passed": 68,
+      "failed": 0,
+      "externalRequests": 0,
+      "uncaughtErrors": 0
+    },
+    "file": {
+      "passed": 68,
+      "failed": 0,
+      "externalRequests": 0,
+      "uncaughtErrors": 0
+    }
+  },
+  "build": {
+    "htmlBytes": 16845847,
+    "sha256": "7b1f25b3f05a06f4cb7841b3b492e8b8ca5ee2dbb8e9b90b1ae08ce968ed63d1",
+    "separateRuntimeFiles": 0,
+    "embeddedLicenseNotices": 48
+  },
+  "limitations": [
+    "Chromium headless/Linux; responsive viewports, not physical phone hardware.",
+    "Speech policy uses controlled mocks; actual Arabic speech hardware/pack not tested.",
+    "Worker failure and watchdog use controlled faults.",
+    "OCR uses a real printed fixture; arbitrary handwriting is not guaranteed.",
+    "Complex integer powers |n|<=10^12; roots n<=32; trigonometric identities n<=12.",
+    "Probability workbench is bounded: urn draws<=32, colors<=8, discrete-law values<=100, joint law<=10x10, mixtures<=8 branches.",
+    "Exact rational arithmetic is bounded; binomial and normal distributions use finite-precision approximations. Underflow does not imply a mathematically impossible event or a verified zero variance.",
+    "Independent numerical checks are not proofs; unsupported or ambiguous cases ask for clarification."
+  ],
+  "environment": {
+    "node": "22.22.3",
+    "npm": "10.9.8",
+    "chromium": "153.0.8010.0",
+    "platform": "Linux x64 headless"
+  },
+  "supplementaryDocumentationSmoke": {
+    "passed": 23,
+    "failed": 0
+  }
+}

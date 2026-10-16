@@ -1,0 +1,348 @@
+[
+  {
+    "name": "@fontsource/cairo",
+    "version": "5.3.0",
+    "license": "OFL-1.1",
+    "notices": [
+      "licenses/npm/fontsource__cairo/LICENSE"
+    ]
+  },
+  {
+    "name": "@fontsource/fira-code",
+    "version": "5.3.0",
+    "license": "OFL-1.1",
+    "notices": [
+      "licenses/npm/fontsource__fira-code/LICENSE"
+    ]
+  },
+  {
+    "name": "@types/canvas-confetti",
+    "version": "1.9.0",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/types__canvas-confetti/LICENSE"
+    ]
+  },
+  {
+    "name": "@types/katex",
+    "version": "0.16.8",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/types__katex/LICENSE"
+    ]
+  },
+  {
+    "name": "canvas-confetti",
+    "version": "1.9.4",
+    "license": "ISC",
+    "notices": [
+      "licenses/npm/canvas-confetti/LICENSE"
+    ]
+  },
+  {
+    "name": "chart.js",
+    "version": "4.5.1",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/chart.js/LICENSE.md"
+    ]
+  },
+  {
+    "name": "clsx",
+    "version": "2.1.1",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/clsx/license"
+    ]
+  },
+  {
+    "name": "katex",
+    "version": "0.19.0",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/katex/LICENSE"
+    ]
+  },
+  {
+    "name": "lucide-react",
+    "version": "1.55.0",
+    "license": "ISC",
+    "notices": [
+      "licenses/npm/lucide-react/LICENSE"
+    ]
+  },
+  {
+    "name": "mathjs",
+    "version": "15.2.0",
+    "license": "Apache-2.0",
+    "notices": [
+      "licenses/npm/mathjs/LICENSE",
+      "licenses/npm/mathjs/NOTICE"
+    ]
+  },
+  {
+    "name": "mathlive",
+    "version": "0.111.1",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/mathlive/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "nerdamer",
+    "version": "2.0.0",
+    "license": "Apache-2.0",
+    "notices": [
+      "licenses/npm/nerdamer/LICENSE.md"
+    ]
+  },
+  {
+    "name": "react-chartjs-2",
+    "version": "5.3.1",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/react-chartjs-2/LICENSE",
+      "licenses/npm/react-chartjs-2/LICENSE.md"
+    ]
+  },
+  {
+    "name": "react-dom",
+    "version": "19.2.6",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/react-dom/LICENSE"
+    ]
+  },
+  {
+    "name": "react",
+    "version": "19.2.6",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/react/LICENSE"
+    ]
+  },
+  {
+    "name": "tailwind-merge",
+    "version": "3.4.0",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/tailwind-merge/LICENSE.md"
+    ]
+  },
+  {
+    "name": "tesseract.js",
+    "version": "7.0.0",
+    "license": "Apache-2.0",
+    "notices": [
+      "licenses/npm/tesseract.js/LICENSE.md"
+    ]
+  },
+  {
+    "name": "@kurkle/color",
+    "version": "0.3.4",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/kurkle__color/LICENSE.md"
+    ]
+  },
+  {
+    "name": "commander",
+    "version": "15.0.0",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/commander/LICENSE"
+    ]
+  },
+  {
+    "name": "@types/react",
+    "version": "19.2.7",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/types__react/LICENSE"
+    ]
+  },
+  {
+    "name": "@babel/runtime",
+    "version": "7.29.10",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/babel__runtime/LICENSE"
+    ]
+  },
+  {
+    "name": "complex.js",
+    "version": "2.4.3",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/complex.js/LICENSE"
+    ]
+  },
+  {
+    "name": "decimal.js",
+    "version": "10.6.0",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/decimal.js/LICENCE.md"
+    ]
+  },
+  {
+    "name": "escape-latex",
+    "version": "1.2.0",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/escape-latex/LICENSE.md"
+    ]
+  },
+  {
+    "name": "fraction.js",
+    "version": "5.3.4",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/fraction.js/LICENSE"
+    ]
+  },
+  {
+    "name": "javascript-natural-sort",
+    "version": "0.7.1",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/javascript-natural-sort/NOTICE-from-source.txt"
+    ]
+  },
+  {
+    "name": "seedrandom",
+    "version": "3.0.5",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/seedrandom/NOTICE-from-source.txt"
+    ]
+  },
+  {
+    "name": "tiny-emitter",
+    "version": "2.1.0",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/tiny-emitter/LICENSE"
+    ]
+  },
+  {
+    "name": "typed-function",
+    "version": "4.2.2",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/typed-function/LICENSE"
+    ]
+  },
+  {
+    "name": "scheduler",
+    "version": "0.27.0",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/scheduler/LICENSE"
+    ]
+  },
+  {
+    "name": "bmp-js",
+    "version": "0.1.0",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/bmp-js/LICENSE"
+    ]
+  },
+  {
+    "name": "idb-keyval",
+    "version": "6.3.0",
+    "license": "Apache-2.0",
+    "notices": [
+      "licenses/npm/idb-keyval/LICENCE"
+    ]
+  },
+  {
+    "name": "is-url",
+    "version": "1.2.4",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/is-url/LICENSE-MIT"
+    ]
+  },
+  {
+    "name": "node-fetch",
+    "version": "2.7.0",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/node-fetch/LICENSE.md"
+    ]
+  },
+  {
+    "name": "opencollective-postinstall",
+    "version": "2.0.3",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/opencollective-postinstall/LICENSE"
+    ]
+  },
+  {
+    "name": "regenerator-runtime",
+    "version": "0.13.11",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/regenerator-runtime/LICENSE"
+    ]
+  },
+  {
+    "name": "tesseract.js-core",
+    "version": "7.0.0",
+    "license": "Apache-2.0",
+    "notices": [
+      "licenses/npm/tesseract.js-core/LICENSE"
+    ]
+  },
+  {
+    "name": "wasm-feature-detect",
+    "version": "1.9.0",
+    "license": "Apache-2.0",
+    "notices": [
+      "licenses/npm/wasm-feature-detect/LICENSE"
+    ]
+  },
+  {
+    "name": "zlibjs",
+    "version": "0.3.1",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/zlibjs/LICENSE"
+    ]
+  },
+  {
+    "name": "csstype",
+    "version": "3.2.3",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/csstype/LICENSE"
+    ]
+  },
+  {
+    "name": "whatwg-url",
+    "version": "5.0.0",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/whatwg-url/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "tr46",
+    "version": "0.0.3",
+    "license": "MIT",
+    "notices": [
+      "licenses/npm/tr46/LICENSE.md"
+    ]
+  },
+  {
+    "name": "webidl-conversions",
+    "version": "3.0.1",
+    "license": "BSD-2-Clause",
+    "notices": [
+      "licenses/npm/webidl-conversions/LICENSE.md"
+    ]
+  }
+]

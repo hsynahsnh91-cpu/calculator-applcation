@@ -1,0 +1,16 @@
+{
+  "format": 1,
+  "sourceFiles": 179,
+  "artifacts": [
+    {
+      "file": "calculator.html",
+      "bytes": 16845847,
+      "sha256": "7b1f25b3f05a06f4cb7841b3b492e8b8ca5ee2dbb8e9b90b1ae08ce968ed63d1"
+    },
+    {
+      "file": "calculator-source.zip",
+      "bytes": 5364755,
+      "sha256": "bc6416d25bed8c92d9bb26439de480be23f6564b66647bcff4f5a4c057afc553"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{"question":"كيس فيه 3 كرات حمراء و5 بيضاء سحبت كرتان معًا، احسب احتمال كرة حمراء واحدة أو أكثر","unsolved":[],"engines":["probabilityEngine"],"final":["P(X\\ge1)=\\frac{9}{14}"]}
+{"question":"كيس فيه 3 حمراء و5 بيضاء، سحب كرتين متتاليًا دون إعادة، احسب احتمال أن تكون الثانية حمراء بشرط أن تكون الأولى بيضاء","unsolved":[],"engines":["probabilityEngine"],"final":["P(C_2\\mid C_1)=\\frac{\\frac{15}{56}}{\\frac{5}{8}}=\\frac{3}{7}"]}
+{"question":"احسب P(A|B)","unsolved":[],"engines":["probabilityEngine"],"final":["P(A\\mid B)=\\frac{P(A\\cap B)}{P(B)}=\\frac{\\frac{15}{56}}{\\frac{5}{8}}=\\frac{3}{7}"]}
+{"question":"P(A)=1/2، P(B)=1/3، P(A∩B)=1/6، احسب الاتحاد","unsolved":[],"engines":["probabilityEngine"],"final":["P(A\\cup B)=P(A)+P(B)-P(A\\cap B)=\\frac{2}{3}"]}
+{"question":"احسب P(A|B)","unsolved":[],"engines":["probabilityEngine"],"final":["P(A\\mid B)=\\frac{P(A\\cap B)}{P(B)}=\\frac{\\frac{1}{6}}{\\frac{1}{3}}=\\frac{1}{2}"]}
+{"question":"احسب متمم A","unsolved":[],"engines":["probabilityEngine"],"final":["P(\\overline{A})=1-P(A)=\\frac{1}{2}"]}
+{"question":"الاحتمال الكلي q=[1/3,2/3]، p=[1/2,1/4]","unsolved":[],"engines":["probabilityEngine"],"final":["P(B)=\\sum_iP(H_i)P(B\\mid H_i)=\\frac{1}{3}"]}
+{"question":"بايز، احسب P(H2|B)","unsolved":[],"engines":["probabilityEngine"],"final":["P(H_{2}\\mid B)=\\frac{P(H_{2})P(B\\mid H_{2})}{\\sum_iP(H_i)P(B\\mid H_i)}=\\frac{1}{2}"]}
+{"question":"احسب متمم B","unsolved":[],"engines":["probabilityEngine"],"final":["P(\\overline{B})=1-P(B)=\\frac{2}{3}"]}
+{"question":"المتحول X=[0,1,2]، p=[1/4,1/2,1/4]، احسب الأمل والتباين","unsolved":[],"engines":["probabilityEngine"],"final":["\\begin{aligned}E(X)&=1\\\\E(X^2)&=\\frac{3}{2}\\\\V(X)&=\\frac{1}{2}\\\\\\sigma_{X}&=\\sqrt{\\frac{1}{2}}\\approx 0.707106781187\\end{aligned}"]}
+{"question":"احسب E(X^2)","unsolved":[],"engines":["probabilityEngine"],"final":["E(X^2)=\\frac{3}{2}"]}
+{"question":"أنشئ الدالة المولدة الاحتمالية","unsolved":[],"engines":["probabilityEngine"],"final":["G(t)=\\frac{1}{4}t^{0}+\\frac{1}{2}t^{1}+\\frac{1}{4}t^{2}"]}
+{"question":"جد مشتقة الدالة السابقة","unsolved":[],"engines":["calculusEngine"],"final":["f'(x) = \\frac{ x+1}{2}"]}
+{"question":"القيم=[1,2,3]، التكرارات=[2,3,1]، احسب المتوسط والمدرج التكراري","unsolved":[],"engines":["probabilityEngine"],"final":["\\begin{aligned}\\overline{x}&=\\frac{11}{6}\\\\M_e&=2\\\\\\sigma^2&=\\frac{17}{36}\\\\\\sigma&\\approx 0.687184270936\\end{aligned}"]}
+{"question":"احسب التباين فقط","unsolved":[],"engines":["probabilityEngine"],"final":["\\sigma^2=\\frac{17}{36}"]}
+{"question":"احسب الانحراف المعياري","unsolved":[],"engines":["probabilityEngine"],"final":["\\sigma\\approx 0.687184270936"]}
+{"question":"حول جدول التكرارات إلى مصفوفة","unsolved":[],"engines":["probabilityEngine"],"final":["M=\\begin{pmatrix}1&2\\\\2&3\\\\3&1\\end{pmatrix}"]}
+{"question":"التوزيع الثنائي n=5 p=1/4، احسب P(X>=2)","unsolved":[],"engines":["probabilityEngine"],"final":["P(X\\ge2)\\approx 0.3671875"]}
+{"question":"التوزيع الطبيعي mu=5 sigma=2 x=6","unsolved":[],"engines":["probabilityEngine"],"final":["P(X\\le6)\\approx 0.691462"]}
+{"question":"احسب E(X)","unsolved":[],"engines":["probabilityEngine"],"final":["E(X)=5"]}
+{"question":"احسب V(X)","unsolved":[],"engines":["probabilityEngine"],"final":["V(X)=4"]}
+{"question":"احسب E(X^2)","unsolved":[],"engines":["probabilityEngine"],"final":["E(X^2)=29"]}
+{"question":"ارسم المنحنى","unsolved":[],"engines":["probabilityEngine"],"final":["f(x)=\\frac{1}{2\\sqrt{2\\pi}}e^{-\\frac{(x-5)^2}{2(2)^2}}"]}

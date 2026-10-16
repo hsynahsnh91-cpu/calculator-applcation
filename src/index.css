@@ -1,0 +1,1534 @@
+@import "tailwindcss" source("./");
+@import "katex/dist/katex.min.css";
+@import "@fontsource/cairo/arabic-400.css";
+@import "@fontsource/cairo/arabic-600.css";
+@import "@fontsource/cairo/arabic-700.css";
+@import "@fontsource/cairo/latin-400.css";
+@import "@fontsource/fira-code/latin-400.css";
+@source not "../deliverables";
+
+@layer base {
+  :root {
+    --font-cairo: "Cairo", "Tajawal", system-ui, -apple-system, sans-serif;
+    --font-mono: "Fira Code", monospace;
+  }
+
+  body {
+    font-family: var(--font-cairo);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Custom Math and Calculator Display Styles */
+.font-cairo {
+  font-family: "Cairo", "Tajawal", sans-serif;
+}
+
+.font-mono-math {
+  font-family: "Fira Code", monospace;
+}
+
+/* Real mathematical typefaces (KaTeX fonts) */
+.font-math {
+  font-family: "KaTeX_Main", "Cambria Math", "Times New Roman", serif;
+}
+.font-math-italic {
+  font-family: "KaTeX_Math", "Cambria Math", "Times New Roman", serif;
+  font-style: italic;
+}
+
+/* True structured editor used by derivative input. Fractions/radicals grow
+   naturally and placeholders are visible without exposing LaTeX syntax. */
+math-field.natural-math-field {
+  display: block;
+  width: 100%;
+  min-height: 58px;
+  padding: 10px 12px;
+  border: 1px solid rgb(51 65 85);
+  border-radius: 12px;
+  background: rgb(2 6 23);
+  color: rgb(241 245 249);
+  font-size: 1.25rem;
+  direction: ltr;
+  outline: none;
+  --caret-color: #34d399;
+  --selection-background-color: rgba(16, 185, 129, 0.25);
+  --contains-highlight-background-color: rgba(16, 185, 129, 0.14);
+  --placeholder-color: rgb(100 116 139);
+}
+
+/* Remove the side menu and keyboard buttons inside the function field (MathLive CSS parts). */
+math-field.natural-math-field::part(menu-toggle),
+math-field.natural-math-field::part(virtual-keyboard-toggle) {
+  display: none !important;
+}
+
+math-field.natural-math-field:focus-within {
+  border-color: #10b981;
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.35);
+}
+
+/* Natural Box Highlight & Active State.
+   The glow is kept STATIC: animating box-shadow forces a full repaint every
+   frame and is one of the most costly things on a low-end Android WebView. */
+.math-box-active {
+  box-shadow:
+    0 0 0 2px #10b981,
+    0 0 10px rgba(16, 185, 129, 0.45);
+}
+
+/* Instant taps inside an Android WebView: no 300ms delay, no long-press menu,
+   no text-selection on controls. Visual effects are untouched. */
+button,
+a,
+select,
+[role="button"],
+.calculator-keypad,
+nav {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Inputs must stay selectable */
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+  touch-action: manipulation;
+}
+
+/* Smoother momentum scrolling inside scrollable panels */
+.overflow-x-auto,
+.overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* NOTE: we deliberately do NOT force GPU layers (translateZ / will-change) on
+   every button and link. On low-end Android WebViews that creates dozens of
+   separate compositor layers and makes touch + animation jankier. Compositing
+   is left to the browser, which only promotes elements that actually animate. */
+
+/* Series cards: slim, always-visible track so long expansions never get clipped
+   and the scroll gesture stays inside the box on touch devices. */
+.series-scroll {
+  max-width: 100%;
+  overscroll-behavior-x: contain;
+}
+.series-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+.series-scroll::-webkit-scrollbar-track {
+  background: rgba(148, 163, 184, 0.12);
+  border-radius: 9999px;
+}
+.series-scroll::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.55);
+  border-radius: 9999px;
+}
+.series-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(129, 140, 248, 0.85);
+}
+
+/* Smooth custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.6);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.9);
+}
+
+/* Prevent accidental text selection on calculator keypads */
+.calculator-keypad {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* KaTeX tweaks for dark mode and responsive rendering */
+.katex {
+  font-size: 1.15em !important;
+  color: inherit !important;
+  direction: ltr !important;
+}
+
+.katex-display {
+  margin: 0.5em 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.3em 0;
+}
+
+/* Panel helpers. backdrop-filter is intentionally avoided: it is extremely
+   expensive (and sometimes CPU-rendered) on Android WebViews. A high-opacity
+   solid background gives the same dark look for far less cost. */
+.glass-panel {
+  background: rgba(30, 41, 59, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-subtle {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* One conversation, one composer. All fonts and recognition assets are local. */
+:root {
+  color-scheme: dark;
+}
+body {
+  margin: 0;
+  background: #0d1118;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #80dfcf;
+  outline-offset: 3px;
+}
+.chat-app {
+  min-height: 100dvh;
+  background:
+    radial-gradient(ellipse 650px 400px at 80% 0%, #17233344, transparent),
+    #0d1118;
+  color: #e8ecf2;
+  font-family: "Cairo", sans-serif;
+}
+.chat-main {
+  width: min(100%, 920px);
+  margin: 0 auto;
+  padding: 32px 28px 28px;
+  min-height: 100dvh;
+}
+.is-welcome .chat-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 8vh;
+  padding-bottom: 9vh;
+}
+.welcome {
+  margin: 0 0 35px;
+  padding-inline: 10px;
+  text-align: center;
+}
+.welcome-mark {
+  color: #8ce9d6;
+  font-size: 29px;
+  margin-bottom: 18px;
+  line-height: 1;
+}
+.welcome h1 {
+  font-size: clamp(28px, 4.2vw, 43px);
+  line-height: 1.75;
+  font-weight: 600;
+  letter-spacing: -0.7px;
+  margin: 0;
+}
+.welcome h1 > span {
+  color: #a5afbd;
+}
+.name-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #a2ead9;
+  border-bottom: 1px dashed #7de1ca38;
+  font: inherit;
+}
+.welcome p {
+  font-size: 13px;
+  color: #8390a3;
+  margin: 10px 0 0;
+}
+.question-composer {
+  background: #1c222d;
+  border: 1px solid #313a49;
+  border-radius: 29px;
+  padding: 18px 18px 11px;
+  box-shadow: 0 12px 50px #00000012;
+  transition: border-color 0.15s;
+}
+.question-composer:focus-within {
+  border-color: #758c9d;
+}
+.smart-prompt {
+  font-size: 17px;
+  line-height: 2;
+  color: #f0f3f8;
+  min-height: 77px;
+  max-height: 240px;
+  overflow-y: auto;
+  width: 100%;
+  outline: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  position: relative;
+  cursor: text;
+  user-select: text;
+  -webkit-user-select: text;
+  text-align: start;
+  unicode-bidi: plaintext;
+}
+.smart-prompt[data-empty="true"]::before {
+  content: attr(data-placeholder);
+  position: absolute;
+  top: 0;
+  right: 2px;
+  color: #949fae;
+  pointer-events: none;
+}
+.math-island {
+  display: inline-block;
+  direction: ltr;
+  unicode-bidi: isolate;
+  vertical-align: middle;
+  max-width: 100%;
+  padding: 0 2px;
+}
+math-field.inline-math-field {
+  display: inline-block;
+  width: auto;
+  max-width: 100%;
+  background: #ffffff04;
+  color: #f0f9ff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.17em;
+  padding: 0;
+  margin: 0 1px;
+  direction: ltr;
+  --caret-color: #78dfc6;
+  --selection-background-color: #71e7cf2b;
+  --contains-highlight-background-color: #71e7cf14;
+}
+math-field.inline-math-field::part(menu-toggle),
+math-field.inline-math-field::part(virtual-keyboard-toggle) {
+  display: none;
+}
+.composer-tools,
+.composer-right,
+.composer-left {
+  display: flex;
+  align-items: center;
+}
+.composer-tools {
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+.composer-right {
+  gap: 7px;
+  position: relative;
+}
+.composer-left {
+  gap: 8px;
+}
+.composer-icon,
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #b3bfcd;
+  border: none;
+  border-radius: 50%;
+  height: 36px;
+  width: 36px;
+  flex-shrink: 0;
+}
+.composer-icon:hover,
+.icon-button:hover,
+.composer-icon.tool-open {
+  color: white;
+  background: #ffffff0c;
+}
+.angle-indicator {
+  color: #738295;
+  font:
+    10px "Fira Code",
+    monospace;
+  padding-inline: 5px;
+}
+.send-button {
+  background: #b6eadc;
+  color: #122a25;
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.send-button:disabled {
+  background: #303947;
+  color: #778395;
+}
+.send-button:not(:disabled):hover {
+  background: #d0f7ec;
+}
+
+kbd {
+  font-family: "Fira Code", monospace;
+  font-size: 0.9em;
+}
+.composer-error {
+  color: #fda4af;
+  font-size: 12px;
+  padding: 8px 12px 0;
+  line-height: 1.9;
+}
+.starter-prompts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 25px 0 0;
+}
+.starter-prompts button {
+  padding: 14px;
+  background: #151b25;
+  border: 1px solid #252f3d;
+  color: #99a9bc;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: right;
+  font-size: 12px;
+  line-height: 1.9;
+}
+.starter-prompts button:hover {
+  color: #d2f4eb;
+  border-color: #56786f;
+}
+.starter-prompts svg {
+  flex-shrink: 0;
+  transform: rotate(-45deg);
+}
+.tools-menu {
+  position: absolute;
+  z-index: 30;
+  right: -3px;
+  bottom: 46px;
+  width: min(335px, calc(100vw - 46px));
+  overflow-y: auto;
+  background: #202835;
+  border: 1px solid #3b4656;
+  border-radius: 20px;
+  box-shadow: 0 20px 65px #0008;
+  padding: 8px;
+}
+.tools-menu > button {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  text-align: right;
+  padding: 11px 12px;
+  min-height: 42px;
+  border-radius: 11px;
+  color: #c8d2df;
+  font-size: 12px;
+}
+.tools-menu > button > span:first-of-type {
+  flex: 1;
+}
+.tools-menu > button:hover {
+  background: #ffffff08;
+  color: white;
+}
+.menu-tag {
+  color: #8193a7;
+  font-size: 9px;
+}
+.menu-divider {
+  margin: 6px 8px;
+  height: 1px;
+  background: #ffffff0b;
+}
+.tools-menu .menu-danger {
+  color: #ef9ba9;
+}
+.angle-settings {
+  padding: 10px 12px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #a8b6c7;
+}
+.angle-settings > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.angle-settings > div {
+  display: flex;
+  background: #111a25;
+  padding: 3px;
+  border-radius: 9px;
+}
+.angle-settings button {
+  padding: 4px 6px;
+  font-size: 10px;
+  border-radius: 6px;
+  font-family: "Fira Code", monospace;
+}
+.angle-settings button[aria-pressed="true"] {
+  background: #b6eadc;
+  color: #0d2821;
+}
+.setting-switch {
+  width: 28px;
+  height: 16px;
+  border-radius: 10px;
+  background: #465060;
+  position: relative;
+}
+.setting-switch::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 10px;
+  height: 10px;
+  background: #95a1b1;
+  border-radius: 50%;
+}
+.setting-switch.is-on {
+  background: #38665d;
+}
+.setting-switch.is-on::before {
+  right: 15px;
+  background: #a2ead9;
+}
+.conversation {
+  padding-top: 12px;
+  padding-bottom: 20px;
+}
+.conversation-turn {
+  margin-bottom: 35px;
+  scroll-margin-top: 25px;
+}
+.user-message {
+  border-radius: 24px 24px 7px 24px;
+  padding: 15px 21px;
+  background: #202b3b;
+  margin: 0 0 24px auto;
+  max-width: 88%;
+  width: fit-content;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 2;
+}
+.question-image {
+  display: block;
+  max-width: 220px;
+  max-height: 150px;
+  object-fit: contain;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+.assistant-message {
+  display: flex;
+  gap: 13px;
+  min-width: 0;
+}
+.answer-avatar {
+  color: #83dec6;
+  font-size: 25px;
+  width: 26px;
+  flex-shrink: 0;
+  line-height: 1.8;
+}
+.answer-content {
+  min-width: 0;
+  flex: 1;
+}
+.answer-intro {
+  font-size: 13px;
+  color: #b3c0d1;
+  line-height: 2;
+  min-height: 26px;
+  margin: 0 0 18px;
+}
+.final-answer {
+  border: 1px solid #68c9ad30;
+  border-radius: 20px;
+  background: linear-gradient(130deg, #122c253b, #151e2b95);
+  padding: 16px 20px 10px;
+  margin-bottom: 24px;
+}
+.final-label {
+  color: #93dac8;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.final-result + .final-result {
+  border-top: 1px solid #ffffff0b;
+  padding-top: 14px;
+}
+.verification-row {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  margin: 14px 0 7px;
+  flex-wrap: wrap;
+}
+.verified-badge {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  color: #91e6ca;
+  background: #28655135;
+  border-radius: 6px;
+  font-size: 10px;
+  padding: 3px 6px;
+}
+.engine-credit,
+.unverified-note {
+  color: #8393a7;
+  font-size: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.steps-block {
+  margin-bottom: 26px;
+}
+.steps-block > h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 17px;
+  color: #e2e9f1;
+}
+.solution-step {
+  padding: 3px 0 10px;
+}
+.step-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.step-heading h4 {
+  font-size: 12px;
+  color: #c2d3e1;
+  font-weight: 600;
+}
+.step-number {
+  font:
+    10px "Fira Code",
+    monospace;
+  color: #8bd5c3;
+  border: 1px solid #4974655c;
+  border-radius: 50%;
+  width: 21px;
+  height: 21px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step-explanation {
+  color: #91a0b4;
+  font-size: 12px;
+  line-height: 2.2;
+  padding-inline-start: 30px;
+  margin: 5px 0 8px;
+}
+.step-math {
+  border-radius: 13px;
+  background: #111a27;
+  padding: 8px 10px;
+  margin: 6px 29px 0 0;
+  color: #d3e2ee;
+  font-size: 14px;
+}
+.answer-visual {
+  background: #101a27;
+  border: 1px solid #ffffff09;
+  border-radius: 17px;
+  padding: 15px;
+  margin: 0;
+  overflow: hidden;
+}
+.answer-visual figcaption {
+  color: #a6cfc6;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 0 0 13px;
+}
+.svg-math {
+  font:
+    italic 13px "KaTeX_Math",
+    serif;
+}
+.answer-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  padding-top: 19px;
+  flex-wrap: wrap;
+}
+.answer-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: #91a3b8;
+  padding: 5px 0;
+}
+.answer-action:hover {
+  color: #c4e9df;
+}
+.follow-ups {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.suggestion-button {
+  border: 1px solid #354253;
+  border-radius: 14px;
+  color: #a8bacb;
+  font-size: 11px;
+  padding: 8px 11px;
+  line-height: 1.8;
+  background: #111a26;
+}
+.suggestion-button:hover {
+  background: #1e3040;
+  color: #e0f3ef;
+}
+.answer-note,
+.clarification-card {
+  background: #262317;
+  border: 1px solid #f2c86a24;
+  border-radius: 15px;
+  color: #d8c9a0;
+  padding: 14px;
+  font-size: 12px;
+  line-height: 2.2;
+  margin-top: 18px;
+}
+.clarification-card {
+  background: #182330;
+  border-color: #88b9df20;
+  color: #c3d4e4;
+}
+.analysis-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: #adbdd0;
+  font-size: 12px;
+  padding: 5px 5px 20px;
+}
+.engine-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 13px;
+}
+.engine-chip {
+  font-size: 10px;
+  border: 1px solid #2d394a;
+  border-radius: 8px;
+  padding: 4px 9px;
+  color: #708399;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.engine-chip-active {
+  background: #2a4a423e;
+  border-color: #6bc9ae66;
+  color: #b4eadc;
+}
+.has-conversation .composer-zone {
+  position: sticky;
+  z-index: 15;
+  bottom: 14px;
+  margin-top: 20px;
+  padding-top: 13px;
+  background: linear-gradient(transparent, #0d1118 19%);
+}
+.probability-tree,
+.probability-tree ul {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  list-style: none;
+  padding: 15px 0 0;
+  width: max-content;
+  min-width: 100%;
+}
+.probability-tree li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tree-node {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  border: 1px solid #426359;
+  background: #172d2b;
+  border-radius: 10px;
+  padding: 8px 13px;
+  font-size: 11px;
+  color: #b7e2d8;
+  min-width: 62px;
+}
+.probability-tree ul {
+  position: relative;
+  padding-top: 20px;
+}
+.probability-tree ul::before {
+  content: "";
+  position: absolute;
+  width: 1px;
+  height: 16px;
+  background: #426359;
+  top: 0;
+  left: 50%;
+}
+.chat-modal-layer {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #030710d9;
+  padding: 18px;
+}
+.chat-modal {
+  background: #131c29;
+  border: 1px solid #334154;
+  border-radius: 23px;
+  max-width: 640px;
+  width: 100%;
+  max-height: 88dvh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 90px #0008;
+  outline: none;
+}
+.chat-modal-wide {
+  max-width: 1000px;
+}
+.chat-modal-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #293547;
+  padding: 12px 18px;
+}
+.chat-modal-heading h2 {
+  font-size: 15px;
+  font-weight: 600;
+}
+.chat-modal-body {
+  overflow-y: auto;
+  min-height: 0;
+  padding: 20px;
+}
+.primary-button {
+  border: 0;
+  border-radius: 12px;
+  padding: 11px 18px;
+  color: #132b23;
+  background: #b6eadc;
+  font-size: 12px;
+  font-weight: 700;
+}
+.primary-button:disabled {
+  background: #394957;
+  color: #8190a1;
+}
+.name-input,
+.ocr-review {
+  width: 100%;
+  outline: none;
+  border: 1px solid #37485d;
+  background: #0d1521;
+  border-radius: 12px;
+  padding: 12px;
+  color: #ecf4f8;
+  font-family: inherit;
+  font-size: 14px;
+}
+.name-input:focus,
+.ocr-review:focus {
+  border-color: #7db6a7;
+}
+.image-attachment {
+  padding: 8px 3px 15px;
+  border-bottom: 1px solid #ffffff0d;
+  margin-bottom: 10px;
+}
+.ocr-review {
+  min-height: 90px;
+  max-height: 200px;
+  resize: vertical;
+  font-size: 13px;
+}
+.is-listening {
+  color: #fea5ac;
+  background: #4b2837;
+}
+.reveal-section {
+  animation: answer-reveal 0.16s ease-out both;
+}
+@keyframes answer-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (max-width: 640px) {
+  .chat-main {
+    padding: 20px 14px 20px;
+  }
+  .is-welcome .chat-main {
+    padding-top: 9vh;
+    padding-bottom: 6vh;
+  }
+  .welcome {
+    margin-bottom: 26px;
+    padding-inline: 5px;
+  }
+  .welcome h1 {
+    font-size: 28px;
+    line-height: 1.8;
+  }
+  .welcome p {
+    font-size: 11px;
+  }
+  .question-composer {
+    padding: 15px 14px 10px;
+    border-radius: 25px;
+  }
+  .smart-prompt {
+    font-size: 16px;
+    min-height: 84px;
+  }
+
+  .starter-prompts {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 21px;
+  }
+  .starter-prompts button {
+    padding: 11px 14px;
+  }
+  .has-conversation .composer-zone {
+    bottom: 9px;
+  }
+  .assistant-message {
+    gap: 7px;
+  }
+  .answer-avatar {
+    width: 19px;
+    font-size: 22px;
+  }
+  .final-answer {
+    padding: 14px 12px 8px;
+  }
+  .user-message {
+    max-width: 94%;
+    font-size: 13px;
+    padding: 12px 16px;
+  }
+  .step-math {
+    margin-inline-start: 0;
+    font-size: 13px;
+  }
+  .step-explanation {
+    padding-inline-start: 0;
+  }
+  .answer-visual {
+    padding: 11px;
+  }
+  .chat-modal-layer {
+    padding: 10px;
+  }
+  .chat-modal-body {
+    padding: 14px;
+  }
+  .follow-ups {
+    gap: 6px;
+  }
+  .suggestion-button {
+    font-size: 10px;
+    padding: 7px 9px;
+  }
+}
+
+/* Mathematical forms stay readable as individual cards on narrow screens. */
+.complex-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.complex-form-card {
+  min-width: 0;
+  padding: 16px 12px;
+  border: 1px solid #71e7cf20;
+  border-radius: 16px;
+  background: #102b282c;
+}
+.complex-form-card h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #b8e6dc;
+  font-size: 13px;
+  font-weight: 600;
+}
+.complex-form-card h4 span {
+  display: inline-grid;
+  place-items: center;
+  height: 23px;
+  width: 23px;
+  border-radius: 7px;
+  background: #71e7cf14;
+  color: #71e7cf;
+  font-size: 11px;
+}
+.complex-form-caption {
+  margin-top: 8px;
+  color: #93a7a7;
+  font-size: 12px;
+  line-height: 1.9;
+}
+.complex-form-card .katex-display {
+  font-size: 0.86em;
+  margin: 12px 0 2px;
+}
+@media (max-width: 720px) {
+  .complex-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .complex-form-card {
+    padding: 14px;
+  }
+  .complex-form-card .katex-display {
+    font-size: 1em;
+  }
+}
+
+/* On-demand probability board: no page navigation, backdrop filters or animations. */
+.probability-modal {
+  max-width: 760px;
+  animation: none;
+  transition: none;
+  background: #151e2b;
+  border-color: #354251;
+}
+.probability-board {
+  color: #cbd4df;
+  font-size: 13px;
+  line-height: 1.9;
+}
+.probability-lead {
+  font-size: 12px;
+  color: #8d9bad;
+  margin: 0 0 17px;
+}
+.probability-tabs {
+  display: flex;
+  gap: 3px;
+  padding: 4px;
+  border-radius: 13px;
+  background: #0e1621;
+  margin-bottom: 20px;
+}
+.probability-tabs button {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  padding: 6px 3px;
+  border-radius: 9px;
+  color: #8e9caf;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.probability-tabs button[aria-selected="true"] {
+  background: #2b3b45;
+  color: #d0eee3;
+}
+.probability-panel {
+  display: grid;
+  gap: 15px;
+  min-width: 0;
+}
+.probability-board input:not([type="checkbox"]):not([type="range"]),
+.probability-board select,
+.probability-board textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 43px;
+  padding: 9px 12px;
+  background: #101925;
+  color: #d3dce6;
+  border: 1px solid #344252;
+  border-radius: 10px;
+  outline: none;
+  font-family: inherit;
+  font-size: 13px;
+}
+.probability-board input[dir="ltr"],
+.probability-board textarea[dir="ltr"] {
+  font-family: "Fira Code", monospace !important;
+  font-size: 12px !important;
+}
+.probability-board textarea {
+  resize: vertical;
+  max-height: 240px;
+}
+.probability-board input:focus-visible,
+.probability-board textarea:focus-visible,
+.probability-board select:focus-visible {
+  border-color: #84bca9;
+  box-shadow: 0 0 0 2px #84bca91a;
+}
+.probability-board select {
+  cursor: pointer;
+}
+.probability-board button:focus-visible {
+  outline: 2px solid #95cab7;
+  outline-offset: 3px;
+}
+.probability-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+.probability-field > span {
+  color: #a8b5c4;
+  font-size: 12px;
+}
+.probability-grid,
+.probability-bound {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 13px;
+}
+.probability-bound {
+  padding-top: 2px;
+}
+.urn-stage {
+  background: #101923;
+  border: 1px solid #303e4c;
+  border-radius: 17px;
+  padding: 12px 17px 9px;
+}
+.urn-stage-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #afbdca;
+  font-size: 12px;
+}
+.urn-stage-heading button {
+  padding: 8px;
+  border-radius: 9px;
+  color: #a2b1c0;
+}
+.urn-stage-heading button:hover {
+  background: #ffffff08;
+}
+.urn-bowl {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 8px;
+  min-height: 82px;
+  max-width: 480px;
+  margin: 6px auto 13px;
+  padding: 12px 18px 16px;
+  border: 1px solid #536270;
+  border-top: 0;
+  border-radius: 10px 10px 60px 60px;
+  background: #ffffff02;
+}
+.urn-bowl i {
+  display: block;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow:
+    inset 2px 2px 4px #ffffff38,
+    inset -3px -3px 5px #0003;
+  border: 1px solid #ffffff12;
+  position: relative;
+}
+.urn-bowl i::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 3px;
+  border-radius: 50%;
+  top: 4px;
+  left: 5px;
+  background: #ffffff66;
+}
+.urn-preview-note {
+  text-align: center;
+  font-size: 10px;
+  color: #8492a3;
+  margin: 0;
+}
+.urn-color-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.urn-color-row {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  min-width: 0;
+}
+.urn-color-row > i,
+.probability-target > i {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid #ffffff25;
+}
+.urn-color-row label {
+  min-width: 0;
+  flex: 1;
+}
+.urn-color-row label:nth-of-type(2) {
+  flex: 0.7;
+}
+.urn-color-row input {
+  padding: 7px 8px !important;
+  min-height: 39px !important;
+}
+.urn-color-row button {
+  padding: 7px 3px;
+  color: #8d9bac;
+}
+.probability-board button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.probability-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  color: #a1c8b9;
+  padding: 2px 0;
+  font-size: 11px;
+}
+.probability-mode-note {
+  font-size: 11px;
+  color: #91a997;
+  margin: -3px 0 0;
+}
+.probability-space,
+.probability-live {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 13px;
+  background: #101c24;
+  border: 1px solid #2d4145;
+  border-radius: 11px;
+  min-width: 0;
+}
+.probability-space > span,
+.probability-live > span {
+  font-size: 11px;
+  color: #9aaeb2;
+}
+.probability-space > .probability-math,
+.probability-live > .probability-math {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 3px;
+}
+.probability-live {
+  background: #15272a;
+  border-color: #39534e;
+}
+.probability-target {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 11px;
+  color: #aab7c5;
+}
+.probability-target > i {
+  background: var(--target-color);
+}
+.probability-target > .probability-math {
+  margin-inline-start: auto;
+  color: var(--target-color);
+}
+.probability-help,
+.probability-guide {
+  font-size: 12px;
+  color: #93a4b5;
+  line-height: 2.1;
+}
+.probability-help {
+  margin: 0;
+}
+.probability-check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.probability-check input {
+  accent-color: #97c7b4;
+  width: 16px;
+  height: 16px;
+}
+.probability-guide-toggle {
+  width: 100%;
+  margin-top: 21px;
+  padding: 11px 0;
+  text-align: right;
+  display: flex;
+  justify-content: space-between;
+  color: #9babba;
+  border-top: 1px solid #ffffff09;
+  font-size: 11px;
+}
+.probability-guide {
+  padding: 6px 0 15px;
+}
+.probability-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  padding: 17px 0 0;
+  margin-top: 5px;
+  border-top: 1px solid #ffffff0b;
+}
+.probability-actions .primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 12px;
+  min-height: 43px;
+}
+.probability-actions .suggestion-button {
+  min-height: 43px;
+}
+.probability-error {
+  font-size: 12px;
+  color: #e9a0a9;
+  padding: 9px 12px;
+  border: 1px solid #7d3c4555;
+  border-radius: 10px;
+  background: #40222b44;
+}
+.probability-p-label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  align-items: center;
+  font-size: 11px;
+  padding-bottom: 8px;
+}
+.probability-p-label > .probability-math:nth-child(2) {
+  color: var(--target-color);
+  margin-inline-end: auto;
+}
+.probability-p-track {
+  height: 13px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #455368;
+  direction: ltr;
+}
+.probability-p-track > i {
+  display: block;
+  height: 100%;
+  background: var(--target-color);
+}
+.probability-p-meter input[type="range"] {
+  width: 100%;
+  margin-top: 13px;
+  accent-color: var(--target-color);
+  cursor: pointer;
+}
+.probability-histogram svg {
+  width: 100%;
+  min-width: 250px;
+  display: block;
+}
+.visual-note {
+  font-size: 11px;
+  color: #8e9fb2;
+  line-height: 1.9;
+  margin: 9px 0 0;
+}
+.histogram-data {
+  margin-top: 12px;
+  font-size: 11px;
+  color: #8fa3b4;
+}
+.histogram-data summary {
+  cursor: pointer;
+  width: fit-content;
+}
+.histogram-data-scroll {
+  max-height: 230px;
+  overflow: auto;
+  margin-top: 9px;
+}
+.histogram-data table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+.histogram-data td,
+.histogram-data th {
+  padding: 7px;
+  border-bottom: 1px solid #ffffff09;
+}
+.histogram-data td[dir="ltr"] {
+  font-family: "Fira Code", monospace;
+}
+@media (max-width: 540px) {
+  .probability-modal .chat-modal-body {
+    padding: 16px 14px;
+  }
+  .probability-modal .chat-modal-heading {
+    padding: 14px 17px;
+  }
+  .probability-modal .chat-modal-heading h2 {
+    font-size: 15px;
+  }
+  .probability-tabs {
+    gap: 0;
+    padding: 3px;
+  }
+  .probability-tabs button {
+    font-size: 10px;
+    padding: 6px 2px;
+    min-height: 40px;
+  }
+  .urn-color-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .probability-grid,
+  .probability-bound {
+    gap: 10px;
+  }
+  .probability-field > span {
+    font-size: 11px;
+  }
+  .probability-board select {
+    font-size: 12px;
+    padding: 9px 6px;
+  }
+  .urn-bowl {
+    gap: 7px;
+    padding: 12px 15px 15px;
+  }
+  .urn-bowl i {
+    width: 21px;
+    height: 21px;
+  }
+  .probability-actions {
+    gap: 8px;
+  }
+  .probability-actions button {
+    font-size: 11px;
+    flex: 1;
+    white-space: nowrap;
+  }
+}
+.probability-event-description {
+  font-size: 11px;
+  color: #a3b7b1;
+  margin: -5px 0 0;
+}
+.probability-space .probability-math,
+.probability-live .probability-math {
+  font-size: 16px;
+}
+.probability-target .probability-math {
+  font-size: 15px;
+}
+.probability-tabs {
+  position: sticky;
+  top: -20px;
+  z-index: 3;
+}
+.probability-actions {
+  position: sticky;
+  bottom: -20px;
+  z-index: 2;
+  padding: 13px 0;
+  background: #151e2b;
+  box-shadow: 0 -10px 15px #151e2b;
+}
+@media (max-width: 540px) {
+  .probability-tabs {
+    top: -16px;
+  }
+  .probability-actions {
+    bottom: -16px;
+  }
+}
