@@ -1,0 +1,75 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+import { viteSingleFile } from "vite-plugin-singlefile";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+function offlineNotices(): { path: string; text: string }[] {
+  const result: { path: string; text: string }[] = [];
+  const collect = (directory: string) => {
+    for (const item of fs.readdirSync(directory, { withFileTypes: true })) {
+      const filename = path.join(directory, item.name);
+      if (item.isDirectory()) collect(filename);
+      else if (item.isFile())
+        result.push({
+          path: path.relative(__dirname, filename).replace(/\\/g, "/"),
+          text: fs.readFileSync(filename, "utf8"),
+        });
+    }
+  };
+  collect(path.join(__dirname, "licenses"));
+  result.push({
+    path: "THIRD_PARTY_NOTICES.md",
+    text: fs.readFileSync(
+      path.join(__dirname, "THIRD_PARTY_NOTICES.md"),
+      "utf8",
+    ),
+  });
+  return result.sort((first, second) => first.path.localeCompare(second.path));
+}
+
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss(),
+    {
+      name: "offline-license-notices",
+      apply: "build",
+      transformIndexHtml() {
+        return [
+          {
+            tag: "script",
+            attrs: { type: "application/json", id: "offline-license-notices" },
+            children: JSON.stringify(offlineNotices()).replace(/</g, "\\u003c"),
+            injectTo: "body" as const,
+          },
+        ];
+      },
+    },
+    {
+      name: "standalone-script-source",
+      apply: "build",
+      enforce: "post",
+      generateBundle(_options, bundle) {
+        // MathLive identifies inline scripts by this debug label under file://.
+        for (const chunk of Object.values(bundle)) {
+          if (chunk.type === "chunk")
+            chunk.code += "\n//# sourceURL=calculator-inline.js\n";
+        }
+      },
+    },
+    viteSingleFile(),
+  ],
+  worker: {
+    format: "iife",
+    rollupOptions: { output: { inlineDynamicImports: true } },
+  },
+  server: { host: "0.0.0.0", allowedHosts: [".e2b.app"] },
+  preview: { host: "0.0.0.0", allowedHosts: [".e2b.app"] },
+  resolve: { alias: { "@": path.resolve(__dirname, "src") } },
+});

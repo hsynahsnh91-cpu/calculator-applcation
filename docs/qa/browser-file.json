@@ -1,0 +1,279 @@
+{
+  "url": "file:///home/user/calculator-applcation/dist/index.html",
+  "results": [
+    {
+      "name": "single RTL conversation; no header, section pages, or bottom navigation",
+      "pass": true
+    },
+    {
+      "name": "editable name is stored only locally",
+      "pass": true
+    },
+    {
+      "name": "browser acceptance 1: calculusEngine",
+      "pass": true
+    },
+    {
+      "name": "browser acceptance 2: equationSolver",
+      "pass": true
+    },
+    {
+      "name": "browser acceptance 3: integrationEngine",
+      "pass": true
+    },
+    {
+      "name": "browser acceptance 4: limitsEngine",
+      "pass": true
+    },
+    {
+      "name": "browser acceptance 5: matricesEngine",
+      "pass": true
+    },
+    {
+      "name": "browser acceptance 6: complexTools",
+      "pass": true
+    },
+    {
+      "name": "browser acceptance 7: probabilityEngine",
+      "pass": true
+    },
+    {
+      "name": "browser acceptance 8: sequences",
+      "pass": true
+    },
+    {
+      "name": "browser acceptance 9: geometryEngine",
+      "pass": true
+    },
+    {
+      "name": "browser acceptance 10: mathEngine",
+      "pass": true
+    },
+    {
+      "name": "answer order is final → steps → applicable visuals → suggestions",
+      "pass": true
+    },
+    {
+      "name": "manual save, guarded history, and a nested confirmation Escape",
+      "pass": true
+    },
+    {
+      "name": "copy action uses the composed answer and solution text",
+      "pass": true
+    },
+    {
+      "name": "conversation and context survive reload",
+      "pass": true
+    },
+    {
+      "name": "new conversation resets the shared function but keeps saved history",
+      "pass": true
+    },
+    {
+      "name": "physical ^ creates an editable exponent, not visible raw notation",
+      "pass": true
+    },
+    {
+      "name": "Shift+Enter creates a new line without sending, including inside math",
+      "pass": true
+    },
+    {
+      "name": "mathematical keypad inserts a genuine fraction in the mixed composer",
+      "pass": true
+    },
+    {
+      "name": "local formula bank is a modal, not a navigation page",
+      "pass": true
+    },
+    {
+      "name": "menu arrows, modal focus trap, and reduced-motion preferences",
+      "pass": true
+    },
+    {
+      "name": "angle selection persists and affects only unmarked scientific angles",
+      "pass": true
+    },
+    {
+      "name": "compound request shares its definition and retains partial success",
+      "pass": true
+    },
+    {
+      "name": "follow-up buttons are live and use the current conversation context",
+      "pass": true
+    },
+    {
+      "name": "clear conversation is explicit and does not delete saved history",
+      "pass": true
+    },
+    {
+      "name": "phone and narrow viewport have no horizontal document overflow",
+      "pass": true
+    },
+    {
+      "name": "unwanted solving/composer captions are absent; keyboard shortcuts are retained",
+      "pass": true
+    },
+    {
+      "name": "three exact complex forms stack on a narrow phone without document overflow",
+      "pass": true
+    },
+    {
+      "name": "complex forms and aliases survive reload, and conjugate follow-up is live",
+      "pass": true
+    },
+    {
+      "name": "Euler exponential gives the correct exact real and imaginary parts in the Worker",
+      "pass": true
+    },
+    {
+      "name": "large De Moivre powers stay compact and never overflow the mobile answer",
+      "pass": true
+    },
+    {
+      "name": "multiple-angle and power-reduction identities are genuine mobile KaTeX",
+      "pass": true
+    },
+    {
+      "name": "negative discriminant is impossible in R; an explicit follow-up solves it in C",
+      "pass": true
+    },
+    {
+      "name": "complex plane distance and three-point ratio angles use arrowed segments",
+      "pass": true
+    },
+    {
+      "name": "translation, homothety and centered rotation produce checked image coordinates",
+      "pass": true
+    },
+    {
+      "name": "nth roots lie on the plotted circle, remain reviewable and persist",
+      "pass": true
+    },
+    {
+      "name": "probability board is quiet and on demand, not a restored section page",
+      "pass": true
+    },
+    {
+      "name": "changing the target colour or counts immediately updates p and its colour",
+      "pass": true
+    },
+    {
+      "name": "all added colours participate in live urn feedback and remain editable",
+      "pass": true
+    },
+    {
+      "name": "shuffle randomizes only bounded ball positions, never counts or probabilities",
+      "pass": true
+    },
+    {
+      "name": "drawing dropdown explains all three counting modes and recomputes n(Omega)",
+      "pass": true
+    },
+    {
+      "name": "exactly, at least and less-than are distinct live events with ordered wording",
+      "pass": true
+    },
+    {
+      "name": "the board inserts a complete editable question without sending it",
+      "pass": true
+    },
+    {
+      "name": "direct board solve uses the real Worker and stores structured probability context",
+      "pass": true
+    },
+    {
+      "name": "an answer opens its own older experiment, not a newer unrelated distribution",
+      "pass": true
+    },
+    {
+      "name": "event controls expose independent and disjoint assumptions only on selection",
+      "pass": true
+    },
+    {
+      "name": "Bayes controls appear immediately and the rendered tree is normalized",
+      "pass": true
+    },
+    {
+      "name": "a law built in the board has complete moments and a live calculus bridge",
+      "pass": true
+    },
+    {
+      "name": "joint-law controls check every cell rather than confusing zero covariance with independence",
+      "pass": true
+    },
+    {
+      "name": "binomial p changes update the coloured meter without changing the meaning of tails",
+      "pass": true
+    },
+    {
+      "name": "statistics produce a real frequency histogram with readable underlying data",
+      "pass": true
+    },
+    {
+      "name": "the frequency-table matrix bridge is usable by the existing matrix engine",
+      "pass": true
+    },
+    {
+      "name": "ordered urn conditional controls calculate the correct restricted space",
+      "pass": true
+    },
+    {
+      "name": "invalid urn controls never show a stale live probability or allow a solve",
+      "pass": true
+    },
+    {
+      "name": "probability context and histogram visuals survive an offline reload",
+      "pass": true
+    },
+    {
+      "name": "probability board tabs, focus and floating layout work at narrow phone widths",
+      "pass": true
+    },
+    {
+      "name": "local OCR returns reviewable text and never solves before approval",
+      "pass": true
+    },
+    {
+      "name": "cancelling OCR initialization leaves the composer and solver usable",
+      "pass": true
+    },
+    {
+      "name": "malformed saved answer is ignored instead of crashing React",
+      "pass": true
+    },
+    {
+      "name": "solver stop terminates a stalled Worker and the next question works",
+      "pass": true
+    },
+    {
+      "name": "watchdog returns an honest clarification, not a fake numerical answer",
+      "pass": true
+    },
+    {
+      "name": "Worker failure becomes an Arabic clarification without crashing the chat",
+      "pass": true
+    },
+    {
+      "name": "speech policy: available",
+      "pass": true
+    },
+    {
+      "name": "speech policy: downloadable",
+      "pass": true
+    },
+    {
+      "name": "speech policy: unavailable",
+      "pass": true
+    },
+    {
+      "name": "speech policy: server-only",
+      "pass": true
+    },
+    {
+      "name": "no external HTTP requests or uncaught browser errors",
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "external": []
+}
