@@ -203,8 +203,11 @@ export const publishRequestSchema = z
   .object({
     items: z.array(knowledgeItemSchema).max(2_000),
     settings: solverSettingsSchema,
+    /**
+     * Produced by a real local run of the unified solver immediately before
+     * publish. The server rejects missing or failed approved cases.
+     */
     regression: z.array(regressionOutcomeSchema).max(2_000),
-    force: z.boolean().default(false),
   })
   .strict();
 export type PublishRequest = z.infer<typeof publishRequestSchema>;

@@ -101,7 +101,7 @@ export async function publishKnowledge(input: PublishRequest): Promise<{
   version: number;
   itemCount: number;
   elapsedMs: number;
-  forcedDespiteRegression: boolean;
+  regressionPassed: true;
 }> {
   const body = await request("/api/admin-publish", {
     method: "POST",
@@ -112,14 +112,14 @@ export async function publishKnowledge(input: PublishRequest): Promise<{
     typeof body.version !== "number" ||
     typeof body.itemCount !== "number" ||
     typeof body.elapsedMs !== "number" ||
-    typeof body.forcedDespiteRegression !== "boolean"
+    body.regressionPassed !== true
   )
     throw new Error("استجاب النشر ببيانات غير متوقعة.");
   return {
     version: body.version,
     itemCount: body.itemCount,
     elapsedMs: body.elapsedMs,
-    forcedDespiteRegression: body.forcedDespiteRegression,
+    regressionPassed: true,
   };
 }
 
