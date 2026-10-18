@@ -1,13 +1,135 @@
 import { Redis } from "@upstash/redis";
 
+export type RedisCredentialSource = "upstash" | "vercel-kv";
+
+export interface RedisCredentials {
+  source: RedisCredentialSource;
+  url: string;
+  token: string;
+}
+
+export type RedisConfiguration =
+  | { available: true; credentials: RedisCredentials }
+  | { available: false; message: string };
+
+type Environment = Readonly<Record<string, string | undefined>>;
+
 let cachedRedis: Redis | null | undefined;
+let cachedConfiguration: RedisConfiguration | undefined;
+
+function valueFrom(environment: Environment, name: string): string | undefined {
+  const value = environment[name]?.trim();
+  return value || undefined;
+}
+
+function isSafeRestUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    // Redis credentials must never be sent over an unencrypted endpoint.
+    return url.protocol === "https:" && Boolean(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
+interface CredentialCandidate {
+  source: RedisCredentialSource;
+  url?: string;
+  token?: string;
+}
+
+/**
+ * Resolve complete URL/token pairs together. Selecting each environment
+ * variable independently can accidentally combine a stale UPSTASH value with
+ * a current Vercel KV value, which produces an opaque authentication failure.
+ */
+export function resolveRedisConfiguration(
+  environment: Environment = process.env,
+): RedisConfiguration {
+  const candidates: CredentialCandidate[] = [
+    {
+      source: "upstash",
+      url: valueFrom(environment, "UPSTASH_REDIS_REST_URL"),
+      token: valueFrom(environment, "UPSTASH_REDIS_REST_TOKEN"),
+    },
+    {
+      source: "vercel-kv",
+      url: valueFrom(environment, "KV_REST_API_URL"),
+      token: valueFrom(environment, "KV_REST_API_TOKEN"),
+    },
+  ];
+
+  for (const candidate of candidates) {
+    if (candidate.url && candidate.token && isSafeRestUrl(candidate.url))
+      return {
+        available: true,
+        credentials: {
+          source: candidate.source,
+          url: candidate.url,
+          token: candidate.token,
+        },
+      };
+  }
+
+  const hasIncompletePair = candidates.some(
+    (candidate) => Boolean(candidate.url) !== Boolean(candidate.token),
+  );
+  if (hasIncompletePair)
+    return {
+      available: false,
+      message:
+        "إعداد Redis غير مكتمل: اضبط زوجًا كاملًا فقط من UPSTASH_REDIS_REST_URL وUPSTASH_REDIS_REST_TOKEN، أو من KV_REST_API_URL وKV_REST_API_TOKEN.",
+    };
+
+  const hasInvalidUrl = candidates.some(
+    (candidate) => Boolean(candidate.url && candidate.token && !isSafeRestUrl(candidate.url)),
+  );
+  if (hasInvalidUrl)
+    return {
+      available: false,
+      message:
+        "عنوان Redis غير صالح أو غير آمن. استخدم عنوان REST يبدأ بـ https:// من Upstash أو Vercel KV.",
+    };
+
+  return {
+    available: false,
+    message:
+      "يلزم ربط Redis قبل فتح الإدارة كي يعمل حد محاولات الدخول بأمان.",
+  };
+}
+
+function configuredRedis(): RedisConfiguration {
+  if (!cachedConfiguration) cachedConfiguration = resolveRedisConfiguration();
+  return cachedConfiguration;
+}
 
 export function redis(): Redis | null {
   if (cachedRedis !== undefined) return cachedRedis;
-  const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
-  cachedRedis = url && token ? new Redis({ url, token }) : null;
+  const configuration = configuredRedis();
+  if (!configuration.available) {
+    cachedRedis = null;
+    return cachedRedis;
+  }
+  try {
+    cachedRedis = new Redis({
+      url: configuration.credentials.url,
+      token: configuration.credentials.token,
+    });
+  } catch {
+    cachedConfiguration = {
+      available: false,
+      message:
+        "تعذر تهيئة عميل Redis. تحقق من عنوان REST ورمز الوصول في إعدادات Vercel.",
+    };
+    cachedRedis = null;
+  }
   return cachedRedis;
+}
+
+/** A safe message for an administrator; it never exposes a URL or token. */
+export function redisConfigurationMessage(): string | undefined {
+  const configuration = configuredRedis();
+  return configuration.available ? undefined : configuration.message;
 }
 
 export function redisIsRequired(): boolean {
@@ -35,9 +157,14 @@ export async function failedLoginAttempt(ip: string): Promise<{
   const client = redis();
   if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
   const key = RedisKey.loginAttempts(ip);
-  const count = await client.incr(key);
-  if (count === 1) await client.expire(key, 15 * 60);
-  const ttl = await client.ttl(key);
+  // One atomic transaction avoids three separate REST round-trips and keeps
+  // the initial 15-minute window intact even under concurrent failed attempts.
+  const [count, , ttl] = await client
+    .multi()
+    .incr(key)
+    .expire(key, 15 * 60, "NX")
+    .ttl(key)
+    .exec();
   return { blocked: count >= 5, retryAfterSeconds: Math.max(0, ttl) };
 }
 
@@ -47,8 +174,8 @@ export async function loginBlocked(ip: string): Promise<{
 }> {
   const client = redis();
   if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
-  const count = await client.get<number>(RedisKey.loginAttempts(ip));
-  const ttl = await client.ttl(RedisKey.loginAttempts(ip));
+  const key = RedisKey.loginAttempts(ip);
+  const [count, ttl] = await client.pipeline().get<number>(key).ttl(key).exec();
   return {
     blocked: (count ?? 0) >= 5,
     retryAfterSeconds: Math.max(0, ttl),

@@ -11,11 +11,18 @@ interface AdminTokenPayload {
   expiresAt: number;
 }
 
-function requiredSecret(): string {
+function adminSecretConfigurationError(): string | undefined {
   const secret = process.env.ADMIN_SECRET;
-  if (!secret || secret.length < 32)
-    throw new Error("لم يُضبط ADMIN_SECRET بطول آمن في إعدادات Vercel.");
-  return secret;
+  if (!secret) return "لم يُضبط ADMIN_SECRET في إعدادات Vercel بعد.";
+  if (secret.length < 32)
+    return "يجب أن يتكون ADMIN_SECRET من 32 محرفًا على الأقل في إعدادات Vercel.";
+  return undefined;
+}
+
+function requiredSecret(): string {
+  const error = adminSecretConfigurationError();
+  if (error) throw new Error(error);
+  return process.env.ADMIN_SECRET!;
 }
 
 function base64Url(value: string): string {
@@ -135,8 +142,14 @@ export function requireTrustedOrigin(
   return false;
 }
 
+export function adminConfigurationError(): string | undefined {
+  if (!process.env.ADMIN_PASSWORD)
+    return "لم يُضبط ADMIN_PASSWORD في إعدادات Vercel بعد.";
+  return adminSecretConfigurationError();
+}
+
 export function adminPasswordConfigured(): boolean {
-  return Boolean(process.env.ADMIN_PASSWORD && process.env.ADMIN_SECRET);
+  return adminConfigurationError() === undefined;
 }
 
 export function passwordMatches(candidate: string): boolean {
