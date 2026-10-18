@@ -6,9 +6,9 @@ import {
   passwordMatches,
   requireTrustedOrigin,
   setAdminCookie,
-} from "./_lib/auth";
-import { clientIp, methodNotAllowed, readJsonBody, sendJson } from "./_lib/http";
-import { clearFailedLoginAttempts, failedLoginAttempt, loginBlocked, redis } from "./_lib/redis";
+} from "../lib/auth";
+import { clientIp, methodNotAllowed, readJsonBody, sendJson } from "../lib/http";
+import { clearFailedLoginAttempts, failedLoginAttempt, loginBlocked, redis } from "../lib/redis";
 
 const loginSchema = z.object({ password: z.string().min(1).max(1_024) }).strict();
 

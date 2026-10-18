@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
-import { clientIp, methodNotAllowed, readJsonBody, sendJson } from "./_lib/http";
-import { RedisKey, redis } from "./_lib/redis";
+import { clientIp, methodNotAllowed, readJsonBody, sendJson } from "../lib/http";
+import { RedisKey, redis } from "../lib/redis";
 
 const eventSchema = z.object({ solved: z.boolean() }).strict();
 

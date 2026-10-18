@@ -203,8 +203,8 @@ export const publishRequestSchema = z
   .object({
     items: z.array(knowledgeItemSchema).max(2_000),
     settings: solverSettingsSchema,
+    /** Fresh outcomes from the mandatory comprehensive regression run. */
     regression: z.array(regressionOutcomeSchema).max(2_000),
-    force: z.boolean().default(false),
   })
   .strict();
 export type PublishRequest = z.infer<typeof publishRequestSchema>;

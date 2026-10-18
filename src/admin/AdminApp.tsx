@@ -45,6 +45,10 @@ import { DocumentScanner } from "./DocumentScanner";
 import { findCurriculumGaps } from "./curriculum";
 import { scanDocument, type ScannedDocument } from "./scanner";
 import {
+  approvedSolutionFromAnswer,
+  approvedSolutionsMatch,
+} from "../knowledge/regression";
+import {
   AdminApiError,
   adminLogin,
   adminLogout,
@@ -62,7 +66,6 @@ import {
   type AdminStatistics,
 } from "./api";
 import {
-  approvedSolutionSchema,
   defaultSolverSettings,
   errorAnalysisSchema,
   knowledgeItemSchema,
@@ -175,45 +178,6 @@ function createItemFromBlock(block: AnalysisBlock, source: string): KnowledgeIte
     ...(block.book_solution ? { bookSolution: block.book_solution } : {}),
     comparison: "not_compared",
   });
-}
-
-function solutionFromAnswer(answer: SolverAnswer): ApprovedSolution | undefined {
-  if (!answer.results.length) return undefined;
-  const primary = answer.results[0];
-  const parsed = approvedSolutionSchema.safeParse({
-    answerText: primary.note || undefined,
-    answerLatex: primary.finalLatex,
-    steps: answer.results.flatMap((result) =>
-      result.steps.map((step) => ({
-        title: step.title,
-        ...(step.text ? { text: step.text } : {}),
-        latex: step.latex,
-      })),
-    ),
-    verification: {
-      passed: primary.verification.passed,
-      method: primary.verification.method,
-    },
-    elapsedMs: answer.elapsedMs,
-  });
-  return parsed.success ? parsed.data : undefined;
-}
-
-function solutionKey(solution: ApprovedSolution | undefined): string {
-  if (!solution) return "";
-  return canonicalizeQuestion(solution.answerLatex || solution.answerText || "");
-}
-
-function compareSolutions(
-  engineSolution: ApprovedSolution | undefined,
-  bookSolution: ApprovedSolution | undefined,
-): KnowledgeItem["comparison"] {
-  if (!bookSolution) return "not_compared";
-  const engineKey = solutionKey(engineSolution);
-  const bookKey = solutionKey(bookSolution);
-  // Exact normalized equality only. Different equivalent-looking mathematics is
-  // deliberately left for a human review rather than claimed as a match.
-  return engineKey && bookKey && engineKey === bookKey ? "matching" : "needs_review";
 }
 
 function inferCorrectionAnalysis(
@@ -511,10 +475,14 @@ export default function AdminApp() {
           () => undefined,
           controller.signal,
         );
-        const solution = solutionFromAnswer(answer);
+        const solution = approvedSolutionFromAnswer(answer);
         const run: ExerciseRun = { state: "complete", answer, ...(solution ? { solution } : {}) };
         setRuns((previous) => ({ ...previous, [item.id]: run }));
-        const comparison = compareSolutions(solution, item.bookSolution);
+        const comparison = item.bookSolution
+          ? approvedSolutionsMatch(solution, item.bookSolution)
+            ? "matching"
+            : "needs_review"
+          : "not_compared";
         const updated = knowledgeItemSchema.parse({
           ...item,
           ...(solution ? { approvedSolution: solution } : {}),
@@ -624,11 +592,11 @@ export default function AdminApp() {
   };
 
   const comprehensiveTest = useCallback(async (): Promise<RegressionOutcome[]> => {
+    // An approved item without an answer is a real regression too; never skip it.
     const testable = items.filter(
       (item) =>
         ["approved", "published"].includes(item.status) &&
-        ["example", "exercise", "correction"].includes(item.type) &&
-        Boolean(item.approvedSolution),
+        ["example", "exercise", "correction"].includes(item.type),
     );
     const controller = new AbortController();
     regressionAbort.current?.abort();
@@ -640,6 +608,16 @@ export default function AdminApp() {
       for (const item of testable) {
         if (controller.signal.aborted) throw new DOMException("أُلغي الاختبار الشامل.", "AbortError");
         const started = performance.now();
+        if (!item.approvedSolution) {
+          outcomes.push({
+            itemId: item.id,
+            passed: false,
+            elapsedMs: 0,
+            message: "العنصر المعتمد لا يحتوي حلًا معتمدًا صالحًا ليُقارن بالمحرك.",
+          });
+          setRegression([...outcomes]);
+          continue;
+        }
         try {
           const answer = await solveLocally(
             item.structured || item.originalText,
@@ -651,8 +629,8 @@ export default function AdminApp() {
             () => undefined,
             controller.signal,
           );
-          const actual = solutionFromAnswer(answer);
-          const passed = compareSolutions(actual, item.approvedSolution) === "matching";
+          const actual = approvedSolutionFromAnswer(answer);
+          const passed = approvedSolutionsMatch(actual, item.approvedSolution);
           outcomes.push({
             itemId: item.id,
             passed,
@@ -671,8 +649,15 @@ export default function AdminApp() {
         }
         setRegression([...outcomes]);
       }
-      if (!testable.length) setNotice("لا توجد أمثلة أو تمارين معتمدة تحتوي حلًا لاختبارها بعد.");
-      else setNotice(`اكتمل اختبار ${testable.length} عنصرًا فعليًا على المحرك الموحد.`);
+      if (!testable.length) setNotice("لا توجد أمثلة أو تمارين أو تصحيحات معتمدة لاختبارها بعد.");
+      else {
+        const failed = outcomes.filter((outcome) => !outcome.passed).length;
+        setNotice(
+          failed
+            ? `اكتمل الاختبار الشامل مع ${failed} إخفاقات؛ سيبقى النشر مقفلاً حتى إصلاحها.`
+            : `اكتمل اختبار ${testable.length} عنصرًا فعليًا على المحرك الموحد دون انحدار.`,
+        );
+      }
       return outcomes;
     } finally {
       if (regressionAbort.current === controller) regressionAbort.current = null;
@@ -680,14 +665,21 @@ export default function AdminApp() {
     }
   }, [items, settings]);
 
-  const publish = async (force = false) => {
+  const publish = async () => {
     if (publishing) return;
     setPublishing(true);
     setError("");
     setPublishMessage("");
     try {
-      const outcomes = force && regression.length ? regression : await comprehensiveTest();
-      const result = await publishKnowledge({ items, settings, regression: outcomes, force });
+      // A fresh complete test is mandatory for every publish; cached reports are never reused.
+      const outcomes = await comprehensiveTest();
+      const failures = outcomes.filter((outcome) => !outcome.passed);
+      if (failures.length) {
+        setPublishFailures(failures);
+        setError("فشل اختبار الانحدار الإلزامي؛ لم يُرسل أي نشر إلى الخادم.");
+        return;
+      }
+      const result = await publishKnowledge({ items, settings, regression: outcomes });
       const updated = items.map((item) =>
         item.status === "approved" || item.status === "published"
           ? knowledgeItemSchema.parse({ ...item, status: "published", version: result.version })
@@ -697,7 +689,7 @@ export default function AdminApp() {
       setItems(updated);
       setPublishFailures([]);
       setPublishMessage(
-        `تم نشر ${result.itemCount} عنصرًا في النسخة ${result.version} خلال ${Math.round(result.elapsedMs)} مللي ثانية.${result.forcedDespiteRegression ? " نُشرت رغم إخفاقات الانحدار التي قبلتها." : ""}`,
+        `تم نشر ${result.itemCount} عنصرًا في النسخة ${result.version} خلال ${Math.round(result.elapsedMs)} مللي ثانية بعد اجتياز اختبار الانحدار الإلزامي.`,
       );
       await refreshRemote();
     } catch (value) {
@@ -1037,8 +1029,11 @@ export default function AdminApp() {
               {publishFailures.length > 0 && (
                 <div className="admin-blocking-card">
                   <AlertTriangle size={20} />
-                  <div><strong>أوقف النشر اختبار الانحدار</strong><ul>{publishFailures.map((failure) => <li key={failure.itemId}>{failure.message}</li>)}</ul></div>
-                  <button className="admin-wrong-button" type="button" disabled={publishing} onClick={() => void publish(true)}>انشر رغم ذلك</button>
+                  <div>
+                    <strong>أوقف اختبار الانحدار النشر</strong>
+                    <p>أصلح كل عنصر أدناه ثم أعد تشغيل النشر؛ لا يوجد تجاوز لهذا الحاجز.</p>
+                    <ul>{publishFailures.map((failure) => <li key={failure.itemId}>{failure.message}</li>)}</ul>
+                  </div>
                 </div>
               )}
               <div className="admin-two-columns">

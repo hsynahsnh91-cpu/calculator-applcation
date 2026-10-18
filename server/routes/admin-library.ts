@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { requireAdmin } from "./_lib/auth";
-import { methodNotAllowed, sendJson } from "./_lib/http";
-import { getCurrentSnapshot } from "./_lib/knowledgeStore";
+import { requireAdmin } from "../lib/auth";
+import { methodNotAllowed, sendJson } from "../lib/http";
+import { getCurrentSnapshot } from "../lib/knowledgeStore";
 
 /**
  * Drafts deliberately stay in IndexedDB. This endpoint exposes the immutable,

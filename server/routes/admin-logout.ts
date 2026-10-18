@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { clearAdminCookie, requireAdmin, requireTrustedOrigin } from "./_lib/auth";
-import { methodNotAllowed, sendJson } from "./_lib/http";
+import { clearAdminCookie, requireAdmin, requireTrustedOrigin } from "../lib/auth";
+import { methodNotAllowed, sendJson } from "../lib/http";
 
 export default async function handler(
   request: VercelRequest,

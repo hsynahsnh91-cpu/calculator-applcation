@@ -2,10 +2,10 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import {
   failureRecordSchema,
   publicFailureRequestSchema,
-} from "../src/admin/types";
-import { canonicalizeQuestion, questionFingerprint } from "../src/admin/normalization";
-import { clientIp, methodNotAllowed, readJsonBody, sendJson } from "./_lib/http";
-import { RedisKey, redis } from "./_lib/redis";
+} from "../../src/admin/types";
+import { canonicalizeQuestion, questionFingerprint } from "../../src/admin/normalization";
+import { clientIp, methodNotAllowed, readJsonBody, sendJson } from "../lib/http";
+import { RedisKey, redis } from "../lib/redis";
 
 const RATE_LIMIT_PER_MINUTE = 20;
 
