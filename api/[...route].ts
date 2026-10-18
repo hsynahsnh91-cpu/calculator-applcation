@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { sendJson } from "../server/lib/http";
+import { sendJson } from "../server/lib/http.js";
 
 type RouteHandler = (
   request: VercelRequest,
@@ -12,21 +12,26 @@ type RouteModule = { default: RouteHandler };
  * Vercel's free plan counts files under /api as serverless functions. Keep one
  * catch-all function here and load the route implementations from /server,
  * preserving the public URLs used by the React application.
+ *
+ * The Node builder emits TypeScript source as ESM `.js` files. Keep explicit
+ * `.js` runtime specifiers throughout this server dependency graph: Vite and
+ * TypeScript resolve them to source during development, while Vercel resolves
+ * the emitted files without an extensionless-import startup failure.
  */
 const routeLoaders: Record<string, () => Promise<RouteModule>> = {
-  "admin-analyze": () => import("../server/routes/admin-analyze"),
-  "admin-failures": () => import("../server/routes/admin-failures"),
-  "admin-library": () => import("../server/routes/admin-library"),
-  "admin-login": () => import("../server/routes/admin-login"),
-  "admin-logout": () => import("../server/routes/admin-logout"),
-  "admin-publish": () => import("../server/routes/admin-publish"),
-  "admin-session": () => import("../server/routes/admin-session"),
-  "admin-settings": () => import("../server/routes/admin-settings"),
-  "admin-stats": () => import("../server/routes/admin-stats"),
-  "admin-versions": () => import("../server/routes/admin-versions"),
-  knowledge: () => import("../server/routes/knowledge"),
-  "knowledge-event": () => import("../server/routes/knowledge-event"),
-  "knowledge-failure": () => import("../server/routes/knowledge-failure"),
+  "admin-analyze": () => import("../server/routes/admin-analyze.js"),
+  "admin-failures": () => import("../server/routes/admin-failures.js"),
+  "admin-library": () => import("../server/routes/admin-library.js"),
+  "admin-login": () => import("../server/routes/admin-login.js"),
+  "admin-logout": () => import("../server/routes/admin-logout.js"),
+  "admin-publish": () => import("../server/routes/admin-publish.js"),
+  "admin-session": () => import("../server/routes/admin-session.js"),
+  "admin-settings": () => import("../server/routes/admin-settings.js"),
+  "admin-stats": () => import("../server/routes/admin-stats.js"),
+  "admin-versions": () => import("../server/routes/admin-versions.js"),
+  knowledge: () => import("../server/routes/knowledge.js"),
+  "knowledge-event": () => import("../server/routes/knowledge-event.js"),
+  "knowledge-failure": () => import("../server/routes/knowledge-failure.js"),
 };
 
 function routeFromRequest(request: VercelRequest): string {

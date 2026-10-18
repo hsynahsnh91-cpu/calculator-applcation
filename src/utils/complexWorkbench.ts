@@ -1,12 +1,12 @@
-import type { AngleMode } from "../types";
-import type { ComplexAnswer, ComplexRequest } from "../solver/complexTypes";
+import type { AngleMode } from "../types/index.js";
+import type { ComplexAnswer, ComplexRequest } from "../solver/complexTypes.js";
 import {
   ClarificationError,
   type ComplexVisual,
   type SolutionStep,
   type Verification,
-} from "../solver/types";
-import { math, numberTex, parseExpression } from "../solver/math";
+} from "../solver/types.js";
+import { math, numberTex, parseExpression } from "../solver/math.js";
 import {
   addPair,
   subtractPair,
@@ -26,7 +26,7 @@ import {
   verifyPair,
   type Pair,
   type ComplexValue,
-} from "./complexMath";
+} from "./complexMath.js";
 
 const T = String.raw;
 const aligned = (lines: string[]) =>

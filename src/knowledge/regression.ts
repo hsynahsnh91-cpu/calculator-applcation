@@ -2,9 +2,9 @@ import {
   approvedSolutionSchema,
   type ApprovedSolution,
   type KnowledgeItem,
-} from "../admin/types";
-import { canonicalizeQuestion } from "../admin/normalization";
-import type { SolverAnswer } from "../solver/types";
+} from "../admin/types.js";
+import { canonicalizeQuestion } from "../admin/normalization.js";
+import type { SolverAnswer } from "../solver/types.js";
 
 /**
  * Convert only an actual unified-engine answer into the persistence schema.

@@ -3,11 +3,11 @@ import {
   publishRequestSchema,
   type KnowledgeItem,
   type RegressionOutcome,
-} from "../../src/admin/types";
-import { requireAdmin, requireTrustedOrigin } from "../lib/auth";
-import { methodNotAllowed, readJsonBody, sendJson } from "../lib/http";
-import { getCurrentSnapshot, publishSnapshot } from "../lib/knowledgeStore";
-import { runServerRegression } from "../lib/regression";
+} from "../../src/admin/types.js";
+import { requireAdmin, requireTrustedOrigin } from "../lib/auth.js";
+import { methodNotAllowed, readJsonBody, sendJson } from "../lib/http.js";
+import { getCurrentSnapshot, publishSnapshot } from "../lib/knowledgeStore.js";
+import { runServerRegression } from "../lib/regression.js";
 
 export const config = { maxDuration: 60 };
 

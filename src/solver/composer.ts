@@ -5,7 +5,7 @@ import {
   type SolverContext,
   type SolverResult,
   type UnsolvedPart,
-} from "./types";
+} from "./types.js";
 const samples: Record<string, string> = {
   mathEngine: "احسب sin(30°)+√2",
   equationSolver: "حل المعادلة 2x^2-5x+3=0",

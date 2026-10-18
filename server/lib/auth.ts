@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { sendJson } from "./http";
+import { sendJson } from "./http.js";
 
 const COOKIE_NAME = "syrian_math_admin";
 const SESSION_SECONDS = 8 * 60 * 60;

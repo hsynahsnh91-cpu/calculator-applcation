@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
-import { requireAdmin, requireTrustedOrigin } from "../lib/auth";
-import { listedFailures, removeFailure } from "../lib/failures";
-import { methodNotAllowed, readJsonBody, sendJson } from "../lib/http";
+import { requireAdmin, requireTrustedOrigin } from "../lib/auth.js";
+import { listedFailures, removeFailure } from "../lib/failures.js";
+import { methodNotAllowed, readJsonBody, sendJson } from "../lib/http.js";
 
 const deleteSchema = z.object({ fingerprint: z.string().trim().min(6).max(160) }).strict();
 

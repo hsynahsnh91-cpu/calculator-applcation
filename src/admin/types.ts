@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { EngineId } from "../solver/types";
+import type { EngineId } from "../solver/types.js";
 
 /**
  * The admin and API layers share these schemas.  Data is always parsed before

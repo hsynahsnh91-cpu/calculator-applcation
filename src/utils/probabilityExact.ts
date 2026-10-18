@@ -1,5 +1,5 @@
-import { ClarificationError } from "../solver/types";
-import type { ProbabilityComparison } from "../solver/probabilityTypes";
+import { ClarificationError } from "../solver/types.js";
+import type { ProbabilityComparison } from "../solver/probabilityTypes.js";
 
 const MAX_DIGITS = 1200;
 const gcd = (a: bigint, b: bigint): bigint => {

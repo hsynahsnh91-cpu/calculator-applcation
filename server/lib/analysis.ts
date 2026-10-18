@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { DEFAULT_ENGINE_PROMPT } from "../../src/admin/enginePrompt";
+import { DEFAULT_ENGINE_PROMPT } from "../../src/admin/enginePrompt.js";
 import {
   analysisBlockSchema,
   analysisResponseSchema,
@@ -7,9 +7,9 @@ import {
   type AnalysisBlock,
   type AnalysisResponse,
   type AnalyzeRequest,
-} from "../../src/admin/types";
-import { normalizeScannedText, toLatexHint } from "../../src/admin/normalization";
-import { getStoredAdminSettings } from "./knowledgeStore";
+} from "../../src/admin/types.js";
+import { normalizeScannedText, toLatexHint } from "../../src/admin/normalization.js";
+import { getStoredAdminSettings } from "./knowledgeStore.js";
 
 const aiPayloadSchema = z
   .object({

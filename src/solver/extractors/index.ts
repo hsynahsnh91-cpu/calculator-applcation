@@ -1,4 +1,4 @@
-import { ClarificationError, type SolverContext } from "../types";
+import { ClarificationError, type SolverContext } from "../types.js";
 
 const NUMBER = "-?\\d+(?:\\.\\d+)?";
 export function numericMatch(

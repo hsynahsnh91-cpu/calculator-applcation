@@ -2,14 +2,14 @@ import {
   type KnowledgeItem,
   type RegressionOutcome,
   type SolverSettings,
-} from "../../src/admin/types";
+} from "../../src/admin/types.js";
 import {
   approvedSolutionFromAnswer,
   approvedSolutionsMatch,
   isRegressionKnowledgeItem,
-} from "../../src/knowledge/regression";
-import { solvePrompt } from "../../src/solver/orchestrator";
-import { emptyContext } from "../../src/solver/types";
+} from "../../src/knowledge/regression.js";
+import { solvePrompt } from "../../src/solver/orchestrator.js";
+import { emptyContext } from "../../src/solver/types.js";
 
 type RegressionCandidate = Pick<
   KnowledgeItem,

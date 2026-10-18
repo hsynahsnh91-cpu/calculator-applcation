@@ -1,7 +1,7 @@
 import { create, all, type MathNode } from 'mathjs';
 import nerdamer from 'nerdamer';
-import { CalculusSolution } from '../types';
-import { tex } from './equationSolver';
+import { CalculusSolution } from '../types/index.js';
+import { tex } from './equationSolver.js';
 
 const math = create(all, { number: 'number' });
 

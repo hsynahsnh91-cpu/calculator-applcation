@@ -1,5 +1,5 @@
 import { create, all } from 'mathjs';
-import { AngleMode } from '../types';
+import { AngleMode } from '../types/index.js';
 
 // Fast instance: plain 64-bit numbers.
 // BigNumber with precision 64 is very slow inside a phone WebView,
@@ -240,4 +240,4 @@ export function baseNConvert(value: number, base: 'BIN' | 'OCT' | 'DEC' | 'HEX')
   return intVal.toString(10);
 }
 
-export { SCIENTIFIC_CONSTANTS } from './constants';
+export { SCIENTIFIC_CONSTANTS } from './constants.js';

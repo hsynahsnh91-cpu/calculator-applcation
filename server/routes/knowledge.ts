@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { methodNotAllowed, sendJson } from "../lib/http";
-import { getCurrentSnapshot } from "../lib/knowledgeStore";
+import { methodNotAllowed, sendJson } from "../lib/http.js";
+import { getCurrentSnapshot } from "../lib/knowledgeStore.js";
 
 export default async function handler(
   request: VercelRequest,

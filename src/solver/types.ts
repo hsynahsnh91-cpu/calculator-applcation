@@ -1,5 +1,5 @@
-import type { AngleMode, AppMode } from "../types";
-import type { ProbabilityContext } from "./probabilityTypes";
+import type { AngleMode, AppMode } from "../types/index.js";
+import type { ProbabilityContext } from "./probabilityTypes.js";
 
 export const ENGINE_LABELS = {
   mathEngine: "الحساب العلمي",

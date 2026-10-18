@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { requireAdmin } from "../lib/auth";
-import { failureSection, listedFailures } from "../lib/failures";
-import { methodNotAllowed, sendJson } from "../lib/http";
-import { getCurrentSnapshot } from "../lib/knowledgeStore";
-import { RedisKey, redis } from "../lib/redis";
+import { requireAdmin } from "../lib/auth.js";
+import { failureSection, listedFailures } from "../lib/failures.js";
+import { methodNotAllowed, sendJson } from "../lib/http.js";
+import { getCurrentSnapshot } from "../lib/knowledgeStore.js";
+import { RedisKey, redis } from "../lib/redis.js";
 
 function finiteCounter(value: unknown): number {
   const result = typeof value === "string" ? Number(value) : value;

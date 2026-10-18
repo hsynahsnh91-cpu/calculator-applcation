@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
-import { requireAdmin, requireTrustedOrigin } from "../lib/auth";
-import { methodNotAllowed, readJsonBody, sendJson } from "../lib/http";
-import { getStoredAdminSettings, setStoredAdminSettings } from "../lib/knowledgeStore";
+import { requireAdmin, requireTrustedOrigin } from "../lib/auth.js";
+import { methodNotAllowed, readJsonBody, sendJson } from "../lib/http.js";
+import { getStoredAdminSettings, setStoredAdminSettings } from "../lib/knowledgeStore.js";
 
 const settingsSchema = z.object({ prompt: z.string().trim().min(1).max(24_000).optional() }).strict();
 

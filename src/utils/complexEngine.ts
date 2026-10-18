@@ -1,5 +1,5 @@
-import { ComplexSolution } from "../types";
-import { decimalToFraction, fractionToLatex } from "./mathEngine";
+import { ComplexSolution } from "../types/index.js";
+import { decimalToFraction, fractionToLatex } from "./mathEngine.js";
 
 // ============================================================================
 // Syrian mark-scheme extras
@@ -417,4 +417,4 @@ export function solveComplexNumber(
 }
 
 // Expanded, pure conversation engine: Euler, algebra, large powers and plane transformations.
-export { solveComplexRequest } from "./complexWorkbench";
+export { solveComplexRequest } from "./complexWorkbench.js";

@@ -1,12 +1,12 @@
-import { decodeLatex } from "./parser";
-import type { AngleMode, AppMode } from "../types";
+import { decodeLatex } from "./parser.js";
+import type { AngleMode, AppMode } from "../types/index.js";
 import {
   ClarificationError,
   type EngineId,
   type SolverContext,
   type SolverResult,
   type Verification,
-} from "./types";
+} from "./types.js";
 import {
   extractBounds,
   extractEquation,
@@ -19,7 +19,7 @@ import {
   mathFragments,
   numericMatch,
   requireValue,
-} from "./extractors";
+} from "./extractors/index.js";
 
 const unverified = (
   method = "لا تتوفر مطابقة عددية مستقلة لهذه النتيجة",
@@ -55,9 +55,9 @@ export async function runEngine(
     sampleCurve,
     verifyDerivative,
     verifyIntegral,
-  } = await import("./math");
+  } = await import("./math.js");
   if (engine === "mathEngine") {
-    const { evaluateMathExpression } = await import("../utils/mathEngine");
+    const { evaluateMathExpression } = await import("../utils/mathEngine.js");
     const scalar = context.probability?.lastScalar;
     const original = extractScientific(
       text.replace(/(?:الاحتمال|النتيجة)\s+السابق(?:ة)?/g, "ans"),
@@ -115,10 +115,10 @@ export async function runEngine(
     return out;
   }
   if (engine === "equationSolver" && /جملة|نظام/.test(text)) {
-    const { extractLinearSystem } = await import("./extractors/systems");
+    const { extractLinearSystem } = await import("./extractors/systems.js");
     const input = extractLinearSystem(text, context);
     const { solveSystem2x2, solveSystem3x3 } = await import(
-      "../utils/equationSolver"
+      "../utils/equationSolver.js"
     );
     const [a, b] = input.matrix;
     const solution =
@@ -182,7 +182,7 @@ export async function runEngine(
     );
     if (engine === "complexTools") {
       const { solveComplexEquation } = await import(
-        "../utils/complexEquations"
+        "../utils/complexEquations.js"
       );
       const solved = solveComplexEquation(expression, variable);
       if (solved)
@@ -193,7 +193,7 @@ export async function runEngine(
     }
     const coefficients = polynomialCoefficients(expression, variable);
     const { solvePolynomial, verifyRoots, complexRootPoints } = await import(
-      "../utils/complexTools"
+      "../utils/complexTools.js"
     );
     const solution = solvePolynomial(
       coefficients,
@@ -270,7 +270,7 @@ export async function runEngine(
       context.assignments,
     );
     const { computeDerivative, buildVariationTableLatex } = await import(
-      "../utils/calculusEngine"
+      "../utils/calculusEngine.js"
     );
     const plotOnly =
       /ارسم|رسم المنحني|رسم المنحنى/.test(text) && !/مشتق|تغير|مماس/.test(text);
@@ -355,7 +355,7 @@ export async function runEngine(
       context.assignments,
     );
     const bounds = extractBounds(text);
-    const { solveIntegral } = await import("../utils/integrationEngine");
+    const { solveIntegral } = await import("../utils/integrationEngine.js");
     const mode = bounds.lower === undefined ? "indefinite" : "definite";
     const solution = solveIntegral({
       expression,
@@ -418,7 +418,7 @@ export async function runEngine(
     );
     const request = extractLimit(text);
     const { solveLimit, realDomainEndpoints, verifyFiniteLimit } = await import(
-      "../utils/limitsEngine"
+      "../utils/limitsEngine.js"
     );
     const targets = request.endpoints
       ? realDomainEndpoints(expression)
@@ -500,7 +500,7 @@ export async function runEngine(
   }
   if (engine === "sequences") {
     const input = extractSequence(text);
-    const { solveSequence } = await import("../utils/sequences");
+    const { solveSequence } = await import("../utils/sequences.js");
     const { solution, verification } = solveSequence(input);
     const out = result(engine, "sequences", solution.name);
     out.finalLatex = /مجموع|اجمع/.test(text)
@@ -544,7 +544,7 @@ export async function runEngine(
   }
   if (engine === "matricesEngine") {
     const [matrix, second] = extractMatrices(text, context);
-    const { solveMatrixOperations } = await import("../utils/matricesEngine");
+    const { solveMatrixOperations } = await import("../utils/matricesEngine.js");
     const solution = solveMatrixOperations(matrix, second);
     const out = result(engine, "matrices", "عمليات المصفوفة");
     const finals: string[] = [];
@@ -603,12 +603,12 @@ export async function runEngine(
     return out;
   }
   if (engine === "geometryEngine" || engine === "geometryTools") {
-    const geometry = await import("../utils/geometryEngine");
-    const tools = await import("../utils/geometryTools");
+    const geometry = await import("../utils/geometryEngine.js");
+    const tools = await import("../utils/geometryTools.js");
     const points = extractPoints(text);
     const out = result(engine, "geometry", "نتيجة الهندسة الفراغية");
     if (engine === "geometryTools") {
-      const id: import("../utils/geometryTools").SolidId = /مكعب/.test(text)
+      const id: import("../utils/geometryTools.js").SolidId = /مكعب/.test(text)
         ? "cube"
         : /متوازي مستطيلات/.test(text)
           ? "cuboid"
@@ -669,7 +669,7 @@ export async function runEngine(
     const planeText = mathFragments(text).find(
       (part) => part.includes("=") && /[xyz]/.test(part),
     );
-    let plane: import("../utils/geometryEngine").Plane | undefined;
+    let plane: import("../utils/geometryEngine.js").Plane | undefined;
     if (planeText) {
       const [left, right] = planeText.split("=");
       const source = canonical(`(${left})-(${right})`);
@@ -691,7 +691,7 @@ export async function runEngine(
             "معادلة المستوي يجب أن تكون خطية في x وy وz.",
           );
     }
-    let outcome: import("../utils/geometryEngine").Outcome;
+    let outcome: import("../utils/geometryEngine.js").Outcome;
     if (/مسافة/.test(text) && plane && points[0]) {
       outcome = geometry.distancePointPlane(points[0].value, plane);
       const projected = tools.projectPointOntoPlane(points[0].value, plane);
@@ -775,12 +775,12 @@ export async function runEngine(
   }
   if (engine === "probabilityEngine" || engine === "probabilityTools") {
     const { extractProbabilityRequest, assigned } = await import(
-      "./extractors/probability"
+      "./extractors/probability.js"
     );
     const { solveProbabilityRequest, solveExactCombinatorics } = await import(
-      "../utils/probabilityWorkbench"
+      "../utils/probabilityWorkbench.js"
     );
-    const { exact } = await import("../utils/probabilityExact");
+    const { exact } = await import("../utils/probabilityExact.js");
     const out = result(engine, "probability", "الاحتمالات والإحصاء");
     out.engines = ["probabilityEngine", "probabilityTools"];
     if (
@@ -813,8 +813,8 @@ export async function runEngine(
     };
   }
   if (engine === "complexEngine") {
-    const { extractComplexRequest } = await import("./extractors/complex");
-    const { solveComplexRequest } = await import("../utils/complexEngine");
+    const { extractComplexRequest } = await import("./extractors/complex.js");
+    const { solveComplexRequest } = await import("../utils/complexEngine.js");
     const input = extractComplexRequest(text, context);
     return {
       ...result(engine, "complex", "الأعداد العقدية"),
