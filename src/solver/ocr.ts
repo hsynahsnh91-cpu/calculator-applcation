@@ -153,6 +153,55 @@ function getSession(): OCRSession {
   return current;
 }
 
+function preprocessForOCR(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+): void {
+  const image = context.getImageData(0, 0, width, height);
+  const source = image.data;
+  const luminance = new Uint8ClampedArray(width * height);
+  for (let index = 0; index < luminance.length; index++) {
+    const offset = index * 4;
+    const gray = Math.round(
+      0.2126 * source[offset] +
+        0.7152 * source[offset + 1] +
+        0.0722 * source[offset + 2],
+    );
+    // A restrained contrast lift preserves faint pencil/photocopied symbols.
+    luminance[index] = Math.max(0, Math.min(255, Math.round((gray - 128) * 1.48 + 128)));
+  }
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const index = y * width + x;
+      let value = luminance[index];
+      // Remove isolated one-pixel speckles without blurring characters.  Only
+      // a pixel opposed to at least seven neighbours is replaced.
+      let light = 0;
+      let dark = 0;
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          if (!dx && !dy) continue;
+          const neighborX = x + dx;
+          const neighborY = y + dy;
+          if (neighborX < 0 || neighborY < 0 || neighborX >= width || neighborY >= height)
+            continue;
+          if (luminance[neighborY * width + neighborX] >= 180) light++;
+          if (luminance[neighborY * width + neighborX] <= 75) dark++;
+        }
+      }
+      if (value <= 75 && light >= 7) value = 255;
+      else if (value >= 180 && dark >= 7) value = 0;
+      const offset = index * 4;
+      source[offset] = value;
+      source[offset + 1] = value;
+      source[offset + 2] = value;
+      source[offset + 3] = 255;
+    }
+  }
+  context.putImageData(image, 0, 0);
+}
+
 export async function prepareImage(
   file: File,
 ): Promise<{ blob: Blob; preview: string }> {
@@ -169,11 +218,16 @@ export async function prepareImage(
     bitmap.close();
     throw new Error("أبعاد الصورة كبيرة جدًا. قصّ الجزء الذي يحتوي المسألة.");
   }
-  const scale = Math.min(2, 2000 / Math.max(bitmap.width, bitmap.height));
+  const maxPixels = 18_000_000;
+  const scale = Math.min(
+    2.4,
+    2_800 / Math.max(bitmap.width, bitmap.height),
+    Math.sqrt(maxPixels / (bitmap.width * bitmap.height)),
+  );
   const canvas = document.createElement("canvas");
   canvas.width = Math.max(1, Math.round(bitmap.width * scale));
   canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-  const context = canvas.getContext("2d");
+  const context = canvas.getContext("2d", { alpha: false, willReadFrequently: true });
   if (!context) {
     bitmap.close();
     throw new Error("تعذّر تجهيز الصورة في هذا المتصفح.");
@@ -182,6 +236,7 @@ export async function prepareImage(
   context.fillRect(0, 0, canvas.width, canvas.height);
   context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
   bitmap.close();
+  preprocessForOCR(context, canvas.width, canvas.height);
   const blob = await new Promise<Blob>((resolve, reject) =>
     canvas.toBlob(
       (value) =>

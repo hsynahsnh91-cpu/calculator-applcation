@@ -13,6 +13,8 @@ import {
   Copy,
   Info,
   Dices,
+  ThumbsDown,
+  ThumbsUp,
 } from "lucide-react";
 import { Tex, RichText } from "../common/Tex";
 import { Step } from "../common/Step";
@@ -84,6 +86,7 @@ export const AnswerBubble = memo(function AnswerBubble({
   answer,
   onFollowUp,
   onSave,
+  onKnowledgeFeedback,
   onProbability,
   saved,
   animate = false,
@@ -91,6 +94,7 @@ export const AnswerBubble = memo(function AnswerBubble({
   answer: SolverAnswer;
   onFollowUp: (text: string) => void;
   onSave: (answer: SolverAnswer) => void;
+  onKnowledgeFeedback?: (answer: SolverAnswer, isCorrect: boolean) => void;
   onProbability?: (context?: ProbabilityContext) => void;
   saved: boolean;
   animate?: boolean;
@@ -130,6 +134,23 @@ export const AnswerBubble = memo(function AnswerBubble({
         ✦
       </div>
       <div className="answer-content">
+        {answer.knowledge?.source === "approved" && (
+          <div className="knowledge-source-badge" title="مطابقة مع تصحيح أو حل منشور اعتمده المدير">
+            <CheckCheck size={14} />
+            حل معتمد من المنهاج
+          </div>
+        )}
+        {answer.knowledge?.source === "engine" &&
+          (answer.knowledge.relatedRules?.length ?? 0) > 0 && (
+            <details className="knowledge-rules" open>
+              <summary>قواعد مرتبطة من المكتبة المعرفية</summary>
+              <ul>
+                {answer.knowledge.relatedRules?.map((rule) => (
+                  <li key={rule.id}>{rule.text}</li>
+                ))}
+              </ul>
+            </details>
+          )}
         {answer.results.length > 0 && (
           <div className="final-answer" data-testid="final-answer">
             <div className="final-label">الجواب النهائي</div>
@@ -261,6 +282,26 @@ export const AnswerBubble = memo(function AnswerBubble({
         {phase >= 2 && (
           <>
             <div className="answer-actions">
+              {onKnowledgeFeedback && answer.results.length > 0 && (
+                <div className="knowledge-feedback" aria-label="تقييم الحل من أجل التعليم">
+                  <button
+                    type="button"
+                    className="knowledge-feedback-correct"
+                    onClick={() => onKnowledgeFeedback(answer, true)}
+                  >
+                    <ThumbsUp size={15} />
+                    الحل صحيح
+                  </button>
+                  <button
+                    type="button"
+                    className="knowledge-feedback-wrong"
+                    onClick={() => onKnowledgeFeedback(answer, false)}
+                  >
+                    <ThumbsDown size={15} />
+                    الحل خطأ
+                  </button>
+                </div>
+              )}
               {onProbability &&
                 (answer.results.some((r) => r.mode === "probability") ||
                   answer.unsolved.some(
