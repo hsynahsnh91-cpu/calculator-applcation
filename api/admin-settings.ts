@@ -1,0 +1,34 @@
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { z } from "zod";
+import { requireAdmin, requireTrustedOrigin } from "./_lib/auth";
+import { methodNotAllowed, readJsonBody, sendJson } from "./_lib/http";
+import { getStoredAdminSettings, setStoredAdminSettings } from "./_lib/knowledgeStore";
+
+const settingsSchema = z.object({ prompt: z.string().trim().min(1).max(24_000).optional() }).strict();
+
+export default async function handler(
+  request: VercelRequest,
+  response: VercelResponse,
+): Promise<void> {
+  if (!["GET", "PUT"].includes(request.method ?? ""))
+    return methodNotAllowed(response, ["GET", "PUT"]);
+  if (!requireAdmin(request, response)) return;
+  if (request.method === "PUT" && !requireTrustedOrigin(request, response)) return;
+  try {
+    if (request.method === "GET") {
+      sendJson(response, 200, await getStoredAdminSettings());
+      return;
+    }
+    const parsed = settingsSchema.safeParse(await readJsonBody(request));
+    if (!parsed.success) {
+      sendJson(response, 400, { error: "إعداد البرومبت غير صالح." });
+      return;
+    }
+    await setStoredAdminSettings(parsed.data);
+    sendJson(response, 200, { saved: true });
+  } catch (error) {
+    sendJson(response, 503, {
+      error: error instanceof Error ? error.message : "تعذّر حفظ إعدادات الإدارة.",
+    });
+  }
+}

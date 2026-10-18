@@ -131,6 +131,18 @@ export interface UnsolvedPart {
   message: string;
   choices: string[];
 }
+export interface KnowledgeRuleContext {
+  id: string;
+  text: string;
+  latex?: string;
+  confidence: number;
+}
+export interface KnowledgeAnswerMetadata {
+  source: "approved" | "engine";
+  itemId?: string;
+  matchScore?: number;
+  relatedRules?: KnowledgeRuleContext[];
+}
 export interface SolverAnswer {
   id: string;
   question: string;
@@ -141,6 +153,8 @@ export interface SolverAnswer {
   candidates: Candidate[];
   context: SolverContext;
   elapsedMs: number;
+  /** Present only when published Syrian curriculum knowledge participated. */
+  knowledge?: KnowledgeAnswerMetadata;
 }
 export interface SolverProgress {
   stage: "analyzing" | "running" | "verifying";
@@ -150,6 +164,12 @@ export interface SolverProgress {
 export interface SolveOptions {
   angleMode: AngleMode;
   context?: SolverContext;
+  /** Related published rules, selected before the local engine is invoked. */
+  knowledgeContext?: KnowledgeRuleContext[];
+  /** Administrator-controlled engines omitted from this particular run. */
+  disabledEngines?: EngineId[];
+  /** Interactive deadline, bounded by the client before scheduling the worker. */
+  timeoutMs?: number;
 }
 export interface ConversationTurn {
   id: string;

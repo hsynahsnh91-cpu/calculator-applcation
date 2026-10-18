@@ -38,8 +38,14 @@ import { RichText } from "./components/common/Tex";
 import { localDB } from "./utils/localDB";
 import { soundHaptics } from "./utils/soundHaptics";
 import { useOfflineSpeech } from "./hooks/useOfflineSpeech";
-import { cancelSolver, solveLocally } from "./solver/client";
-import { composeAnswer } from "./solver/composer";
+import { cancelSolver } from "./solver/client";
+import { composeAnswer, answerAsText } from "./solver/composer";
+import {
+  loadKnowledge,
+  recordKnowledgeFailure,
+  recordKnowledgeSuccess,
+  solveWithKnowledge,
+} from "./knowledge/client";
 import {
   emptyContext,
   ENGINE_LABELS,
@@ -145,6 +151,10 @@ export default function App() {
   useEffect(() => {
     localDB.saveConversation(turns);
   }, [turns]);
+  useEffect(() => {
+    // A failed or unavailable knowledge service must never delay the local solver.
+    void loadKnowledge();
+  }, []);
   useEffect(() => {
     if (!busy) return;
     const timer = setInterval(
@@ -272,7 +282,7 @@ export default function App() {
     soundHaptics.playEquals();
     soundHaptics.vibrate(20);
     try {
-      const answer = await solveLocally(
+      const answer = await solveWithKnowledge(
         question,
         { angleMode: angle, context: context.current },
         (progress) => {
@@ -291,6 +301,15 @@ export default function App() {
         current.signal,
       );
       if (request !== token.current) return;
+      const delayedPart = answer.unsolved.find((part) =>
+        /مهلة|حد الزمن|لم يكتمل التحقق/.test(part.message),
+      );
+      if (!answer.results.length || delayedPart)
+        recordKnowledgeFailure(
+          question,
+          delayedPart?.message ?? answer.unsolved[0]?.message ?? "لم يُنتج المحرك نتيجة قابلة للعرض.",
+        );
+      else recordKnowledgeSuccess();
       context.current = answer.context;
       const turn: ConversationTurn = {
         id: `turn-${Date.now()}`,
@@ -317,6 +336,7 @@ export default function App() {
         context.current,
         0,
       );
+      recordKnowledgeFailure(question, message);
       setTurns((previous) => [
         ...previous,
         { id: `turn-${Date.now()}`, question, answer, createdAt: Date.now() },
@@ -352,6 +372,26 @@ export default function App() {
     });
     setHistory(localDB.getHistory());
   }, []);
+  const sendKnowledgeFeedback = useCallback(
+    (answer: SolverAnswer, isCorrect: boolean) => {
+      try {
+        sessionStorage.setItem(
+          "syrian-math-admin-feedback",
+          JSON.stringify({
+            question: answer.question,
+            answerText: answerAsText(answer),
+            answerLatex: answer.results.map((result) => result.finalLatex).join("\\qquad "),
+            isCorrect,
+            createdAt: new Date().toISOString(),
+          }),
+        );
+      } catch {
+        // The Admin page still opens; it can receive a manual correction.
+      }
+      window.location.assign("/Admin");
+    },
+    [],
+  );
   const selectHistory = (entry: HistoryEntry) => {
     const stored = entry.tags
       ?.find((tag) => tag.startsWith("question:"))
@@ -409,6 +449,7 @@ export default function App() {
                     animate={index === turns.length - 1}
                     onFollowUp={followUp}
                     onSave={save}
+                    onKnowledgeFeedback={sendKnowledgeFeedback}
                     onProbability={openProbability}
                     saved={history.some((entry) =>
                       entry.tags?.includes(turn.answer.id),

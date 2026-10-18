@@ -1,0 +1,1301 @@
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
+import {
+  AlertTriangle,
+  BarChart3,
+  BookOpen,
+  Check,
+  CheckCircle2,
+  CircleHelp,
+  CloudUpload,
+  Download,
+  FilePenLine,
+  Gauge,
+  Layers3,
+  LibraryBig,
+  LoaderCircle,
+  LockKeyhole,
+  LogOut,
+  Play,
+  Plus,
+  RotateCcw,
+  Save,
+  Search,
+  Settings2,
+  ShieldCheck,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
+import { z } from "zod";
+import { Tex } from "../components/common/Tex";
+import { ENGINE_LABELS, type EngineId, type SolverAnswer } from "../solver/types";
+import { cancelSolver, solveLocally } from "../solver/client";
+import { DEFAULT_ENGINE_PROMPT } from "./enginePrompt";
+import { adminDraftDB } from "./indexedDB";
+import { canonicalizeQuestion, questionFingerprint } from "./normalization";
+import { DocumentScanner } from "./DocumentScanner";
+import { findCurriculumGaps } from "./curriculum";
+import { scanDocument, type ScannedDocument } from "./scanner";
+import {
+  AdminApiError,
+  adminLogin,
+  adminLogout,
+  analyzeRemote,
+  checkAdminSession,
+  getAdminStatistics,
+  getFailures,
+  getServerPrompt,
+  getVersions,
+  publishedLibrary,
+  publishKnowledge,
+  removeFailure,
+  rollbackVersion,
+  saveServerPrompt,
+  type AdminStatistics,
+} from "./api";
+import {
+  approvedSolutionSchema,
+  defaultSolverSettings,
+  errorAnalysisSchema,
+  knowledgeItemSchema,
+  solverSettingsSchema,
+  type AnalysisBlock,
+  type ApprovedSolution,
+  type ErrorAnalysis,
+  type FailureRecord,
+  type KnowledgeItem,
+  type KnowledgeItemType,
+  type KnowledgeSnapshot,
+  type RegressionOutcome,
+  type SolverSettings,
+  type VersionSummary,
+} from "./types";
+
+type AdminTab = "overview" | "scan" | "library" | "publish" | "monitor" | "settings";
+type SessionState = "checking" | "anonymous" | "authenticated";
+
+type ExerciseRun =
+  | { state: "idle" }
+  | { state: "running" }
+  | { state: "complete"; answer: SolverAnswer; solution?: ApprovedSolution }
+  | { state: "error"; message: string };
+
+interface CorrectionTarget {
+  item: KnowledgeItem;
+  wrongSolution?: ApprovedSolution;
+}
+
+interface IncomingFeedback {
+  question: string;
+  answerText: string;
+  answerLatex: string;
+  isCorrect: boolean;
+  createdAt: string;
+}
+
+const itemTypeLabels: Record<KnowledgeItemType, string> = {
+  rule: "قاعدة",
+  example: "مثال",
+  exercise: "تمرين",
+  correction: "تصحيح",
+  notation: "تعريف/رمز",
+};
+
+const statusLabels: Record<KnowledgeItem["status"], string> = {
+  draft: "مسودة",
+  approved: "معتمد",
+  published: "منشور",
+};
+
+const tabs: { id: AdminTab; label: string; icon: typeof Gauge }[] = [
+  { id: "overview", label: "نظرة عامة", icon: Gauge },
+  { id: "scan", label: "مسح وتحليل", icon: CloudUpload },
+  { id: "library", label: "المكتبة", icon: LibraryBig },
+  { id: "publish", label: "النشر والنسخ", icon: Layers3 },
+  { id: "monitor", label: "المتابعة والاختبار", icon: BarChart3 },
+  { id: "settings", label: "الإعدادات", icon: Settings2 },
+];
+
+const backupSchema = z
+  .object({
+    items: z.array(knowledgeItemSchema),
+    settings: solverSettingsSchema,
+  })
+  .strict();
+
+function makeId(prefix: string): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto)
+    return `${prefix}-${crypto.randomUUID()}`;
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
+function nowIso(): string {
+  return new Date().toISOString();
+}
+
+function asItemType(block: AnalysisBlock): KnowledgeItemType {
+  if (block.classification === "rule") return "rule";
+  if (block.classification === "solved_example") return "example";
+  if (block.classification === "exercise") return "exercise";
+  return "notation";
+}
+
+function createItemFromBlock(block: AnalysisBlock, source: string): KnowledgeItem {
+  const timestamp = nowIso();
+  const canonicalQuestion = canonicalizeQuestion(block.structured || block.originalText);
+  return knowledgeItemSchema.parse({
+    id: makeId("knowledge"),
+    type: asItemType(block),
+    originalText: block.originalText,
+    structured: block.structured,
+    latex: block.latex,
+    grade: block.grade,
+    unit: block.unit,
+    lesson: block.lesson,
+    source,
+    fileName: source,
+    page: block.page,
+    status: "draft",
+    confidence: block.confidence,
+    needsReview: block.needs_review,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    version: 0,
+    canonicalQuestion,
+    fingerprint: questionFingerprint(canonicalQuestion),
+    relatedRuleIds: [],
+    ...(block.book_solution ? { bookSolution: block.book_solution } : {}),
+    comparison: "not_compared",
+  });
+}
+
+function solutionFromAnswer(answer: SolverAnswer): ApprovedSolution | undefined {
+  if (!answer.results.length) return undefined;
+  const primary = answer.results[0];
+  const parsed = approvedSolutionSchema.safeParse({
+    answerText: primary.note || undefined,
+    answerLatex: primary.finalLatex,
+    steps: answer.results.flatMap((result) =>
+      result.steps.map((step) => ({
+        title: step.title,
+        ...(step.text ? { text: step.text } : {}),
+        latex: step.latex,
+      })),
+    ),
+    verification: {
+      passed: primary.verification.passed,
+      method: primary.verification.method,
+    },
+    elapsedMs: answer.elapsedMs,
+  });
+  return parsed.success ? parsed.data : undefined;
+}
+
+function solutionKey(solution: ApprovedSolution | undefined): string {
+  if (!solution) return "";
+  return canonicalizeQuestion(solution.answerLatex || solution.answerText || "");
+}
+
+function compareSolutions(
+  engineSolution: ApprovedSolution | undefined,
+  bookSolution: ApprovedSolution | undefined,
+): KnowledgeItem["comparison"] {
+  if (!bookSolution) return "not_compared";
+  const engineKey = solutionKey(engineSolution);
+  const bookKey = solutionKey(bookSolution);
+  // Exact normalized equality only. Different equivalent-looking mathematics is
+  // deliberately left for a human review rather than claimed as a match.
+  return engineKey && bookKey && engineKey === bookKey ? "matching" : "needs_review";
+}
+
+function inferCorrectionAnalysis(
+  item: KnowledgeItem,
+  wrongSolution: ApprovedSolution | undefined,
+  reason: string,
+): ErrorAnalysis {
+  const category = item.needsReview
+    ? "ocr_error"
+    : !wrongSolution
+      ? "engine_selection"
+      : /صياغ|معطيات|غامض/.test(reason)
+        ? "formulation"
+        : "missing_rule";
+  const labels: Record<ErrorAnalysis["category"], string> = {
+    missing_rule: "قاعدة ناقصة أو غير ممثلة في سياق المحرك",
+    ocr_error: "خطأ محتمل في قراءة النص أو الرموز",
+    engine_selection: "اختيار محرك غير مناسب أو عدم توافر محرك ملائم",
+    formulation: "صياغة السؤال أو المعطيات تحتاج تنظيمًا أو توضيحًا",
+    unknown: "سبب غير محسوم ويحتاج مراجعة",
+  };
+  return errorAnalysisSchema.parse({
+    category,
+    explanation: `${labels[category]}${reason ? `: ${reason}` : ""}. هذا اقتراح آلي بالأنماط ويحتاج اعتمادك.`,
+    suggestedRule: `عند ورود مسألة في «${item.unit}» بعنوان «${item.lesson}»، تحقق أولًا من المعطيات والرموز ثم طبّق القاعدة المعتمدة المرتبطة بالسؤال قبل اختيار المحرك.`,
+  });
+}
+
+function parseIncomingFeedback(value: unknown): IncomingFeedback | undefined {
+  if (
+    value !== null &&
+    typeof value === "object" &&
+    typeof (value as IncomingFeedback).question === "string" &&
+    typeof (value as IncomingFeedback).answerText === "string" &&
+    typeof (value as IncomingFeedback).answerLatex === "string" &&
+    typeof (value as IncomingFeedback).isCorrect === "boolean" &&
+    typeof (value as IncomingFeedback).createdAt === "string"
+  )
+    return value as IncomingFeedback;
+  return undefined;
+}
+
+function textSteps(source: string) {
+  return source
+    .split("\n")
+    .map((text) => text.trim())
+    .filter(Boolean)
+    .slice(0, 80)
+    .map((text, index) => ({ title: `الخطوة ${index + 1}`, text }));
+}
+
+function mergeWorkspace(
+  localItems: KnowledgeItem[],
+  snapshot: KnowledgeSnapshot | null,
+): KnowledgeItem[] {
+  const map = new Map(localItems.map((item) => [item.id, item]));
+  snapshot?.items.forEach((published) => {
+    const local = map.get(published.id);
+    if (!local || local.status === "published") map.set(published.id, published);
+  });
+  return [...map.values()].sort((first, second) => second.updatedAt.localeCompare(first.updatedAt));
+}
+
+function AdminLogin({ onAuthenticated }: { onAuthenticated: () => void }) {
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!password || busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      await adminLogin(password);
+      setPassword("");
+      onAuthenticated();
+    } catch (value) {
+      setError(value instanceof Error ? value.message : "تعذّر تسجيل الدخول.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <main className="admin-login-page" dir="rtl">
+      <section className="admin-login-card">
+        <div className="admin-brand-mark" aria-hidden="true">
+          ∑
+        </div>
+        <p className="admin-eyebrow">لوحة تعليم المحرك</p>
+        <h1>إدارة المعرفة الرياضية السورية</h1>
+        <p>
+          أدخل كلمة مرور الإدارة. لا تُخزن كلمة المرور في المتصفح، وتُنشأ جلسة
+          محمية في كوكي آمن على الخادم.
+        </p>
+        <form onSubmit={(event) => void submit(event)}>
+          <label>
+            كلمة مرور الإدارة
+            <input
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              type="password"
+              autoComplete="current-password"
+              required
+              autoFocus
+            />
+          </label>
+          {error && <p className="admin-error-text" role="alert">{error}</p>}
+          <button className="admin-primary-button admin-login-button" disabled={busy} type="submit">
+            {busy ? <LoaderCircle className="animate-spin" size={17} /> : <LockKeyhole size={17} />}
+            دخول آمن
+          </button>
+        </form>
+        <a href="/" className="admin-back-link">العودة إلى الحاسبة</a>
+      </section>
+    </main>
+  );
+}
+
+function AnswerPreview({ run }: { run: ExerciseRun }) {
+  if (run.state === "idle") return <p className="admin-muted">لم يُشغّل المحرك بعد.</p>;
+  if (run.state === "running")
+    return <p className="admin-muted"><LoaderCircle className="animate-spin inline" size={14} /> جارٍ تشغيل المحرك الموحد…</p>;
+  if (run.state === "error") return <p className="admin-error-text">{run.message}</p>;
+  return (
+    <div className="admin-answer-preview">
+      <p>زمن الحل الفعلي: {Math.round(run.answer.elapsedMs)} مللي ثانية</p>
+      {run.answer.results.length === 0 ? (
+        <p className="admin-error-text">لم يعطِ المحرك نتيجة؛ لا يمكن اعتماد حل تلقائي.</p>
+      ) : (
+        run.answer.results.map((result) => (
+          <div className="admin-answer-result" key={result.id}>
+            <strong>{result.title}</strong>
+            <Tex display math={result.finalLatex} />
+            <span className={result.verification.passed ? "admin-verified" : "admin-unverified"}>
+              {result.verification.passed ? "تم تحقق فعلي" : "غير متحقق"}: {result.verification.method}
+            </span>
+            {result.steps.length > 0 && (
+              <details>
+                <summary>خطوات المحرك ({result.steps.length})</summary>
+                {result.steps.map((step, index) => (
+                  <div key={`${step.title}-${index}`} className="admin-solution-step">
+                    <b>{index + 1}. {step.title}</b>
+                    {step.text && <p>{step.text}</p>}
+                    <Tex display math={step.latex} />
+                  </div>
+                ))}
+              </details>
+            )}
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+export default function AdminApp() {
+  const [session, setSession] = useState<SessionState>("checking");
+  const [tab, setTab] = useState<AdminTab>("overview");
+  const [items, setItems] = useState<KnowledgeItem[]>([]);
+  const [settings, setSettings] = useState<SolverSettings>({ ...defaultSolverSettings });
+  const [prompt, setPrompt] = useState(DEFAULT_ENGINE_PROMPT);
+  const [published, setPublished] = useState<KnowledgeSnapshot | null>(null);
+  const [versions, setVersions] = useState<VersionSummary[]>([]);
+  const [stats, setStats] = useState<AdminStatistics | null>(null);
+  const [failures, setFailures] = useState<FailureRecord[]>([]);
+  const [runs, setRuns] = useState<Record<string, ExerciseRun>>({});
+  const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+  const [workspaceBusy, setWorkspaceBusy] = useState(false);
+  const [correctionTarget, setCorrectionTarget] = useState<CorrectionTarget | null>(null);
+  const [incomingFeedback, setIncomingFeedback] = useState<IncomingFeedback | null>(null);
+  const [libraryQuery, setLibraryQuery] = useState("");
+  const [libraryType, setLibraryType] = useState<KnowledgeItemType | "all">("all");
+  const [libraryStatus, setLibraryStatus] = useState<KnowledgeItem["status"] | "all">("all");
+  const [libraryGrade, setLibraryGrade] = useState("all");
+  const [libraryUnit, setLibraryUnit] = useState("all");
+  const [editing, setEditing] = useState<KnowledgeItem | null>(null);
+  const [regression, setRegression] = useState<RegressionOutcome[]>([]);
+  const [regressionBusy, setRegressionBusy] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [publishFailures, setPublishFailures] = useState<RegressionOutcome[]>([]);
+  const [publishMessage, setPublishMessage] = useState("");
+  const backupInput = useRef<HTMLInputElement>(null);
+  const regressionAbort = useRef<AbortController | null>(null);
+
+  const saveItem = useCallback(async (item: KnowledgeItem) => {
+    const next = knowledgeItemSchema.parse({ ...item, updatedAt: nowIso() });
+    await adminDraftDB.putItem(next);
+    setItems((previous) => {
+      const index = previous.findIndex((candidate) => candidate.id === next.id);
+      if (index < 0) return [next, ...previous];
+      const copy = [...previous];
+      copy[index] = next;
+      return copy.sort((first, second) => second.updatedAt.localeCompare(first.updatedAt));
+    });
+    return next;
+  }, []);
+
+  const refreshRemote = useCallback(async () => {
+    const [remoteResult, versionsResult, statsResult, failuresResult] = await Promise.allSettled([
+      publishedLibrary(),
+      getVersions(),
+      getAdminStatistics(),
+      getFailures(),
+    ]);
+    if (remoteResult.status === "fulfilled") {
+      setPublished(remoteResult.value);
+      setItems((current) => mergeWorkspace(current, remoteResult.value));
+      if (remoteResult.value) await adminDraftDB.putItems(remoteResult.value.items);
+    }
+    if (versionsResult.status === "fulfilled") setVersions(versionsResult.value);
+    if (statsResult.status === "fulfilled") setStats(statsResult.value);
+    if (failuresResult.status === "fulfilled") setFailures(failuresResult.value);
+  }, []);
+
+  const loadWorkspace = useCallback(async () => {
+    setWorkspaceBusy(true);
+    setError("");
+    try {
+      const [draftItems, storedSettings, localPrompt, serverPrompt] = await Promise.all([
+        adminDraftDB.getItems(),
+        adminDraftDB.getSettings(),
+        adminDraftDB.getPrompt(),
+        getServerPrompt().catch(() => undefined),
+      ]);
+      setItems(draftItems);
+      setSettings(storedSettings);
+      setPrompt(serverPrompt ?? localPrompt ?? DEFAULT_ENGINE_PROMPT);
+      await refreshRemote();
+    } catch (value) {
+      setError(value instanceof Error ? value.message : "تعذر فتح مسودات الإدارة المحلية.");
+    } finally {
+      setWorkspaceBusy(false);
+    }
+  }, [refreshRemote]);
+
+  useEffect(() => {
+    let active = true;
+    void checkAdminSession()
+      .then((authenticated) => {
+        if (!active) return;
+        setSession(authenticated ? "authenticated" : "anonymous");
+        if (authenticated) void loadWorkspace();
+      })
+      .catch(() => {
+        if (active) setSession("anonymous");
+      });
+    return () => {
+      active = false;
+    };
+  }, [loadWorkspace]);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("syrian-math-admin-feedback");
+      if (!raw) return;
+      const parsed = parseIncomingFeedback(JSON.parse(raw));
+      if (parsed) setIncomingFeedback(parsed);
+      sessionStorage.removeItem("syrian-math-admin-feedback");
+    } catch {
+      // A malformed cross-page helper is ignored rather than blocking Admin.
+    }
+  }, []);
+
+  useEffect(
+    () => () => {
+      regressionAbort.current?.abort();
+      cancelSolver();
+    },
+    [],
+  );
+
+  const runExercise = useCallback(
+    async (item: KnowledgeItem): Promise<ExerciseRun> => {
+      if (!["exercise", "example"].includes(item.type)) return { state: "idle" };
+      const controller = new AbortController();
+      setRuns((previous) => ({ ...previous, [item.id]: { state: "running" } }));
+      const relatedRules = items
+        .filter((candidate) => candidate.type === "rule" && item.relatedRuleIds.includes(candidate.id))
+        .map((rule) => ({
+          id: rule.id,
+          text: rule.structured || rule.originalText,
+          latex: rule.latex || undefined,
+          confidence: rule.confidence,
+        }));
+      try {
+        const answer = await solveLocally(
+          item.structured || item.originalText,
+          {
+            angleMode: "DEG",
+            disabledEngines: settings.disabledEngines,
+            timeoutMs: settings.timeoutMs,
+            knowledgeContext: relatedRules,
+          },
+          () => undefined,
+          controller.signal,
+        );
+        const solution = solutionFromAnswer(answer);
+        const run: ExerciseRun = { state: "complete", answer, ...(solution ? { solution } : {}) };
+        setRuns((previous) => ({ ...previous, [item.id]: run }));
+        const comparison = compareSolutions(solution, item.bookSolution);
+        const updated = knowledgeItemSchema.parse({
+          ...item,
+          ...(solution ? { approvedSolution: solution } : {}),
+          comparison,
+          needsReview: item.needsReview || !solution || comparison === "needs_review",
+        });
+        await saveItem(updated);
+        return run;
+      } catch (value) {
+        const run: ExerciseRun = {
+          state: "error",
+          message: value instanceof Error ? value.message : "تعذر تشغيل المحرك الموحد.",
+        };
+        setRuns((previous) => ({ ...previous, [item.id]: run }));
+        const updated = knowledgeItemSchema.parse({ ...item, needsReview: true });
+        await saveItem(updated);
+        return run;
+      }
+    },
+    [items, saveItem, settings],
+  );
+
+  const analyzeScannedDocument = useCallback(
+    async (document: ScannedDocument) => {
+      const analysis = await analyzeRemote({
+        text: document.text,
+        source: document.fileName,
+        pageHints: document.pages.map((page) => page.page),
+      });
+      const created = analysis.blocks.map((block) => createItemFromBlock(block, document.fileName));
+      await adminDraftDB.putItems(created);
+      setItems((previous) => [...created, ...previous]);
+      setNotice(
+        `استخرج التحليل ${created.length} عنصرًا بأسلوب ${analysis.mode === "ai" ? "الذكاء الاصطناعي" : "الأنماط المحلية"}.`,
+      );
+      if (analysis.warnings.length) setError(analysis.warnings.join(" "));
+      for (const item of created) {
+        if (item.type === "exercise" || item.type === "example") void runExercise(item);
+      }
+    },
+    [runExercise],
+  );
+
+  const approveEngineSolution = async (item: KnowledgeItem) => {
+    const run = runs[item.id];
+    const solution = run?.state === "complete" ? run.solution : item.approvedSolution;
+    if (!solution) {
+      setError("لا يوجد حل فعلي من المحرك لاعتماده. شغّل التمرين أو أضف تصحيحًا يدويًا.");
+      return;
+    }
+    await saveItem(knowledgeItemSchema.parse({ ...item, status: "approved", approvedSolution: solution }));
+    setNotice("أصبح العنصر معتمدًا محليًا وجاهزًا للنشر.");
+  };
+
+  const acceptIncomingFeedback = async () => {
+    if (!incomingFeedback) return;
+    const timestamp = nowIso();
+    const canonicalQuestion = canonicalizeQuestion(incomingFeedback.question);
+    const generated = knowledgeItemSchema.parse({
+      id: makeId("feedback"),
+      type: "exercise",
+      originalText: incomingFeedback.question,
+      structured: incomingFeedback.question,
+      latex: incomingFeedback.answerLatex,
+      grade: "غير محدد",
+      unit: "غير محددة",
+      lesson: "تعليم من إجابة التطبيق",
+      source: "تقييم من واجهة الحاسبة",
+      fileName: "تقييم مباشر",
+      page: 1,
+      status: incomingFeedback.isCorrect ? "approved" : "draft",
+      confidence: 1,
+      needsReview: !incomingFeedback.isCorrect,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      version: 0,
+      canonicalQuestion,
+      fingerprint: questionFingerprint(canonicalQuestion),
+      relatedRuleIds: [],
+      approvedSolution: {
+        answerText: incomingFeedback.answerText,
+        answerLatex: incomingFeedback.answerLatex || undefined,
+        steps: [],
+      },
+      comparison: "not_compared",
+    });
+    await saveItem(generated);
+    setIncomingFeedback(null);
+    if (incomingFeedback.isCorrect) {
+      setNotice("حُفظت الإجابة المصححة كتمرين معتمد محليًا؛ انشرها عندما تكون جاهزًا.");
+      setTab("library");
+    } else {
+      setCorrectionTarget({ item: generated, wrongSolution: generated.approvedSolution });
+    }
+  };
+
+  const deleteItem = async (item: KnowledgeItem) => {
+    if (!window.confirm(`حذف «${item.originalText.slice(0, 70)}» من المسودات المحلية؟`)) return;
+    await adminDraftDB.deleteItem(item.id);
+    setItems((previous) => previous.filter((candidate) => candidate.id !== item.id));
+    setRuns((previous) => {
+      const copy = { ...previous };
+      delete copy[item.id];
+      return copy;
+    });
+    setNotice("حُذف العنصر من مساحة العمل المحلية. لا يتغير أي إصدار منشور حتى تنشر نسخة جديدة.");
+  };
+
+  const comprehensiveTest = useCallback(async (): Promise<RegressionOutcome[]> => {
+    const testable = items.filter(
+      (item) =>
+        ["approved", "published"].includes(item.status) &&
+        ["example", "exercise", "correction"].includes(item.type) &&
+        Boolean(item.approvedSolution),
+    );
+    const controller = new AbortController();
+    regressionAbort.current?.abort();
+    regressionAbort.current = controller;
+    setRegressionBusy(true);
+    setRegression([]);
+    const outcomes: RegressionOutcome[] = [];
+    try {
+      for (const item of testable) {
+        if (controller.signal.aborted) throw new DOMException("أُلغي الاختبار الشامل.", "AbortError");
+        const started = performance.now();
+        try {
+          const answer = await solveLocally(
+            item.structured || item.originalText,
+            {
+              angleMode: "DEG",
+              disabledEngines: settings.disabledEngines,
+              timeoutMs: settings.timeoutMs,
+            },
+            () => undefined,
+            controller.signal,
+          );
+          const actual = solutionFromAnswer(answer);
+          const passed = compareSolutions(actual, item.approvedSolution) === "matching";
+          outcomes.push({
+            itemId: item.id,
+            passed,
+            elapsedMs: Math.round(performance.now() - started),
+            message: passed
+              ? `نجح: ${item.unit} — ${item.lesson}`
+              : "اختلفت نتيجة المحرك أو صيغتها عن الحل المعتمد؛ يحتاج مراجعة بشرية.",
+          });
+        } catch (value) {
+          outcomes.push({
+            itemId: item.id,
+            passed: false,
+            elapsedMs: Math.round(performance.now() - started),
+            message: value instanceof Error ? value.message : "فشل تشغيل المثال.",
+          });
+        }
+        setRegression([...outcomes]);
+      }
+      if (!testable.length) setNotice("لا توجد أمثلة أو تمارين معتمدة تحتوي حلًا لاختبارها بعد.");
+      else setNotice(`اكتمل اختبار ${testable.length} عنصرًا فعليًا على المحرك الموحد.`);
+      return outcomes;
+    } finally {
+      if (regressionAbort.current === controller) regressionAbort.current = null;
+      setRegressionBusy(false);
+    }
+  }, [items, settings]);
+
+  const publish = async (force = false) => {
+    if (publishing) return;
+    setPublishing(true);
+    setError("");
+    setPublishMessage("");
+    try {
+      const outcomes = force && regression.length ? regression : await comprehensiveTest();
+      const result = await publishKnowledge({ items, settings, regression: outcomes, force });
+      const updated = items.map((item) =>
+        item.status === "approved" || item.status === "published"
+          ? knowledgeItemSchema.parse({ ...item, status: "published", version: result.version })
+          : item,
+      );
+      await adminDraftDB.replaceItems(updated);
+      setItems(updated);
+      setPublishFailures([]);
+      setPublishMessage(
+        `تم نشر ${result.itemCount} عنصرًا في النسخة ${result.version} خلال ${Math.round(result.elapsedMs)} مللي ثانية.${result.forcedDespiteRegression ? " نُشرت رغم إخفاقات الانحدار التي قبلتها." : ""}`,
+      );
+      await refreshRemote();
+    } catch (value) {
+      if (value instanceof AdminApiError && value.status === 409) {
+        const failures =
+          value.body &&
+          typeof value.body === "object" &&
+          "failures" in value.body &&
+          Array.isArray(value.body.failures)
+            ? value.body.failures
+                .map((entry) => {
+                  const parsed = z
+                    .object({
+                      itemId: z.string(),
+                      passed: z.boolean(),
+                      message: z.string(),
+                      elapsedMs: z.number(),
+                    })
+                    .safeParse(entry);
+                  return parsed.success ? parsed.data : undefined;
+                })
+                .filter((entry): entry is RegressionOutcome => Boolean(entry))
+            : [];
+        setPublishFailures(failures);
+        setError(value.message);
+      } else setError(value instanceof Error ? value.message : "تعذر النشر.");
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  const saveSettings = async (next: SolverSettings) => {
+    const parsed = solverSettingsSchema.parse(next);
+    const safe: SolverSettings = {
+      ...parsed,
+      disabledEngines: parsed.disabledEngines.filter(
+        (engine): engine is EngineId => Object.prototype.hasOwnProperty.call(ENGINE_LABELS, engine),
+      ),
+    };
+    await adminDraftDB.saveSettings(safe);
+    setSettings(safe);
+    setNotice("حُفظت إعدادات المحرك محليًا. تصبح عامة لكل الزوار عند نشر نسخة معرفة جديدة.");
+  };
+
+  const savePrompt = async () => {
+    try {
+      await adminDraftDB.savePrompt(prompt);
+      await saveServerPrompt(prompt);
+      setNotice("حُفظ البرومبت في الخادم وفي مسودات هذا الجهاز.");
+    } catch (value) {
+      setError(value instanceof Error ? value.message : "تعذر حفظ البرومبت.");
+    }
+  };
+
+  const exportBackup = () => {
+    const payload = JSON.stringify({ items, settings }, null, 2);
+    const blob = new Blob([payload], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `syrian-math-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importBackup = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    try {
+      const parsed = backupSchema.parse(JSON.parse(await file.text()));
+      await adminDraftDB.replaceItems(parsed.items);
+      await adminDraftDB.saveSettings({
+        ...parsed.settings,
+        disabledEngines: parsed.settings.disabledEngines.filter(
+          (engine): engine is EngineId => Object.prototype.hasOwnProperty.call(ENGINE_LABELS, engine),
+        ),
+      });
+      setItems(parsed.items);
+      setSettings({
+        ...parsed.settings,
+        disabledEngines: parsed.settings.disabledEngines.filter(
+          (engine): engine is EngineId => Object.prototype.hasOwnProperty.call(ENGINE_LABELS, engine),
+        ),
+      });
+      setNotice("استُوردت النسخة الاحتياطية إلى المسودات المحلية. لا تُنشر تلقائيًا.");
+    } catch (value) {
+      setError(value instanceof Error ? value.message : "ملف النسخة الاحتياطية غير صالح.");
+    }
+  };
+
+  const rollback = async (version: number) => {
+    if (!window.confirm(`هل تريد جعل النسخة ${version} هي النسخة الحالية للزوار؟`)) return;
+    try {
+      await rollbackVersion(version);
+      setNotice(`تم التراجع إلى النسخة ${version}. ستلتقطها التطبيقات عند التحديث أو انتهاء ذاكرة التخزين المؤقت.`);
+      await refreshRemote();
+    } catch (value) {
+      setError(value instanceof Error ? value.message : "تعذر التراجع.");
+    }
+  };
+
+  const teachFailure = (failure: FailureRecord) => {
+    const timestamp = nowIso();
+    const canonicalQuestion = canonicalizeQuestion(failure.sampleQuestion);
+    const item = knowledgeItemSchema.parse({
+      id: makeId("failure"),
+      type: "exercise",
+      originalText: failure.sampleQuestion,
+      structured: failure.sampleQuestion,
+      latex: "",
+      grade: "غير محدد",
+      unit: "من سجل الإخفاقات",
+      lesson: "تعليم سؤال متكرر",
+      source: "سجل الإخفاقات",
+      fileName: "سجل الإخفاقات",
+      page: 1,
+      status: "draft",
+      confidence: 1,
+      needsReview: true,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      version: 0,
+      canonicalQuestion,
+      fingerprint: questionFingerprint(canonicalQuestion),
+      relatedRuleIds: [],
+      comparison: "not_compared",
+    });
+    void saveItem(item);
+    setTab("library");
+    void runExercise(item);
+    setNotice("أضيف سؤال الإخفاق كمسودة وبدأ تشغيل المحرك عليه. صحح النتيجة أو اعتمدها من المكتبة.");
+  };
+
+  const filteredItems = useMemo(() => {
+    const query = libraryQuery.trim().toLocaleLowerCase("ar");
+    return items.filter((item) => {
+      const haystack = `${item.originalText} ${item.structured} ${item.grade} ${item.unit} ${item.lesson}`.toLocaleLowerCase("ar");
+      return (
+        (!query || haystack.includes(query)) &&
+        (libraryType === "all" || item.type === libraryType) &&
+        (libraryStatus === "all" || item.status === libraryStatus) &&
+        (libraryGrade === "all" || item.grade === libraryGrade) &&
+        (libraryUnit === "all" || item.unit === libraryUnit)
+      );
+    });
+  }, [items, libraryGrade, libraryQuery, libraryStatus, libraryType, libraryUnit]);
+
+  const gaps = useMemo(() => findCurriculumGaps(items), [items]);
+  const grades = useMemo(() => [...new Set(items.map((item) => item.grade))].sort(), [items]);
+  const units = useMemo(
+    () => [...new Set(items.filter((item) => libraryGrade === "all" || item.grade === libraryGrade).map((item) => item.unit))].sort(),
+    [items, libraryGrade],
+  );
+
+  if (session === "checking")
+    return (
+      <main className="admin-login-page" dir="rtl">
+        <p className="admin-loading"><LoaderCircle className="animate-spin" /> التحقق من جلسة الإدارة…</p>
+      </main>
+    );
+  if (session === "anonymous")
+    return <AdminLogin onAuthenticated={() => setSession("authenticated")} />;
+
+  return (
+    <div className="admin-app" dir="rtl">
+      <header className="admin-header">
+        <a className="admin-logo" href="/" aria-label="العودة إلى الحاسبة">
+          <span>∑</span>
+          <div><strong>تعليم المحرك</strong><small>منهاج سوريا</small></div>
+        </a>
+        <div className="admin-header-actions">
+          {workspaceBusy && <LoaderCircle className="animate-spin" size={18} />}
+          <button className="admin-secondary-button" type="button" onClick={() => void loadWorkspace()}>
+            <RotateCcw size={15} /> تحديث
+          </button>
+          <button
+            className="admin-secondary-button"
+            type="button"
+            onClick={() => void adminLogout().finally(() => setSession("anonymous"))}
+          >
+            <LogOut size={15} /> خروج
+          </button>
+        </div>
+      </header>
+      <div className="admin-layout">
+        <nav className="admin-nav" aria-label="أقسام لوحة الإدارة">
+          {tabs.map(({ id, label, icon: Icon }) => (
+            <button
+              type="button"
+              key={id}
+              className={tab === id ? "is-active" : ""}
+              aria-current={tab === id ? "page" : undefined}
+              onClick={() => setTab(id)}
+            >
+              <Icon size={18} /> {label}
+            </button>
+          ))}
+          <div className="admin-nav-note">
+            <ShieldCheck size={16} />
+            المسودات على هذا الجهاز؛ النشر فقط يصل إلى Redis.
+          </div>
+        </nav>
+        <main className="admin-content">
+          {(notice || error) && (
+            <div className={`admin-alert ${error ? "is-error" : ""}`} role={error ? "alert" : "status"}>
+              {error ? <AlertTriangle size={18} /> : <CheckCircle2 size={18} />}
+              <span>{error || notice}</span>
+              <button type="button" aria-label="إخفاء الرسالة" onClick={() => { setNotice(""); setError(""); }}><X size={16} /></button>
+            </div>
+          )}
+
+          {incomingFeedback && (
+            <section className="admin-feedback-banner">
+              <div>
+                <strong>{incomingFeedback.isCorrect ? "وصل تقييم: الحل صحيح" : "وصل تقييم: الحل خطأ"}</strong>
+                <p>{incomingFeedback.question}</p>
+              </div>
+              <button className="admin-primary-button" type="button" onClick={() => void acceptIncomingFeedback()}>
+                <Plus size={16} /> {incomingFeedback.isCorrect ? "أضفه كحل معتمد" : "أضف التصحيح الآن"}
+              </button>
+              <button className="admin-icon-button" type="button" onClick={() => setIncomingFeedback(null)}><X size={17} /></button>
+            </section>
+          )}
+
+          {tab === "overview" && (
+            <section className="admin-section">
+              <div className="admin-section-heading">
+                <div>
+                  <p className="admin-eyebrow">النسخة الحالية {published ? `#${published.version}` : "غير منشورة"}</p>
+                  <h1>مرحبًا في لوحة التعليم الذكي</h1>
+                  <p>استخدم المسح ثم راجع النتائج واعتمدها قبل النشر. لا يُعرض للطلاب إلا ما نُشر بنجاح.</p>
+                </div>
+              </div>
+              <div className="admin-stat-grid">
+                <article><BookOpen size={21} /><strong>{Math.max(stats?.approvedItems ?? 0, items.filter((item) => item.status !== "draft").length)}</strong><span>عنصر منشور/معتمد</span></article>
+                <article><FilePenLine size={21} /><strong>{Math.max(stats?.corrections ?? 0, items.filter((item) => item.type === "correction" && item.status !== "draft").length)}</strong><span>تصحيح معتمد</span></article>
+                <article><BarChart3 size={21} /><strong>{stats?.solveRate === null || stats?.solveRate === undefined ? "—" : `${Math.round(stats.solveRate * 100)}٪`}</strong><span>نسبة الأسئلة المحلولة</span></article>
+                <article><AlertTriangle size={21} /><strong>{failures.length}</strong><span>أسئلة فاشلة مسجلة</span></article>
+              </div>
+              <div className="admin-two-columns">
+                <article className="admin-panel-card">
+                  <h2>أكثر الأقسام احتياجًا للتعليم</h2>
+                  {stats?.mostFailingSections.length ? (
+                    <ol className="admin-ranked-list">
+                      {stats.mostFailingSections.map((entry) => <li key={entry.section}><span>{entry.section}</span><b>{entry.count}</b></li>)}
+                    </ol>
+                  ) : <p className="admin-empty-state">لا توجد بيانات حل كافية بعد؛ لا تُعرض نسبة أو قسم مخمّن.</p>}
+                </article>
+                <article className="admin-panel-card">
+                  <h2>اقتراحات تغطية المنهاج</h2>
+                  {gaps.length ? (
+                    <ul className="admin-gap-list">
+                      {gaps.slice(0, 12).map((gap) => <li key={`${gap.grade}-${gap.topic}`}><span>{gap.grade}</span>{gap.topic}</li>)}
+                    </ul>
+                  ) : <p className="admin-empty-state">أضف عناصر ذات صف ووحدة لتظهر فجوات تغطية ذات معنى.</p>}
+                </article>
+              </div>
+            </section>
+          )}
+
+          {tab === "scan" && <DocumentScanner onAnalyze={analyzeScannedDocument} />}
+
+          {tab === "library" && (
+            <section className="admin-section">
+              <div className="admin-section-heading">
+                <div>
+                  <p className="admin-eyebrow">{items.length} عنصر في مساحة العمل</p>
+                  <h1>المكتبة المعرفية والمراجعة</h1>
+                  <p>عدّل أو احذف أي مسودة. العناصر المنشورة في Redis تصبح مسودة عند تعديلها ثم تحتاج نشر نسخة جديدة.</p>
+                </div>
+              </div>
+              <div className="admin-library-filters">
+                <label className="admin-search"><Search size={17} /><input placeholder="ابحث في النص أو الدرس…" value={libraryQuery} onChange={(event) => setLibraryQuery(event.target.value)} /></label>
+                <select value={libraryType} onChange={(event) => setLibraryType(event.target.value as KnowledgeItemType | "all")}><option value="all">كل الأنواع</option>{Object.entries(itemTypeLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select>
+                <select value={libraryStatus} onChange={(event) => setLibraryStatus(event.target.value as KnowledgeItem["status"] | "all")}><option value="all">كل الحالات</option>{Object.entries(statusLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select>
+                <select value={libraryGrade} onChange={(event) => { setLibraryGrade(event.target.value); setLibraryUnit("all"); }}><option value="all">كل الصفوف</option>{grades.map((grade) => <option key={grade}>{grade}</option>)}</select>
+                <select value={libraryUnit} onChange={(event) => setLibraryUnit(event.target.value)}><option value="all">كل الوحدات</option>{units.map((unit) => <option key={unit}>{unit}</option>)}</select>
+              </div>
+              <p className="admin-result-count">{filteredItems.length} نتيجة مطابقة</p>
+              <div className="admin-library-list">
+                {filteredItems.map((item) => {
+                  const run = runs[item.id] ?? { state: "idle" as const };
+                  return (
+                    <article className="admin-library-card" key={item.id}>
+                      <div className="admin-item-meta">
+                        <span className={`admin-type-tag type-${item.type}`}>{itemTypeLabels[item.type]}</span>
+                        <span className={`admin-status-tag status-${item.status}`}>{statusLabels[item.status]}</span>
+                        {item.needsReview && <span className="admin-review-tag">يحتاج مراجعة</span>}
+                        {item.comparison === "matching" && <span className="admin-match-tag">حل الكتاب مطابق</span>}
+                        {item.comparison === "needs_review" && <span className="admin-review-tag">حل الكتاب يحتاج مراجعة</span>}
+                      </div>
+                      <h2>{item.lesson}</h2>
+                      <p className="admin-item-context">{item.grade} · {item.unit} · {item.source} · ص{item.page}</p>
+                      <p className="admin-item-text">{item.originalText}</p>
+                      {(item.type === "exercise" || item.type === "example") && <AnswerPreview run={run} />}
+                      <div className="admin-card-actions">
+                        {(item.type === "exercise" || item.type === "example") && (
+                          <button type="button" className="admin-secondary-button" onClick={() => void runExercise(item)}><Play size={15} /> تشغيل المحرك</button>
+                        )}
+                        {(item.type === "exercise" || item.type === "example") && (
+                          <button type="button" className="admin-correct-button" onClick={() => void approveEngineSolution(item)}><Check size={16} /> الحل صحيح</button>
+                        )}
+                        {(item.type === "exercise" || item.type === "example") && (
+                          <button type="button" className="admin-wrong-button" onClick={() => setCorrectionTarget({ item, wrongSolution: run.state === "complete" ? run.solution : item.approvedSolution })}><AlertTriangle size={16} /> الحل خطأ</button>
+                        )}
+                        <button type="button" className="admin-secondary-button" onClick={() => setEditing(item)}><FilePenLine size={15} /> تعديل</button>
+                        <button type="button" className="admin-danger-button" onClick={() => void deleteItem(item)}><Trash2 size={15} /> حذف</button>
+                      </div>
+                    </article>
+                  );
+                })}
+                {!filteredItems.length && <p className="admin-empty-state">لا توجد عناصر مطابقة للتصفية الحالية.</p>}
+              </div>
+            </section>
+          )}
+
+          {tab === "publish" && (
+            <section className="admin-section">
+              <div className="admin-section-heading">
+                <div>
+                  <p className="admin-eyebrow">نشر ذري دون ملفات عامة</p>
+                  <h1>نشر التعليم وإدارة النسخ</h1>
+                  <p>يفحص النشر المخطط والحجم، ثم يختبر الأمثلة السابقة محليًا على المحرك قبل تبديل مؤشر النسخة في Redis.</p>
+                </div>
+              </div>
+              <div className="admin-publish-card">
+                <div>
+                  <strong>{items.filter((item) => ["approved", "published"].includes(item.status)).length}</strong>
+                  <span>عنصر جاهز للنشر</span>
+                </div>
+                <button className="admin-primary-button" type="button" disabled={publishing || regressionBusy} onClick={() => void publish()}>
+                  {publishing ? <LoaderCircle className="animate-spin" size={17} /> : <CloudUpload size={17} />} نشر التعليم
+                </button>
+              </div>
+              {publishMessage && <p className="admin-success-text">{publishMessage}</p>}
+              {publishFailures.length > 0 && (
+                <div className="admin-blocking-card">
+                  <AlertTriangle size={20} />
+                  <div><strong>أوقف النشر اختبار الانحدار</strong><ul>{publishFailures.map((failure) => <li key={failure.itemId}>{failure.message}</li>)}</ul></div>
+                  <button className="admin-wrong-button" type="button" disabled={publishing} onClick={() => void publish(true)}>انشر رغم ذلك</button>
+                </div>
+              )}
+              <div className="admin-two-columns">
+                <article className="admin-panel-card">
+                  <h2>النسخ المنشورة</h2>
+                  <ul className="admin-version-list">
+                    {versions.map((version) => (
+                      <li key={version.version}>
+                        <div><b>النسخة {version.version}</b><span>{new Date(version.publishedAt).toLocaleString("ar-SY")} · {version.itemCount} عنصر</span></div>
+                        <button type="button" className="admin-secondary-button" disabled={published?.version === version.version} onClick={() => void rollback(version.version)}><RotateCcw size={14} /> تراجع</button>
+                      </li>
+                    ))}
+                    {!versions.length && <li className="admin-empty-state">لا توجد نسخة منشورة بعد.</li>}
+                  </ul>
+                </article>
+                <article className="admin-panel-card">
+                  <h2>نسخة احتياطية ثانوية</h2>
+                  <p>التصدير والاستيراد اختياريان لمسودات هذا الجهاز فقط، وليس جزءًا من النشر ولا يتطلب إعادة نشر الموقع.</p>
+                  <div className="admin-inline-actions">
+                    <button type="button" className="admin-secondary-button" onClick={exportBackup}><Download size={15} /> تصدير احتياطي</button>
+                    <button type="button" className="admin-secondary-button" onClick={() => backupInput.current?.click()}><Upload size={15} /> استيراد احتياطي</button>
+                  </div>
+                  <input ref={backupInput} type="file" className="hidden" accept="application/json,.json" onChange={(event) => void importBackup(event)} />
+                </article>
+              </div>
+            </section>
+          )}
+
+          {tab === "monitor" && (
+            <section className="admin-section">
+              <div className="admin-section-heading">
+                <div><p className="admin-eyebrow">تشخيص حقيقي لا تخمين</p><h1>سجل الإخفاقات والاختبار الشامل</h1><p>تُسجّل الإخفاقات العامة بشكل مجمّع في Redis، ثم يمكنك تحويل أي سؤال إلى مسودة تعليمية.</p></div>
+                <div className="admin-inline-actions">
+                  {regressionBusy ? <button className="admin-wrong-button" type="button" onClick={() => regressionAbort.current?.abort()}><X size={15} /> إلغاء الاختبار</button> : <button className="admin-primary-button" type="button" onClick={() => void comprehensiveTest()}><Play size={16} /> اختبار شامل</button>}
+                </div>
+              </div>
+              <div className="admin-two-columns">
+                <article className="admin-panel-card">
+                  <h2>الأسئلة التي فشل فيها المحرك</h2>
+                  <ul className="admin-failure-list">
+                    {failures.map((failure) => <li key={failure.fingerprint}><div><b>{failure.sampleQuestion}</b><span>تكرّر {failure.count} مرة · {failure.reason}</span></div><div className="admin-inline-actions"><button type="button" className="admin-secondary-button" onClick={() => teachFailure(failure)}>علّمه الآن</button><button type="button" className="admin-icon-button" title="حذف من السجل" onClick={() => void removeFailure(failure.fingerprint).then(() => setFailures((old) => old.filter((value) => value.fingerprint !== failure.fingerprint)))}><Trash2 size={15} /></button></div></li>)}
+                    {!failures.length && <li className="admin-empty-state">لا توجد إخفاقات مسجلة بعد.</li>}
+                  </ul>
+                </article>
+                <article className="admin-panel-card">
+                  <h2>نتيجة الاختبار الشامل</h2>
+                  {regressionBusy && <p className="admin-muted"><LoaderCircle className="animate-spin inline" size={14} /> تشغيل الأمثلة بالتتابع…</p>}
+                  <ul className="admin-regression-list">
+                    {regression.map((outcome) => <li key={outcome.itemId} className={outcome.passed ? "is-passed" : "is-failed"}><span>{outcome.passed ? "نجح" : "فشل"}</span><p>{outcome.message}</p><b>{outcome.elapsedMs}ms</b></li>)}
+                    {!regression.length && !regressionBusy && <li className="admin-empty-state">اضغط «اختبار شامل» لتشغيل كل مثال معتمد فعليًا.</li>}
+                  </ul>
+                </article>
+              </div>
+            </section>
+          )}
+
+          {tab === "settings" && (
+            <section className="admin-section">
+              <div className="admin-section-heading"><div><p className="admin-eyebrow">إعدادات لا تغيّر المحركات نفسها</p><h1>الضبط والبرومبت</h1><p>إيقاف أي قسم يمنع تشغيله بوضوح ولا يولد جوابًا بديلًا. انشر نسخة لتعميم الإعدادات على الزوار.</p></div></div>
+              <article className="admin-panel-card admin-settings-card">
+                <h2>أقسام المحرك</h2>
+                <div className="admin-engine-grid">
+                  {(Object.keys(ENGINE_LABELS) as EngineId[]).map((engine) => (
+                    <label key={engine} className="admin-engine-toggle"><input type="checkbox" checked={!settings.disabledEngines.includes(engine)} onChange={(event) => {
+                      const disabledEngines = event.target.checked ? settings.disabledEngines.filter((value) => value !== engine) : [...settings.disabledEngines, engine];
+                      void saveSettings({ ...settings, disabledEngines });
+                    }} /><span>{ENGINE_LABELS[engine]}</span><i>{settings.disabledEngines.includes(engine) ? "معطّل" : "مفعّل"}</i></label>
+                  ))}
+                </div>
+                <div className="admin-number-settings">
+                  <label>حد الثقة للمطابقة التقريبية<input type="number" min="0.85" max="0.999" step="0.001" value={settings.matchThreshold} onChange={(event) => void saveSettings({ ...settings, matchThreshold: Number(event.target.value) })} /></label>
+                  <label>مهلة الحل (مللي ثانية)<input type="number" min="2000" max="60000" step="1000" value={settings.timeoutMs} onChange={(event) => void saveSettings({ ...settings, timeoutMs: Number(event.target.value) })} /></label>
+                </div>
+              </article>
+              <article className="admin-panel-card admin-prompt-card">
+                <div className="admin-prompt-heading"><div><h2>برومبت التحليل الذكي</h2><p>يبقى المفتاح في الخادم؛ هذه الصياغة فقط هي القابلة للتحرير.</p></div><div className="admin-inline-actions"><button type="button" className="admin-secondary-button" onClick={() => setPrompt(DEFAULT_ENGINE_PROMPT)}><RotateCcw size={15} /> استعادة الافتراضي</button><button type="button" className="admin-primary-button" onClick={() => void savePrompt()}><Save size={15} /> حفظ البرومبت</button></div></div>
+                <textarea value={prompt} rows={18} dir="rtl" onChange={(event) => setPrompt(event.target.value)} />
+              </article>
+            </section>
+          )}
+        </main>
+      </div>
+      {editing && <KnowledgeEditor item={editing} onClose={() => setEditing(null)} onSave={async (item) => { await saveItem(item); setEditing(null); setNotice("حُفظ تعديل العنصر في المسودات المحلية."); }} />}
+      {correctionTarget && <CorrectionDialog target={correctionTarget} onClose={() => setCorrectionTarget(null)} onSave={async (correction) => { await saveItem(correction); setNotice("حُفظ التصحيح مع المثال السلبي. يمكنك اعتماد القاعدة المقترحة الآن بضغطة واحدة."); }} onAcceptSuggestedRule={async (correction) => {
+        if (!correction.errorAnalysis) return;
+        const timestamp = nowIso();
+        const rule = knowledgeItemSchema.parse({
+          id: makeId("rule"), type: "rule", originalText: correction.errorAnalysis.suggestedRule, structured: correction.errorAnalysis.suggestedRule, latex: "", grade: correction.grade, unit: correction.unit, lesson: `قاعدة وقائية: ${correction.lesson}`, source: "اقتراح بعد تصحيح", fileName: correction.fileName, page: correction.page, status: "approved", confidence: 0.8, needsReview: false, createdAt: timestamp, updatedAt: timestamp, version: 0, canonicalQuestion: canonicalizeQuestion(correction.errorAnalysis.suggestedRule), fingerprint: questionFingerprint(canonicalizeQuestion(correction.errorAnalysis.suggestedRule)), relatedRuleIds: [], comparison: "not_compared",
+        });
+        await saveItem(rule);
+        setNotice("أضيفت القاعدة المقترحة كعنصر معتمد محليًا.");
+      }} />}
+    </div>
+  );
+}
+
+function KnowledgeEditor({
+  item,
+  onClose,
+  onSave,
+}: {
+  item: KnowledgeItem;
+  onClose: () => void;
+  onSave: (item: KnowledgeItem) => Promise<void>;
+}) {
+  const [draft, setDraft] = useState(item);
+  const [error, setError] = useState("");
+  const save = async (event: FormEvent) => {
+    event.preventDefault();
+    try {
+      const canonicalQuestion = canonicalizeQuestion(draft.structured || draft.originalText);
+      await onSave(
+        knowledgeItemSchema.parse({
+          ...draft,
+          ...(item.status === "published" ? { status: "draft", version: 0 } : {}),
+          canonicalQuestion,
+          fingerprint: questionFingerprint(canonicalQuestion),
+        }),
+      );
+    } catch (value) {
+      setError(value instanceof Error ? value.message : "تعذر حفظ التعديل.");
+    }
+  };
+  return (
+    <div className="admin-modal-layer" role="dialog" aria-modal="true" aria-labelledby="edit-item-heading">
+      <form className="admin-modal" onSubmit={(event) => void save(event)}>
+        <header><h2 id="edit-item-heading">تعديل عنصر المعرفة</h2><button type="button" className="admin-icon-button" onClick={onClose}><X size={18} /></button></header>
+        <div className="admin-modal-body">
+          <div className="admin-form-grid">
+            <label>النوع<select value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value as KnowledgeItemType })}>{Object.entries(itemTypeLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
+            <label>الحالة<select value={draft.status} onChange={(event) => setDraft({ ...draft, status: event.target.value as KnowledgeItem["status"] })}>{Object.entries(statusLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
+            <label>الصف<input value={draft.grade} onChange={(event) => setDraft({ ...draft, grade: event.target.value })} /></label>
+            <label>الوحدة<input value={draft.unit} onChange={(event) => setDraft({ ...draft, unit: event.target.value })} /></label>
+            <label>الدرس<input value={draft.lesson} onChange={(event) => setDraft({ ...draft, lesson: event.target.value })} /></label>
+            <label>الصفحة<input type="number" min="1" value={draft.page} onChange={(event) => setDraft({ ...draft, page: Number(event.target.value) })} /></label>
+            <label>الثقة<input type="number" min="0" max="1" step="0.01" value={draft.confidence} onChange={(event) => setDraft({ ...draft, confidence: Number(event.target.value) })} /></label>
+          </div>
+          <label>النص الأصلي<textarea rows={5} value={draft.originalText} onChange={(event) => setDraft({ ...draft, originalText: event.target.value })} /></label>
+          <label>الصياغة المنظمة<textarea rows={5} value={draft.structured} onChange={(event) => setDraft({ ...draft, structured: event.target.value })} /></label>
+          <label>LaTeX<textarea rows={3} dir="ltr" value={draft.latex} onChange={(event) => setDraft({ ...draft, latex: event.target.value })} /></label>
+          <label className="admin-toggle"><input type="checkbox" checked={draft.needsReview} onChange={(event) => setDraft({ ...draft, needsReview: event.target.checked })} /><span>يحتاج مراجعة بشرية</span></label>
+          {error && <p className="admin-error-text">{error}</p>}
+        </div>
+        <footer><button type="button" className="admin-secondary-button" onClick={onClose}>إلغاء</button><button type="submit" className="admin-primary-button"><Save size={15} /> حفظ</button></footer>
+      </form>
+    </div>
+  );
+}
+
+function CorrectionDialog({
+  target,
+  onClose,
+  onSave,
+  onAcceptSuggestedRule,
+}: {
+  target: CorrectionTarget;
+  onClose: () => void;
+  onSave: (item: KnowledgeItem) => Promise<void>;
+  onAcceptSuggestedRule: (item: KnowledgeItem) => Promise<void>;
+}) {
+  const [answerText, setAnswerText] = useState("");
+  const [answerLatex, setAnswerLatex] = useState("");
+  const [steps, setSteps] = useState("");
+  const [reason, setReason] = useState("قاعدة ناقصة أو تطبيق غير صحيح.");
+  const [scanState, setScanState] = useState("");
+  const [error, setError] = useState("");
+  const [savedCorrection, setSavedCorrection] = useState<KnowledgeItem | null>(null);
+  const scanner = useRef<AbortController | null>(null);
+  useEffect(() => () => scanner.current?.abort(), []);
+  const scanCorrection = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    scanner.current?.abort();
+    const controller = new AbortController();
+    scanner.current = controller;
+    setScanState("بدء مسح صورة/ملف التصحيح…");
+    setError("");
+    try {
+      const document = await scanDocument(file, controller.signal, (progress) => setScanState(progress.label));
+      if (controller.signal.aborted) return;
+      setAnswerText((previous) => `${previous}${previous ? "\n" : ""}${document.text}`);
+      setScanState("أُدرج النص الممسوح في حقل الجواب. راجعه قبل الحفظ.");
+    } catch (value) {
+      if (!controller.signal.aborted) setError(value instanceof Error ? value.message : "تعذر مسح التصحيح.");
+    }
+  };
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!answerText.trim() && !answerLatex.trim()) {
+      setError("اكتب الجواب الصحيح أو الصيغة LaTex قبل الحفظ.");
+      return;
+    }
+    try {
+      const timestamp = nowIso();
+      const analysis = inferCorrectionAnalysis(target.item, target.wrongSolution, reason);
+      const correction = knowledgeItemSchema.parse({
+        id: makeId("correction"),
+        type: "correction",
+        originalText: target.item.originalText,
+        structured: `تصحيح معتمد: ${answerText || answerLatex}`,
+        latex: answerLatex,
+        grade: target.item.grade,
+        unit: target.item.unit,
+        lesson: target.item.lesson,
+        source: target.item.source,
+        fileName: target.item.fileName,
+        page: target.item.page,
+        status: "approved",
+        confidence: 1,
+        needsReview: false,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+        version: 0,
+        canonicalQuestion: target.item.canonicalQuestion,
+        fingerprint: target.item.fingerprint,
+        relatedRuleIds: target.item.relatedRuleIds,
+        approvedSolution: {
+          ...(answerText.trim() ? { answerText: answerText.trim() } : {}),
+          ...(answerLatex.trim() ? { answerLatex: answerLatex.trim() } : {}),
+          steps: textSteps(steps),
+        },
+        ...(target.wrongSolution
+          ? {
+              negativeExample: {
+                answerText: target.wrongSolution.answerText || target.wrongSolution.answerLatex || "لم ينتج جواب قابل للنسخ",
+                ...(target.wrongSolution.answerLatex ? { answerLatex: target.wrongSolution.answerLatex } : {}),
+                reason,
+                createdAt: timestamp,
+              },
+            }
+          : {}),
+        errorAnalysis: analysis,
+        comparison: "not_compared",
+      });
+      await onSave(correction);
+      setSavedCorrection(correction);
+    } catch (value) {
+      setError(value instanceof Error ? value.message : "تعذر حفظ التصحيح.");
+    }
+  };
+  return (
+    <div className="admin-modal-layer" role="dialog" aria-modal="true" aria-labelledby="correction-heading">
+      <form className="admin-modal admin-correction-modal" onSubmit={(event) => void submit(event)}>
+        <header><div><p className="admin-eyebrow">تصحيح بأولوية عليا</p><h2 id="correction-heading">الحل الصحيح للتمرين</h2></div><button type="button" className="admin-icon-button" onClick={onClose}><X size={18} /></button></header>
+        <div className="admin-modal-body">
+          <p className="admin-item-text">{target.item.originalText}</p>
+          <label>الجواب والخطوات الصحيحة (نص)<textarea rows={5} value={answerText} onChange={(event) => setAnswerText(event.target.value)} placeholder="اكتب الجواب المعتمد هنا…" /></label>
+          <label>صيغة LaTeX إن وجدت<textarea rows={3} dir="ltr" value={answerLatex} onChange={(event) => setAnswerLatex(event.target.value)} /></label>
+          <label>خطوات مفصّلة (كل سطر خطوة)<textarea rows={5} value={steps} onChange={(event) => setSteps(event.target.value)} /></label>
+          <label>سبب الخطأ<select value={reason} onChange={(event) => setReason(event.target.value)}><option>قاعدة ناقصة أو تطبيق غير صحيح.</option><option>خطأ في القراءة أو OCR.</option><option>اختيار المحرك غير مناسب.</option><option>صياغة السؤال أو المعطيات ملتبسة.</option></select></label>
+          <div className="admin-correction-scan"><label className="admin-secondary-button"><Upload size={15} /> مسح صورة أو PDF للتصحيح<input className="hidden" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={(event) => void scanCorrection(event)} /></label>{scanState && <span>{scanState}</span>}{scanner.current && <button className="admin-icon-button" type="button" onClick={() => scanner.current?.abort()}><X size={15} /></button>}</div>
+          {error && <p className="admin-error-text">{error}</p>}
+          <div className="admin-suggested-rule"><CircleHelp size={17} /><div><strong>قاعدة مقترحة بعد التصحيح</strong><p>{inferCorrectionAnalysis(target.item, target.wrongSolution, reason).suggestedRule}</p>{savedCorrection ? <button type="button" className="admin-correct-button" onClick={() => { void onAcceptSuggestedRule(savedCorrection).then(onClose).catch((value: unknown) => setError(value instanceof Error ? value.message : "تعذر اعتماد القاعدة المقترحة.")); }}>اعتماد القاعدة المقترحة</button> : <span>احفظ التصحيح أولًا، ثم اعتمد القاعدة المقترحة بضغطة واحدة.</span>}</div></div>
+        </div>
+        <footer><button type="button" className="admin-secondary-button" onClick={onClose}>إلغاء</button><button type="submit" className="admin-primary-button"><Save size={15} /> حفظ التصحيح واعتماده</button></footer>
+      </form>
+    </div>
+  );
+}

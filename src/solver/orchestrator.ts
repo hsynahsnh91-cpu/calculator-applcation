@@ -56,7 +56,10 @@ export async function solvePrompt(
     if (/اشرح.*خطوات|تفصيل اكثر/.test(request) && context.lastPrompt)
       request = context.lastPrompt;
     const ranked = routePrompt(request, context);
-    const selected = selectEngines(ranked, request);
+    const requestedEngines = selectEngines(ranked, request);
+    const selected = requestedEngines.filter(
+      (engine) => !options.disabledEngines?.includes(engine),
+    );
     for (const candidate of ranked) {
       const existing = candidates.find(
         (value) => value.engine === candidate.engine,
@@ -71,8 +74,9 @@ export async function solvePrompt(
     if (!selected.length) {
       unsolved.push({
         request,
-        message:
-          "هل تريد حساب قيمة، أم حل معادلة، أم دراسة دالة؟ لا توجد معطيات كافية لاختيار حل موثوق.",
+        message: requestedEngines.length
+          ? "المحرك الملائم لهذا السؤال مُعطّل من إعدادات الإدارة، لذلك لم يُنشأ جواب بديل. فعّله أو اختر قسمًا آخر."
+          : "هل تريد حساب قيمة، أم حل معادلة، أم دراسة دالة؟ لا توجد معطيات كافية لاختيار حل موثوق.",
         choices: clarificationChoices(ranked),
       });
       continue;
@@ -148,7 +152,7 @@ export async function solvePrompt(
       message: "قُرئت أول 12 فقرة. أرسل بقية الطلبات في رسالة جديدة.",
       choices: [],
     });
-  return composeAnswer(
+  const answer = composeAnswer(
     question,
     results,
     unsolved,
@@ -156,4 +160,10 @@ export async function solvePrompt(
     context,
     performance.now() - started,
   );
+  if (options.knowledgeContext?.length)
+    answer.knowledge = {
+      source: "engine",
+      relatedRules: options.knowledgeContext,
+    };
+  return answer;
 }

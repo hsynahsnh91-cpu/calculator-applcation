@@ -37,6 +37,7 @@ export function solveLocally(
   const active = worker;
   const id = `request-${Date.now()}`;
   const started = performance.now();
+  const timeoutMs = Math.max(2_000, Math.min(60_000, options.timeoutMs ?? 15_000));
   return new Promise((resolve, reject) => {
     let partial: SolverResult[] = [];
     let done = false;
@@ -103,7 +104,7 @@ export function solveLocally(
           performance.now() - started,
         ),
       );
-    }, 15000);
+    }, timeoutMs);
     active.addEventListener("message", listener);
     active.addEventListener("error", failure);
     signal?.addEventListener("abort", abort, { once: true });

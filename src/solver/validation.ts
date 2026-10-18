@@ -180,6 +180,27 @@ function visual(value: unknown): boolean {
     );
   return false;
 }
+function knowledge(value: unknown): boolean {
+  if (!record(value) || (value.source !== "approved" && value.source !== "engine")) return false;
+  return (
+    (value.itemId === undefined || text(value.itemId, 200)) &&
+    (value.matchScore === undefined ||
+      (finite(value.matchScore) && value.matchScore >= 0 && value.matchScore <= 1)) &&
+    (value.relatedRules === undefined ||
+      (Array.isArray(value.relatedRules) &&
+        value.relatedRules.length <= 5 &&
+        value.relatedRules.every(
+          (rule: unknown) =>
+            record(rule) &&
+            text(rule.id, 200) &&
+            text(rule.text, 8000) &&
+            (rule.latex === undefined || text(rule.latex, 8000)) &&
+            finite(rule.confidence) &&
+            rule.confidence >= 0 &&
+            rule.confidence <= 1,
+        )))
+  );
+}
 function result(value: unknown): boolean {
   if (
     !record(value) ||
@@ -274,6 +295,7 @@ export function isConversationTurn(value: unknown): value is ConversationTurn {
     context(answer.context) &&
     finite(answer.elapsedMs) &&
     answer.elapsedMs >= 0 &&
+    (answer.knowledge === undefined || knowledge(answer.knowledge)) &&
     Array.isArray(answer.candidates) &&
     answer.candidates.length <= 13 &&
     answer.candidates.every(
