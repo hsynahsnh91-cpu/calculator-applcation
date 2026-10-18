@@ -3,6 +3,11 @@ import { normalizeScannedText } from "./normalization";
 import { prepareImage, recognizeImage, stopOCR } from "../solver/ocr";
 
 export type ScanSource = "pdf-text" | "ocr";
+export type PdfScanMode = "text-first" | "ocr-all-pages";
+
+export interface ScanOptions {
+  pdfMode?: PdfScanMode;
+}
 
 export interface ScannedPage {
   page: number;
@@ -16,6 +21,10 @@ export interface ScannedDocument {
   fileName: string;
   pages: ScannedPage[];
   text: string;
+  /** Manager-provided context sent with each safe analysis chunk. */
+  attachmentMessage?: string;
+  /** Records whether PDF pages were OCR'd even when a text layer existed. */
+  pdfMode?: PdfScanMode;
 }
 
 export interface ScanProgress {
@@ -33,7 +42,10 @@ function isPdf(file: File): boolean {
 }
 
 function isSupportedImage(file: File): boolean {
-  return /^image\/(png|jpe?g|webp)$/i.test(file.type);
+  return (
+    /^image\/(png|jpe?g|webp)$/i.test(file.type) ||
+    /\.(png|jpe?g|webp)$/i.test(file.name)
+  );
 }
 
 function throwIfAborted(signal: AbortSignal): void {
@@ -108,6 +120,7 @@ async function scanPdf(
   file: File,
   signal: AbortSignal,
   onProgress: ProgressListener,
+  options: ScanOptions,
 ): Promise<ScannedDocument> {
   if (file.size > 35 * 1024 * 1024)
     throw new Error("حجم PDF أكبر من 35 ميغابايت. قسّمه إلى ملف أصغر أولًا.");
@@ -129,24 +142,29 @@ async function scanPdf(
     const pages: ScannedPage[] = [];
     for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
       throwIfAborted(signal);
+      const mustUseOcr = options.pdfMode === "ocr-all-pages";
       onProgress({
         fileName: file.name,
         currentPage: pageNumber,
         totalPages: pdfDocument.numPages,
         fraction: (pageNumber - 1) / pdfDocument.numPages,
-        label: "استخراج طبقة النص من صفحة PDF…",
+        label: mustUseOcr
+          ? "المسح الضوئي الكامل مفعل؛ بدء OCR لصفحة PDF…"
+          : "استخراج طبقة النص من صفحة PDF…",
       });
       const page = await pdfDocument.getPage(pageNumber);
       let textLayer = "";
-      try {
-        const textContent = await page.getTextContent();
-        textLayer = normalizeScannedText(extractTextItems(textContent.items));
-      } catch {
-        // A damaged/unsupported text layer is treated like a scanned page and
-        // continues through the local image OCR path below.
-        textLayer = "";
+      if (!mustUseOcr) {
+        try {
+          const textContent = await page.getTextContent();
+          textLayer = normalizeScannedText(extractTextItems(textContent.items));
+        } catch {
+          // A damaged/unsupported text layer is treated like a scanned page and
+          // continues through the local image OCR path below.
+          textLayer = "";
+        }
       }
-      if (textLayer.replace(/[^\p{L}\p{N}]/gu, "").length >= 8) {
+      if (!mustUseOcr && textLayer.replace(/[^\p{L}\p{N}]/gu, "").length >= 8) {
         pages.push({ page: pageNumber, text: textLayer, source: "pdf-text" });
         onProgress({
           fileName: file.name,
@@ -163,7 +181,9 @@ async function scanPdf(
         currentPage: pageNumber,
         totalPages: pdfDocument.numPages,
         fraction: (pageNumber - 0.78) / pdfDocument.numPages,
-        label: "الصفحة ممسوحة؛ تجهيزها بدقة عالية لـ OCR…",
+        label: mustUseOcr
+          ? "المسح الضوئي الكامل مفعل؛ تجهيز الصفحة بدقة عالية لـ OCR…"
+          : "الصفحة ممسوحة؛ تجهيزها بدقة عالية لـ OCR…",
       });
       const naturalViewport = page.getViewport({ scale: 1 });
       const maxDimension = 3_200;
@@ -215,6 +235,7 @@ async function scanPdf(
       fileName: file.name,
       pages,
       text: pages.map((page) => `\n[الصفحة ${page.page}]\n${page.text}`).join("\n").trim(),
+      pdfMode: options.pdfMode ?? "text-first",
     };
   } finally {
     signal.removeEventListener("abort", abortPdf);
@@ -227,11 +248,12 @@ export async function scanDocument(
   file: File,
   signal: AbortSignal,
   onProgress: ProgressListener,
+  options: ScanOptions = {},
 ): Promise<ScannedDocument> {
   const abortOcr = () => stopOCR();
   signal.addEventListener("abort", abortOcr, { once: true });
   try {
-    if (isPdf(file)) return await scanPdf(file, signal, onProgress);
+    if (isPdf(file)) return await scanPdf(file, signal, onProgress, options);
     if (isSupportedImage(file)) return await scanImage(file, signal, onProgress);
     throw new Error("الملفات المدعومة هي PDF وJPG وPNG وWEBP فقط.");
   } finally {

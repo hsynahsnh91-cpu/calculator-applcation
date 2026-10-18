@@ -1589,6 +1589,11 @@ kbd {
   cursor: pointer;
   font-weight: 700;
 }
+.knowledge-rules p {
+  margin: 7px 0 0;
+  color: #9fc1b5;
+  font-size: 10px;
+}
 .knowledge-rules ul {
   margin: 7px 0 0;
   padding-inline-start: 19px;
@@ -1704,7 +1709,10 @@ kbd {
 .admin-login-card label,
 .admin-modal label,
 .admin-settings-card label,
-.admin-scan-review label {
+.admin-scan-review label,
+.admin-scan-context,
+.admin-training-form > label,
+.admin-training-form .admin-form-grid > label {
   display: grid;
   gap: 7px;
   color: #bdcad6;
@@ -2037,6 +2045,15 @@ kbd {
 .admin-drop-zone.is-dragging { border-color: #80e0c7; background: #1e4a3d66; }
 .admin-drop-zone strong { color: #e1f7f0; font-size: 15px; }
 .admin-drop-zone > span { max-width: 620px; color: #8ba0b4; font-size: 11px; line-height: 1.9; }
+.admin-scan-options { display: grid; gap: 9px; min-width: min(100%, 245px); }
+.admin-scan-context {
+  margin: -7px 0 15px;
+  padding: 12px;
+  border: 1px solid #345364;
+  border-radius: 13px;
+  background: #1123348a;
+}
+.admin-scan-context small { color: #89a1b4; font-size: 10px; font-weight: 400; line-height: 1.8; }
 .admin-scan-list,
 .admin-library-list { display: grid; gap: 12px; margin-top: 17px; }
 .admin-scan-card-heading {
@@ -2052,6 +2069,18 @@ kbd {
 .admin-scan-review { display: grid; gap: 11px; margin-top: 15px; }
 .admin-page-sources { display: flex; flex-wrap: wrap; gap: 6px; }
 .admin-page-sources span { padding: 3px 7px; color: #a9cdd0; background: #173a3c; border-radius: 7px; font-size: 10px; }
+.admin-page-sources span svg { vertical-align: -2px; margin-inline-end: 3px; }
+.admin-training-section {
+  margin-top: 22px;
+  padding-top: 23px;
+  border-top: 1px solid #2c4152;
+}
+.admin-training-section .admin-section-heading { margin-bottom: 16px; }
+.admin-training-section h2 { display: flex; align-items: center; gap: 8px; }
+.admin-training-form { display: grid; gap: 13px; }
+.admin-training-answer-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.admin-training-approval { align-items: flex-start; line-height: 1.9; }
+.admin-training-approval input { margin-top: 5px; }
 .admin-library-filters {
   display: grid;
   grid-template-columns: minmax(180px, 2fr) repeat(4, minmax(110px, 1fr));

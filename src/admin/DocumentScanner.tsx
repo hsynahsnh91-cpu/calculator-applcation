@@ -5,12 +5,16 @@ import {
   ImagePlus,
   LoaderCircle,
   Play,
+  ScanText,
   Square,
   UploadCloud,
   X,
 } from "lucide-react";
-import type { ScannedDocument } from "./scanner";
-import { scanDocument } from "./scanner";
+import {
+  scanDocument,
+  type PdfScanMode,
+  type ScannedDocument,
+} from "./scanner";
 
 interface ScanJob {
   id: string;
@@ -21,12 +25,25 @@ interface ScanJob {
   fraction: number;
   label: string;
   text: string;
+  attachmentMessage: string;
+  pdfMode: PdfScanMode;
   document?: ScannedDocument;
   error?: string;
 }
 
+export interface DocumentAnalysisProgress {
+  currentChunk: number;
+  totalChunks: number;
+  label: string;
+}
+
+export interface DocumentAnalysisOptions {
+  signal?: AbortSignal;
+  onProgress?: (progress: DocumentAnalysisProgress) => void;
+}
+
 interface DocumentScannerProps {
-  onAnalyze: (document: ScannedDocument) => Promise<void>;
+  onAnalyze: (document: ScannedDocument, options?: DocumentAnalysisOptions) => Promise<void>;
 }
 
 function jobId(file: File): string {
@@ -41,21 +58,41 @@ function acceptedFile(file: File): boolean {
   );
 }
 
+function isActiveJob(status: ScanJob["status"]): boolean {
+  return status === "queued" || status === "scanning" || status === "analyzing";
+}
+
+/**
+ * Local OCR happens first. The optional manager note travels with the document
+ * to the server-side classifier only; it never changes OCR or executes code.
+ */
 export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
   const [jobs, setJobs] = useState<ScanJob[]>([]);
   const [autoAnalyze, setAutoAnalyze] = useState(true);
+  const [pdfMode, setPdfMode] = useState<PdfScanMode>("text-first");
+  const [attachmentMessage, setAttachmentMessage] = useState("");
   const [dragging, setDragging] = useState(false);
   const uploadInput = useRef<HTMLInputElement>(null);
   const cameraInput = useRef<HTMLInputElement>(null);
   const controllers = useRef(new Map<string, AbortController>());
   const queue = useRef(Promise.resolve());
+  const deferredCleanup = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  useEffect(
-    () => () => {
-      controllers.current.forEach((controller) => controller.abort());
-      controllers.current.clear();
-    },
-  );
+  useEffect(() => {
+    // React development Strict Mode may briefly run an effect cleanup followed
+    // by setup again. Deferring the abort avoids cancelling a just-queued PDF
+    // during that non-user remount while still releasing workers on real exit.
+    if (deferredCleanup.current !== undefined) {
+      clearTimeout(deferredCleanup.current);
+      deferredCleanup.current = undefined;
+    }
+    return () => {
+      deferredCleanup.current = setTimeout(() => {
+        controllers.current.forEach((controller) => controller.abort());
+        controllers.current.clear();
+      }, 0);
+    };
+  }, []);
 
   const patchJob = (id: string, patch: Partial<ScanJob>) => {
     setJobs((previous) =>
@@ -63,24 +100,79 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
     );
   };
 
-  const analyze = async (id: string, document?: ScannedDocument, text?: string) => {
-    const selected = document ?? jobs.find((job) => job.id === id)?.document;
+  const cancelJob = (id: string) => {
+    const controller = controllers.current.get(id);
+    if (!controller || controller.signal.aborted) return;
+    controller.abort();
+    // Keep the card active until the worker/network call actually unwinds, so
+    // the UI never reports a completed cancellation before resources stop.
+    patchJob(id, { label: "جارٍ إلغاء العملية بأمان…" });
+  };
+
+  const analyze = async (
+    id: string,
+    document?: ScannedDocument,
+    text?: string,
+    existingSignal?: AbortSignal,
+  ) => {
+    const current = jobs.find((job) => job.id === id);
+    const selected = document ?? current?.document;
     if (!selected) return;
-    const revised = text ?? jobs.find((job) => job.id === id)?.text ?? selected.text;
-    patchJob(id, { status: "analyzing", label: "تحليل النص المنظم…" });
+    const revised = text ?? current?.text ?? selected.text;
+    const message = current?.attachmentMessage ?? selected.attachmentMessage ?? "";
+    const ownedController = existingSignal ? undefined : new AbortController();
+    const signal = existingSignal ?? ownedController?.signal;
+    if (ownedController) controllers.current.set(id, ownedController);
+    patchJob(id, {
+      status: "analyzing",
+      error: undefined,
+      fraction: 0,
+      label: "تقسيم الملف وتحليل جميع صفحاته…",
+    });
     try {
-      await onAnalyze({ ...selected, text: revised });
-      patchJob(id, { status: "complete", label: "أضيفت النتائج إلى المسودات المحلية." });
-    } catch (error) {
+      await onAnalyze(
+        { ...selected, text: revised, attachmentMessage: message },
+        {
+          signal,
+          onProgress: (progress) =>
+            patchJob(id, {
+              currentPage: progress.currentChunk,
+              totalPages: progress.totalChunks,
+              fraction: progress.totalChunks ? progress.currentChunk / progress.totalChunks : 0,
+              label: progress.label,
+            }),
+        },
+      );
       patchJob(id, {
-        status: "ready",
-        error: error instanceof Error ? error.message : "تعذر تحليل النص.",
-        label: "النص جاهز، ويمكن إعادة التحليل بعد التصحيح.",
+        status: "complete",
+        fraction: 1,
+        label: "أضيفت نتائج كامل الملف إلى المسودات المحلية للمراجعة والنشر لاحقًا.",
       });
+    } catch (error) {
+      const cancelled = Boolean(signal?.aborted);
+      patchJob(id, {
+        status: cancelled ? "cancelled" : "ready",
+        error: cancelled
+          ? undefined
+          : error instanceof Error
+            ? error.message
+            : "تعذر تحليل النص.",
+        label: cancelled
+          ? "أُلغي التحليل قبل حفظ أي عناصر جديدة."
+          : "النص جاهز، ويمكن إعادة التحليل بعد التصحيح.",
+      });
+    } finally {
+      if (ownedController && controllers.current.get(id) === ownedController)
+        controllers.current.delete(id);
     }
   };
 
-  const schedule = (file: File) => {
+  const schedule = (
+    file: File,
+    note: string,
+    selectedPdfMode: PdfScanMode,
+    shouldAutoAnalyze: boolean,
+  ) => {
     const id = jobId(file);
     const controller = new AbortController();
     controllers.current.set(id, controller);
@@ -95,6 +187,8 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
         fraction: 0,
         label: "في طابور المسح المحلي…",
         text: "",
+        attachmentMessage: note,
+        pdfMode: selectedPdfMode,
       },
     ]);
     queue.current = queue.current
@@ -106,18 +200,28 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
         }
         patchJob(id, { status: "scanning", label: "بدء المسح…" });
         try {
-          const document = await scanDocument(file, controller.signal, (progress) => {
-            patchJob(id, {
-              currentPage: progress.currentPage,
-              totalPages: progress.totalPages,
-              fraction: progress.fraction,
-              label: progress.label,
-            });
-          });
+          const scanned = await scanDocument(
+            file,
+            controller.signal,
+            (progress) => {
+              patchJob(id, {
+                currentPage: progress.currentPage,
+                totalPages: progress.totalPages,
+                fraction: progress.fraction,
+                label: progress.label,
+              });
+            },
+            { pdfMode: selectedPdfMode },
+          );
           if (controller.signal.aborted) {
             patchJob(id, { status: "cancelled", label: "أُلغي المسح." });
             return;
           }
+          const document: ScannedDocument = {
+            ...scanned,
+            attachmentMessage: note,
+            pdfMode: scanned.pdfMode ?? selectedPdfMode,
+          };
           patchJob(id, {
             status: "ready",
             document,
@@ -125,9 +229,9 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
             currentPage: document.pages.length,
             totalPages: document.pages.length,
             fraction: 1,
-            label: "النص قابل للمراجعة قبل الاعتماد.",
+            label: "اكتمل نسخ النص؛ راجعه أو حلله كملف كامل.",
           });
-          if (autoAnalyze) await analyze(id, document, document.text);
+          if (shouldAutoAnalyze) await analyze(id, document, document.text, controller.signal);
         } catch (error) {
           patchJob(id, {
             status: controller.signal.aborted ? "cancelled" : "error",
@@ -140,14 +244,16 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
             label: controller.signal.aborted ? "أُلغي المسح." : "فشل المسح دون إضافة نتائج.",
           });
         } finally {
-          controllers.current.delete(id);
+          if (controllers.current.get(id) === controller) controllers.current.delete(id);
         }
       });
   };
 
   const receiveFiles = (files: File[]) => {
-    files.filter(acceptedFile).forEach(schedule);
-    const rejected = files.length - files.filter(acceptedFile).length;
+    const accepted = files.filter(acceptedFile);
+    const note = attachmentMessage.trim().slice(0, 12_000);
+    accepted.forEach((file) => schedule(file, note, pdfMode, autoAnalyze));
+    const rejected = files.length - accepted.length;
     if (rejected) {
       const id = `rejected-${Date.now()}`;
       setJobs((previous) => [
@@ -160,6 +266,8 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
           totalPages: 0,
           fraction: 0,
           text: "",
+          attachmentMessage: "",
+          pdfMode,
           label: "يُقبل PDF وJPG وPNG وWEBP فقط.",
           error: "استُبعد ملف غير مدعوم.",
         },
@@ -171,22 +279,50 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
     <section className="admin-section" aria-labelledby="scan-heading">
       <div className="admin-section-heading">
         <div>
-          <p className="admin-eyebrow">مسح محلي تلقائي</p>
+          <p className="admin-eyebrow">مسح محلي تلقائي وتعلّم منظم</p>
           <h2 id="scan-heading">ارفع صفحات الكتاب أو صوّر السؤال</h2>
           <p>
-            تُفحص طبقة النص في PDF أولًا؛ أما الصفحات الممسوحة والصور فتُعالج محليًا
-            ثم تمر إلى قارئ OCR العربي والإنجليزي داخل Worker.
+            يُقرأ كامل PDF صفحةً صفحة: طبقة النص أولًا أو OCR كامل عند تفعيله. بعد ذلك
+            يُقسّم النص بأمان إلى دفعات ويدخل المسودات للمراجعة، لا إلى النشر المباشر.
           </p>
         </div>
-        <label className="admin-toggle">
-          <input
-            type="checkbox"
-            checked={autoAnalyze}
-            onChange={(event) => setAutoAnalyze(event.target.checked)}
-          />
-          <span>تحليل تلقائي مباشرة</span>
-        </label>
+        <div className="admin-scan-options">
+          <label className="admin-toggle">
+            <input
+              type="checkbox"
+              checked={autoAnalyze}
+              onChange={(event) => setAutoAnalyze(event.target.checked)}
+            />
+            <span>تحليل تلقائي مباشرة</span>
+          </label>
+          <label className="admin-toggle">
+            <input
+              type="checkbox"
+              checked={pdfMode === "ocr-all-pages"}
+              onChange={(event) =>
+                setPdfMode(event.target.checked ? "ocr-all-pages" : "text-first")
+              }
+            />
+            <span>مسح ضوئي كامل لصفحات PDF</span>
+          </label>
+        </div>
       </div>
+
+      <label className="admin-scan-context">
+        رسالة مرافقة للملف — مثل الصف والوحدة والهدف التعليمي
+        <textarea
+          value={attachmentMessage}
+          rows={3}
+          maxLength={12_000}
+          placeholder="مثال: هذا فصل النهايات للبكالوريا العلمي. استخرج القواعد والأمثلة والتمارين، ولا تعتمد أي جواب غير ظاهر في الكتاب."
+          onChange={(event) => setAttachmentMessage(event.target.value)}
+        />
+        <small>
+          تستخدم الرسالة كسياق للتصنيف فقط؛ لا تنشر محتوى ولا تمنح الذكاء صلاحية تجاوز
+          المراجعة البشرية.
+        </small>
+      </label>
+
       <div
         className={`admin-drop-zone ${dragging ? "is-dragging" : ""}`}
         role="button"
@@ -212,7 +348,10 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
       >
         <UploadCloud size={30} />
         <strong>اسحب ملفات PDF أو JPG أو PNG أو WEBP هنا</strong>
-        <span>يمكن اختيار عدة ملفات؛ يبدأ المسح فورًا ويعمل ملف واحد في كل مرة لحماية الذاكرة.</span>
+        <span>
+          يمكن اختيار عدة ملفات؛ يعمل ملف واحد في كل مرة لحماية الذاكرة. تفعيل المسح
+          الضوئي الكامل أبطأ لكنه يقرأ حتى صفحات PDF التي تحتوي طبقة نص.
+        </span>
         <div className="admin-inline-actions">
           <button
             type="button"
@@ -259,9 +398,7 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
         }}
       />
       <div className="admin-scan-list">
-        {jobs.length === 0 && (
-          <p className="admin-empty-state">لم تُضف أي وثيقة بعد.</p>
-        )}
+        {jobs.length === 0 && <p className="admin-empty-state">لم تُضف أي وثيقة بعد.</p>}
         {jobs.map((job) => (
           <article className="admin-scan-card" key={job.id}>
             <div className="admin-scan-card-heading">
@@ -273,20 +410,18 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
                   {job.label}
                 </p>
               </div>
-              {["queued", "scanning", "analyzing"].includes(job.status) && (
-                <LoaderCircle className="animate-spin" size={19} />
-              )}
-              {["queued", "scanning", "analyzing"].includes(job.status) && (
+              {isActiveJob(job.status) && <LoaderCircle className="animate-spin" size={19} />}
+              {isActiveJob(job.status) && (
                 <button
                   type="button"
                   className="admin-icon-button"
-                  title="إلغاء المسح"
-                  onClick={() => controllers.current.get(job.id)?.abort()}
+                  title="إلغاء المسح أو التحليل"
+                  onClick={() => cancelJob(job.id)}
                 >
                   <Square size={15} />
                 </button>
               )}
-              {job.status === "ready" && (
+              {!isActiveJob(job.status) && (
                 <button
                   type="button"
                   className="admin-icon-button"
@@ -297,7 +432,7 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
                 </button>
               )}
             </div>
-            {["queued", "scanning", "analyzing"].includes(job.status) && (
+            {isActiveJob(job.status) && (
               <div className="admin-progress" aria-label={`تقدم ${job.fileName}`}>
                 <i style={{ width: `${Math.round(job.fraction * 100)}%` }} />
               </div>
@@ -312,7 +447,22 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
                       {page.confidence !== undefined ? ` ${Math.round(page.confidence)}٪` : ""}
                     </span>
                   ))}
+                  {job.document.pdfMode === "ocr-all-pages" && (
+                    <span><ScanText size={12} /> OCR كامل</span>
+                  )}
                 </div>
+                <label>
+                  الرسالة المرافقة لهذا الملف
+                  <textarea
+                    value={job.attachmentMessage}
+                    rows={3}
+                    maxLength={12_000}
+                    dir="auto"
+                    onChange={(event) =>
+                      patchJob(job.id, { attachmentMessage: event.target.value, error: undefined })
+                    }
+                  />
+                </label>
                 <label>
                   النص المستخرج — صححه قبل إعادة التحليل عند الحاجة
                   <textarea
@@ -322,13 +472,13 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
                     onChange={(event) => patchJob(job.id, { text: event.target.value, error: undefined })}
                   />
                 </label>
-                {job.status !== "complete" && (
+                {job.status !== "complete" && !isActiveJob(job.status) && (
                   <button
                     type="button"
                     className="admin-primary-button"
                     onClick={() => void analyze(job.id, job.document, job.text)}
                   >
-                    <Play size={16} /> تحليل النص الآن
+                    <Play size={16} /> تحليل كامل الملف الآن
                   </button>
                 )}
               </div>

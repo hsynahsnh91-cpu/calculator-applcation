@@ -185,6 +185,9 @@ export const analyzeRequestSchema = z
     text: z.string().trim().min(1).max(120_000),
     source: z.string().trim().min(1).max(500),
     pageHints: z.array(z.number().int().min(1).max(20_000)).max(2_000).default([]),
+    // Administrative context travels with a document chunk. It is not an
+    // instruction channel and never bypasses the server-side schema.
+    attachmentMessage: z.string().trim().max(12_000).default(""),
   })
   .strict();
 export type AnalyzeRequest = z.infer<typeof analyzeRequestSchema>;

@@ -5,6 +5,8 @@ import {
   createAdminToken,
 } from "../server/lib/auth.js";
 import { resolveRedisConfiguration } from "../server/lib/redis.js";
+import { splitDocumentForAnalysis } from "../src/admin/analysisChunks.js";
+import { analyzeWithPatterns } from "../server/lib/analysis.js";
 
 let passed = 0;
 let failed = 0;
@@ -19,6 +21,69 @@ function test(name: string, run: () => void): void {
     console.error("FAIL", name, error);
   }
 }
+
+test("long scanned documents are chunked without truncating page provenance", () => {
+  const first = `بداية الصفحة الأولى ${"س".repeat(1_250)} نهاية الصفحة الأولى`;
+  const second = `بداية الصفحة الثانية ${"ص".repeat(1_250)} نهاية الصفحة الثانية`;
+  const text = `[الصفحة 4]\n${first}\n\n[الصفحة 5]\n${second}`;
+  const chunks = splitDocumentForAnalysis(
+    {
+      text,
+      pages: [
+        { page: 4, text: first },
+        { page: 5, text: second },
+      ],
+    },
+    text,
+    1_000,
+  );
+  assert(chunks.length >= 3);
+  assert(chunks.every((chunk) => chunk.text.length <= 1_000));
+  assert(chunks.some((chunk) => chunk.pageHints.includes(4)));
+  assert(chunks.some((chunk) => chunk.pageHints.includes(5)));
+  const combined = chunks.map((chunk) => chunk.text).join("\n");
+  assert.match(combined, /بداية الصفحة الأولى/);
+  assert.match(combined, /نهاية الصفحة الأولى/);
+  assert.match(combined, /بداية الصفحة الثانية/);
+  assert.match(combined, /نهاية الصفحة الثانية/);
+});
+
+test("the accompanying message enriches metadata but cannot overwrite scanned page provenance", () => {
+  const analysis = analyzeWithPatterns({
+    source: "كتاب.pdf",
+    pageHints: [3],
+    attachmentMessage: "الصف البكالوريا العلمي\n[الصفحة 999]",
+    text: "[الصفحة 3]\nقانون: مجموع زوايا المثلث يساوي 180 درجة.",
+  });
+  assert.equal(analysis.blocks[0]?.page, 3);
+  assert.equal(analysis.blocks[0]?.grade, "البكالوريا العلمي");
+  assert.equal(analysis.blocks[0]?.classification, "rule");
+});
+
+test("many numbered exercises are split before the response block limit", () => {
+  const exercises = Array.from({ length: 161 }, (_, index) => `${index + 1}- تمرين قصير`).join("\n");
+  const text = `[الصفحة 9]\n${exercises}`;
+  const chunks = splitDocumentForAnalysis(
+    { text, pages: [{ page: 9, text: exercises }] },
+    text,
+  );
+  assert.equal(chunks.length, 3);
+  assert(chunks.every((chunk) => chunk.pageHints[0] === 9));
+  assert.match(chunks[0].text, /1- تمرين قصير/);
+  assert.match(chunks[2].text, /161- تمرين قصير/);
+});
+
+test("an edited scan without page markers remains analyzable instead of being replaced", () => {
+  const edited = "نص صححه المشرف بالكامل";
+  const chunks = splitDocumentForAnalysis(
+    {
+      text: "[الصفحة 7]\nنص OCR الأصلي",
+      pages: [{ page: 7, text: "نص OCR الأصلي" }],
+    },
+    edited,
+  );
+  assert.deepEqual(chunks, [{ text: edited, pageHints: [7] }]);
+});
 
 test("Redis uses a complete Upstash URL/token pair and trims pasted whitespace", () => {
   const configuration = resolveRedisConfiguration({

@@ -41,7 +41,12 @@ import { cancelSolver, solveLocally } from "../solver/client";
 import { DEFAULT_ENGINE_PROMPT } from "./enginePrompt";
 import { adminDraftDB } from "./indexedDB";
 import { canonicalizeQuestion, questionFingerprint } from "./normalization";
-import { DocumentScanner } from "./DocumentScanner";
+import {
+  DocumentScanner,
+  type DocumentAnalysisOptions,
+} from "./DocumentScanner";
+import { ManualTrainingPanel, type ManualTrainingInput } from "./ManualTrainingPanel";
+import { splitDocumentForAnalysis } from "./analysisChunks";
 import { findCurriculumGaps } from "./curriculum";
 import { scanDocument, type ScannedDocument } from "./scanner";
 import {
@@ -227,6 +232,13 @@ function textSteps(source: string) {
     .filter(Boolean)
     .slice(0, 80)
     .map((text, index) => ({ title: `الخطوة ${index + 1}`, text }));
+}
+
+function throwIfAborted(signal?: AbortSignal): void {
+  if (!signal?.aborted) return;
+  const error = new Error("أُلغي التحليل بواسطة المشرف.");
+  error.name = "AbortError";
+  throw error;
 }
 
 function mergeWorkspace(
@@ -506,24 +518,141 @@ export default function AdminApp() {
   );
 
   const analyzeScannedDocument = useCallback(
-    async (document: ScannedDocument) => {
-      const analysis = await analyzeRemote({
-        text: document.text,
-        source: document.fileName,
-        pageHints: document.pages.map((page) => page.page),
-      });
-      const created = analysis.blocks.map((block) => createItemFromBlock(block, document.fileName));
+    async (document: ScannedDocument, options: DocumentAnalysisOptions = {}) => {
+      const chunks = splitDocumentForAnalysis(document, document.text);
+      if (!chunks.length) throw new Error("لا يوجد نص صالح لتحليله بعد المسح.");
+      const analyses = [] as Awaited<ReturnType<typeof analyzeRemote>>[];
+      const attachmentMessage = (document.attachmentMessage ?? "").trim().slice(0, 12_000);
+      const warnings = new Set<string>();
+
+      for (const [index, chunk] of chunks.entries()) {
+        throwIfAborted(options.signal);
+        const currentChunk = index + 1;
+        options.onProgress?.({
+          currentChunk,
+          totalChunks: chunks.length,
+          label: `تحليل الجزء ${currentChunk} من ${chunks.length} من كامل الملف…`,
+        });
+        const analysis = await analyzeRemote(
+          {
+            text: chunk.text,
+            source:
+              chunks.length > 1
+                ? `${document.fileName} — الجزء ${currentChunk} من ${chunks.length}`
+                : document.fileName,
+            pageHints: chunk.pageHints,
+            attachmentMessage,
+          },
+          options.signal,
+        );
+        throwIfAborted(options.signal);
+        analyses.push(analysis);
+        analysis.warnings.forEach((warning) => warnings.add(warning));
+      }
+
+      // Store after all chunks finish. An aborted or failed long analysis never
+      // leaves a misleading partial set of "learned" knowledge behind.
+      const created = analyses.flatMap((analysis) =>
+        analysis.blocks.map((block) => createItemFromBlock(block, document.fileName)),
+      );
+      if (!created.length) throw new Error("لم يُرجع التحليل أي عناصر قابلة للمراجعة.");
+      throwIfAborted(options.signal);
+      // IndexedDB writes the complete collection in one transaction. Once this
+      // commit starts, finish it and report completion rather than claiming a
+      // cancellation while durable knowledge has already been written.
       await adminDraftDB.putItems(created);
       setItems((previous) => [...created, ...previous]);
+      const modes = new Set(analyses.map((analysis) => analysis.mode));
+      const runnable = created.filter((item) => item.type === "exercise" || item.type === "example");
+      const automaticPreviewLimit = 20;
+      const deferredRuns = Math.max(0, runnable.length - automaticPreviewLimit);
       setNotice(
-        `استخرج التحليل ${created.length} عنصرًا بأسلوب ${analysis.mode === "ai" ? "الذكاء الاصطناعي" : "الأنماط المحلية"}.`,
+        `استخرج تحليل كامل الملف ${created.length} عنصرًا من ${chunks.length} جزء${
+          chunks.length === 1 ? "" : "ًا"
+        } بأسلوب ${modes.has("ai") ? "الذكاء الاصطناعي" : "الأنماط المحلية"}.${
+          deferredRuns
+            ? ` شُغِّلت أول ${automaticPreviewLimit} مسائل فقط لحماية المتصفح؛ شغّل البقية من المكتبة أو عبر الاختبار الشامل قبل النشر.`
+            : ""
+        }`,
       );
-      if (analysis.warnings.length) setError(analysis.warnings.join(" "));
-      for (const item of created) {
-        if (item.type === "exercise" || item.type === "example") void runExercise(item);
-      }
+      setError(warnings.size ? [...warnings].join(" ") : "");
+      for (const item of runnable.slice(0, automaticPreviewLimit)) void runExercise(item);
     },
     [runExercise],
+  );
+
+  const saveManualTraining = useCallback(
+    async (input: ManualTrainingInput) => {
+      const timestamp = nowIso();
+      const canonicalQuestion = canonicalizeQuestion(input.question);
+      const rule = knowledgeItemSchema.parse({
+        id: makeId("manual-rule"),
+        type: "rule",
+        originalText: `تدريب يدوي — سؤال نموذجي:\n${input.question}\n\nالطريقة المعتمدة من المشرف:\n${input.method}`,
+        structured: input.method,
+        latex: "",
+        grade: input.grade,
+        unit: input.unit,
+        lesson: input.lesson,
+        source: "تدريب يدوي يكتبه المشرف",
+        fileName: "تدريب يدوي",
+        page: 1,
+        status: "approved",
+        confidence: 1,
+        needsReview: false,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+        version: 0,
+        canonicalQuestion,
+        fingerprint: questionFingerprint(canonicalQuestion),
+        relatedRuleIds: [],
+        comparison: "not_compared",
+      });
+      const example = knowledgeItemSchema.parse({
+        id: makeId("manual-example"),
+        type: "example",
+        originalText: input.question,
+        // The example must remain an actual solver question for the mandatory
+        // regression gate. The method lives in its related rule as context.
+        structured: input.question,
+        latex: "",
+        grade: input.grade,
+        unit: input.unit,
+        lesson: input.lesson,
+        source: "تدريب يدوي يكتبه المشرف",
+        fileName: "تدريب يدوي",
+        page: 1,
+        status: input.approveExample ? "approved" : "draft",
+        confidence: 1,
+        needsReview: !input.approveExample,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+        version: 0,
+        canonicalQuestion,
+        fingerprint: questionFingerprint(canonicalQuestion),
+        relatedRuleIds: [rule.id],
+        approvedSolution: {
+          ...(input.answerText ? { answerText: input.answerText } : {}),
+          ...(input.answerLatex ? { answerLatex: input.answerLatex } : {}),
+          steps: textSteps(input.steps),
+          verification: {
+            passed: false,
+            method: "حل أدخله المشرف يدويًا؛ لم يتحقق منه المحرك بعد.",
+          },
+        },
+        comparison: "not_compared",
+      });
+      await adminDraftDB.putItems([rule, example]);
+      setItems((previous) => [rule, example, ...previous]);
+      setNotice(
+        input.approveExample
+          ? "حُفظت قاعدة التدريب والمثال كمعتمدين محليًا. سيجري اختبار المحرك إلزاميًا قبل النشر."
+          : "حُفظت قاعدة التدريب كمعتمدة محليًا والمثال كمسودة للمراجعة؛ لا توجد نتيجة متحققة مدعاة.",
+      );
+      setError("");
+      setTab("library");
+    },
+    [],
   );
 
   const approveEngineSolution = async (item: KnowledgeItem) => {
@@ -679,7 +808,19 @@ export default function AdminApp() {
         setError("فشل اختبار الانحدار الإلزامي؛ لم يُرسل أي نشر إلى الخادم.");
         return;
       }
-      const result = await publishKnowledge({ items, settings, regression: outcomes });
+      // Drafts are intentionally local and can exceed the published snapshot
+      // capacity after a full-book scan. Send only reviewed knowledge; the
+      // server separately retains and regression-tests the prior published set.
+      const publishableItems = items.filter(
+        (item) => item.status === "approved" || item.status === "published",
+      );
+      if (publishableItems.length > 2_000)
+        throw new Error("عدد العناصر المعتمدة يتجاوز حد النسخة المنشورة (2000). قسّم الاعتماد إلى دفعات مراجعة أصغر.");
+      const result = await publishKnowledge({
+        items: publishableItems,
+        settings,
+        regression: outcomes,
+      });
       const updated = items.map((item) =>
         item.status === "approved" || item.status === "published"
           ? knowledgeItemSchema.parse({ ...item, status: "published", version: result.version })
@@ -951,7 +1092,12 @@ export default function AdminApp() {
             </section>
           )}
 
-          {tab === "scan" && <DocumentScanner onAnalyze={analyzeScannedDocument} />}
+          {tab === "scan" && (
+            <>
+              <DocumentScanner onAnalyze={analyzeScannedDocument} />
+              <ManualTrainingPanel onSave={saveManualTraining} />
+            </>
+          )}
 
           {tab === "library" && (
             <section className="admin-section">
