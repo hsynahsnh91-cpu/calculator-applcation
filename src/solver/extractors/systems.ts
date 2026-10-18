@@ -1,6 +1,6 @@
-import { canonical, math, parseExpression } from "../math";
-import { ClarificationError, type SolverContext } from "../types";
-import { mathFragments } from "./index";
+import { canonical, math, parseExpression } from "../math.js";
+import { ClarificationError, type SolverContext } from "../types.js";
+import { mathFragments } from "./index.js";
 
 /** Linear systems are extracted as a group, not solved as unrelated equations. */
 export function extractLinearSystem(text: string, context: SolverContext) {

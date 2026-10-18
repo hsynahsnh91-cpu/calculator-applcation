@@ -1,6 +1,6 @@
-import { parsePrompt } from "./parser";
-import { routePrompt, selectEngines } from "./router";
-import { clarificationChoices, composeAnswer } from "./composer";
+import { parsePrompt } from "./parser.js";
+import { routePrompt, selectEngines } from "./router.js";
+import { clarificationChoices, composeAnswer } from "./composer.js";
 import {
   ClarificationError,
   type Candidate,
@@ -9,7 +9,7 @@ import {
   type SolverProgress,
   type SolverResult,
   type UnsolvedPart,
-} from "./types";
+} from "./types.js";
 
 /** Independent requests run together; successive groups consume the previous context patch. */
 export async function solvePrompt(
@@ -40,7 +40,7 @@ export async function solvePrompt(
       performance.now() - started,
     );
   progress?.({ stage: "analyzing", engines: [] });
-  const { runEngine } = await import("./runners");
+  const { runEngine } = await import("./runners.js");
   for (let request of parsed.requests.slice(0, 12)) {
     context = parsePrompt(request, context).context;
     if (

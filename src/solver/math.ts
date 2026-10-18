@@ -1,10 +1,10 @@
 import { all, create, type MathNode } from "mathjs";
-import type { AngleMode } from "../types";
+import type { AngleMode } from "../types/index.js";
 import {
   ClarificationError,
   type CurveSeries,
   type Verification,
-} from "./types";
+} from "./types.js";
 export const math = create(all, { number: "number" });
 const FUNCTIONS = new Set([
   "sin",

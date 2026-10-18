@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { EngineId } from "../solver/types";
+import type { EngineId } from "../solver/types.js";
 
 /**
  * The admin and API layers share these schemas.  Data is always parsed before
@@ -185,6 +185,9 @@ export const analyzeRequestSchema = z
     text: z.string().trim().min(1).max(120_000),
     source: z.string().trim().min(1).max(500),
     pageHints: z.array(z.number().int().min(1).max(20_000)).max(2_000).default([]),
+    // Administrative context travels with a document chunk. It is not an
+    // instruction channel and never bypasses the server-side schema.
+    attachmentMessage: z.string().trim().max(12_000).default(""),
   })
   .strict();
 export type AnalyzeRequest = z.infer<typeof analyzeRequestSchema>;
@@ -203,8 +206,8 @@ export const publishRequestSchema = z
   .object({
     items: z.array(knowledgeItemSchema).max(2_000),
     settings: solverSettingsSchema,
+    /** Fresh outcomes from the mandatory comprehensive regression run. */
     regression: z.array(regressionOutcomeSchema).max(2_000),
-    force: z.boolean().default(false),
   })
   .strict();
 export type PublishRequest = z.infer<typeof publishRequestSchema>;

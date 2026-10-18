@@ -4,8 +4,8 @@ import {
   normalizeMathDialect,
   splitPromptRequests,
   hasMathInstruction,
-} from "./textbook";
-import { emptyContext, type ParsedPrompt, type SolverContext } from "./types";
+} from "./textbook.js";
+import { emptyContext, type ParsedPrompt, type SolverContext } from "./types.js";
 
 export function normalizeDigits(source: string): string {
   return source

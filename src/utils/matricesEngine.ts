@@ -1,5 +1,5 @@
-import { MatrixSolution } from '../types';
-import { tex } from './equationSolver';
+import { MatrixSolution } from '../types/index.js';
+import { tex } from './equationSolver.js';
 import { eigs } from 'mathjs';
 
 // ---------- Gauss / Gauss–Jordan elimination with every row operation recorded ----------

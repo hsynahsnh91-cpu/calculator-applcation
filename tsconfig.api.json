@@ -1,6 +1,6 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["api/**/*.ts"],
+  "include": ["api/**/*.ts", "server/**/*.ts"],
   "compilerOptions": {
     "noEmit": true
   }

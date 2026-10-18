@@ -1,7 +1,7 @@
 import nerdamer from "nerdamer";
 import type { MathNode } from "mathjs";
-import { math, canonical, parseExpression } from "../solver/math";
-import { ClarificationError, type Verification } from "../solver/types";
+import { math, canonical, parseExpression } from "../solver/math.js";
+import { ClarificationError, type Verification } from "../solver/types.js";
 
 export interface Pair {
   r: string;

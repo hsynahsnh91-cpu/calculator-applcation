@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { analyzeRequestSchema } from "../src/admin/types";
-import { requireAdmin, requireTrustedOrigin } from "./_lib/auth";
-import { analyzeDocument } from "./_lib/analysis";
-import { methodNotAllowed, readJsonBody, sendJson } from "./_lib/http";
+import { analyzeRequestSchema } from "../../src/admin/types.js";
+import { requireAdmin, requireTrustedOrigin } from "../lib/auth.js";
+import { analyzeDocument } from "../lib/analysis.js";
+import { methodNotAllowed, readJsonBody, sendJson } from "../lib/http.js";
 
 export const config = { maxDuration: 30 };
 

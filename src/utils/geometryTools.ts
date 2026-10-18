@@ -1,4 +1,4 @@
-import type { WorkStep, V3, Plane } from './geometryEngine';
+import type { WorkStep, V3, Plane } from './geometryEngine.js';
 export type SolidId = 'cube' | 'cuboid' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'triangularPrism';
 export interface SolidMetric { label: string; value: number; latex: string }
 const fmt = (n: number) => String(Number(n.toPrecision(8)));

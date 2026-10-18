@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { isAdminRequest } from "./_lib/auth";
-import { methodNotAllowed, sendJson } from "./_lib/http";
+import { isAdminRequest } from "../lib/auth.js";
+import { methodNotAllowed, sendJson } from "../lib/http.js";
 
 export default async function handler(
   request: VercelRequest,

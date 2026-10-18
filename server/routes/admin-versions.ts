@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
-import { requireAdmin, requireTrustedOrigin } from "./_lib/auth";
-import { methodNotAllowed, readJsonBody, sendJson } from "./_lib/http";
-import { listVersions, rollbackToVersion } from "./_lib/knowledgeStore";
+import { requireAdmin, requireTrustedOrigin } from "../lib/auth.js";
+import { methodNotAllowed, readJsonBody, sendJson } from "../lib/http.js";
+import { listVersions, rollbackToVersion } from "../lib/knowledgeStore.js";
 
 const rollbackSchema = z.object({ version: z.number().int().positive() }).strict();
 

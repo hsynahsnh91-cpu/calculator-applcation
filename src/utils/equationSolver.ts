@@ -1,5 +1,5 @@
-import { EquationSolution } from '../types';
-import { decimalToFraction, fractionToLatex } from './mathEngine';
+import { EquationSolution } from '../types/index.js';
+import { decimalToFraction, fractionToLatex } from './mathEngine.js';
 
 type Root = EquationSolution['roots'][number];
 type Step = EquationSolution['steps'][number];

@@ -1,10 +1,10 @@
-import { isComplexIntent } from "./complexTypes";
+import { isComplexIntent } from "./complexTypes.js";
 import {
   ENGINE_LABELS,
   type Candidate,
   type EngineId,
   type SolverContext,
-} from "./types";
+} from "./types.js";
 
 /** Transparent keyword/shape scoring. No remote service or learned intent classifier. */
 export function routePrompt(

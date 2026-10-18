@@ -1,5 +1,5 @@
-import type { DrawMode } from "../utils/probabilityEngine";
-import type { SolverResult } from "./types";
+import type { DrawMode } from "../utils/probabilityEngine.js";
+import type { SolverResult } from "./types.js";
 
 export type ProbabilityComparison = "eq" | "ge" | "gt" | "le" | "lt";
 export interface UrnModel {

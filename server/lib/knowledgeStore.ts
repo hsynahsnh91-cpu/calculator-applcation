@@ -6,8 +6,8 @@ import {
   type SolverSettings,
   type VersionSummary,
   versionSummarySchema,
-} from "../../src/admin/types";
-import { RedisKey, redis } from "./redis";
+} from "../../src/admin/types.js";
+import { RedisKey, redis } from "./redis.js";
 
 const MAX_SNAPSHOT_BYTES = 2_000_000;
 const MAX_VERSION_LIST = 100;

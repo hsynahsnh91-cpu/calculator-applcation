@@ -144,6 +144,7 @@ export const AnswerBubble = memo(function AnswerBubble({
           (answer.knowledge.relatedRules?.length ?? 0) > 0 && (
             <details className="knowledge-rules" open>
               <summary>قواعد مرتبطة من المكتبة المعرفية</summary>
+              <p>مرجع تعليمي لمسألة شبيهة؛ الجواب أعلاه حُسب بالمحرك ولا يُعد حلًا محفوظًا إلا عند المطابقة المعتمدة.</p>
               <ul>
                 {answer.knowledge.relatedRules?.map((rule) => (
                   <li key={rule.id}>{rule.text}</li>

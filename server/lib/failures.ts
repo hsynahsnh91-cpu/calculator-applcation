@@ -1,5 +1,5 @@
-import { failureRecordSchema, type FailureRecord } from "../../src/admin/types";
-import { RedisKey, redis } from "./redis";
+import { failureRecordSchema, type FailureRecord } from "../../src/admin/types.js";
+import { RedisKey, redis } from "./redis.js";
 
 export async function listedFailures(limit = 100): Promise<FailureRecord[]> {
   const client = redis();

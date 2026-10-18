@@ -1,4 +1,4 @@
-import type { SolverResult } from "./types";
+import type { SolverResult } from "./types.js";
 
 export type ComplexOperation =
   | "forms"

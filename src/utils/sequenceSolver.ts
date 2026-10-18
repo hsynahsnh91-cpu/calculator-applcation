@@ -1,5 +1,5 @@
-import { SequenceSolution } from '../types';
-import { tex, poly } from './equationSolver';
+import { SequenceSolution } from '../types/index.js';
+import { tex, poly } from './equationSolver.js';
 
 type Step = SequenceSolution['steps'][number];
 type Term = SequenceSolution['firstTerms'][number];

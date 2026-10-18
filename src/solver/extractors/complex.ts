@@ -1,8 +1,8 @@
-import { mathInstructionText } from "../textbook";
-import { math, canonical, parseExpression } from "../math";
-import { mathFragments } from "./index";
-import { ClarificationError, type SolverContext } from "../types";
-import type { ComplexRequest } from "../complexTypes";
+import { mathInstructionText } from "../textbook.js";
+import { math, canonical, parseExpression } from "../math.js";
+import { mathFragments } from "./index.js";
+import { ClarificationError, type SolverContext } from "../types.js";
+import type { ComplexRequest } from "../complexTypes.js";
 
 const LABEL = /\b(z(?:_[A-Z]|[1-9])?|omega|theta|power|[abcdnkrw])\s*=\s*/g;
 const clean = (value: string) =>

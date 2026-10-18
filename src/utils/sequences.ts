@@ -1,6 +1,6 @@
-import { solveArithmeticSequence, solveGeometricSequence, solveRecurrenceType1 } from './sequenceSolver';
-import type { SequenceInput } from '../solver/extractors';
-import type { Verification } from '../solver/types';
+import { solveArithmeticSequence, solveGeometricSequence, solveRecurrenceType1 } from './sequenceSolver.js';
+import type { SequenceInput } from '../solver/extractors/index.js';
+import type { Verification } from '../solver/types.js';
 export { solveArithmeticSequence, solveGeometricSequence, solveRecurrenceType1 };
 export function solveSequence(input: SequenceInput) {
   const solution = input.kind === 'recurrence'

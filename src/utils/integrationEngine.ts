@@ -12,9 +12,9 @@
 
 import nerdamer from 'nerdamer';
 import { create, all } from 'mathjs';
-import { normalizeExpr, validateRealIntegralDomain } from './calculusEngine';
-import { cleanMathLatex } from '../components/common/Tex';
-import { tex } from './equationSolver';
+import { normalizeExpr, validateRealIntegralDomain } from './calculusEngine.js';
+import { cleanMathLatex } from '../components/common/Tex.js';
+import { tex } from './equationSolver.js';
 import {
   planSeriesIntegrand,
   integrateSeries,
@@ -23,7 +23,7 @@ import {
   evaluateDefiniteSeries,
   seriesConvergesOn,
   type SeriesKind
-} from './seriesEngine';
+} from './seriesEngine.js';
 
 // mathjs instance for general calculus helpers
 create(all, { number: 'number' });

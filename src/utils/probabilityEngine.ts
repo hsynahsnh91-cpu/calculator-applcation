@@ -1,5 +1,5 @@
 import { erf as mathErf } from 'mathjs';
-import { DescriptiveStatsResult } from '../types';
+import { DescriptiveStatsResult } from '../types/index.js';
 // exact arithmetic helpers reused by the random-variable module
 
 // Safe LaTeX for any number: huge values become a × 10^b instead of "1.5e+306"

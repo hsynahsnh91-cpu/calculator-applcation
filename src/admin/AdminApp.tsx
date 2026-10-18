@@ -41,9 +41,18 @@ import { cancelSolver, solveLocally } from "../solver/client";
 import { DEFAULT_ENGINE_PROMPT } from "./enginePrompt";
 import { adminDraftDB } from "./indexedDB";
 import { canonicalizeQuestion, questionFingerprint } from "./normalization";
-import { DocumentScanner } from "./DocumentScanner";
+import {
+  DocumentScanner,
+  type DocumentAnalysisOptions,
+} from "./DocumentScanner";
+import { ManualTrainingPanel, type ManualTrainingInput } from "./ManualTrainingPanel";
+import { splitDocumentForAnalysis } from "./analysisChunks";
 import { findCurriculumGaps } from "./curriculum";
 import { scanDocument, type ScannedDocument } from "./scanner";
+import {
+  approvedSolutionFromAnswer,
+  approvedSolutionsMatch,
+} from "../knowledge/regression";
 import {
   AdminApiError,
   adminLogin,
@@ -62,7 +71,6 @@ import {
   type AdminStatistics,
 } from "./api";
 import {
-  approvedSolutionSchema,
   defaultSolverSettings,
   errorAnalysisSchema,
   knowledgeItemSchema,
@@ -177,45 +185,6 @@ function createItemFromBlock(block: AnalysisBlock, source: string): KnowledgeIte
   });
 }
 
-function solutionFromAnswer(answer: SolverAnswer): ApprovedSolution | undefined {
-  if (!answer.results.length) return undefined;
-  const primary = answer.results[0];
-  const parsed = approvedSolutionSchema.safeParse({
-    answerText: primary.note || undefined,
-    answerLatex: primary.finalLatex,
-    steps: answer.results.flatMap((result) =>
-      result.steps.map((step) => ({
-        title: step.title,
-        ...(step.text ? { text: step.text } : {}),
-        latex: step.latex,
-      })),
-    ),
-    verification: {
-      passed: primary.verification.passed,
-      method: primary.verification.method,
-    },
-    elapsedMs: answer.elapsedMs,
-  });
-  return parsed.success ? parsed.data : undefined;
-}
-
-function solutionKey(solution: ApprovedSolution | undefined): string {
-  if (!solution) return "";
-  return canonicalizeQuestion(solution.answerLatex || solution.answerText || "");
-}
-
-function compareSolutions(
-  engineSolution: ApprovedSolution | undefined,
-  bookSolution: ApprovedSolution | undefined,
-): KnowledgeItem["comparison"] {
-  if (!bookSolution) return "not_compared";
-  const engineKey = solutionKey(engineSolution);
-  const bookKey = solutionKey(bookSolution);
-  // Exact normalized equality only. Different equivalent-looking mathematics is
-  // deliberately left for a human review rather than claimed as a match.
-  return engineKey && bookKey && engineKey === bookKey ? "matching" : "needs_review";
-}
-
 function inferCorrectionAnalysis(
   item: KnowledgeItem,
   wrongSolution: ApprovedSolution | undefined,
@@ -263,6 +232,13 @@ function textSteps(source: string) {
     .filter(Boolean)
     .slice(0, 80)
     .map((text, index) => ({ title: `الخطوة ${index + 1}`, text }));
+}
+
+function throwIfAborted(signal?: AbortSignal): void {
+  if (!signal?.aborted) return;
+  const error = new Error("أُلغي التحليل بواسطة المشرف.");
+  error.name = "AbortError";
+  throw error;
 }
 
 function mergeWorkspace(
@@ -511,10 +487,14 @@ export default function AdminApp() {
           () => undefined,
           controller.signal,
         );
-        const solution = solutionFromAnswer(answer);
+        const solution = approvedSolutionFromAnswer(answer);
         const run: ExerciseRun = { state: "complete", answer, ...(solution ? { solution } : {}) };
         setRuns((previous) => ({ ...previous, [item.id]: run }));
-        const comparison = compareSolutions(solution, item.bookSolution);
+        const comparison = item.bookSolution
+          ? approvedSolutionsMatch(solution, item.bookSolution)
+            ? "matching"
+            : "needs_review"
+          : "not_compared";
         const updated = knowledgeItemSchema.parse({
           ...item,
           ...(solution ? { approvedSolution: solution } : {}),
@@ -538,24 +518,141 @@ export default function AdminApp() {
   );
 
   const analyzeScannedDocument = useCallback(
-    async (document: ScannedDocument) => {
-      const analysis = await analyzeRemote({
-        text: document.text,
-        source: document.fileName,
-        pageHints: document.pages.map((page) => page.page),
-      });
-      const created = analysis.blocks.map((block) => createItemFromBlock(block, document.fileName));
+    async (document: ScannedDocument, options: DocumentAnalysisOptions = {}) => {
+      const chunks = splitDocumentForAnalysis(document, document.text);
+      if (!chunks.length) throw new Error("لا يوجد نص صالح لتحليله بعد المسح.");
+      const analyses = [] as Awaited<ReturnType<typeof analyzeRemote>>[];
+      const attachmentMessage = (document.attachmentMessage ?? "").trim().slice(0, 12_000);
+      const warnings = new Set<string>();
+
+      for (const [index, chunk] of chunks.entries()) {
+        throwIfAborted(options.signal);
+        const currentChunk = index + 1;
+        options.onProgress?.({
+          currentChunk,
+          totalChunks: chunks.length,
+          label: `تحليل الجزء ${currentChunk} من ${chunks.length} من كامل الملف…`,
+        });
+        const analysis = await analyzeRemote(
+          {
+            text: chunk.text,
+            source:
+              chunks.length > 1
+                ? `${document.fileName} — الجزء ${currentChunk} من ${chunks.length}`
+                : document.fileName,
+            pageHints: chunk.pageHints,
+            attachmentMessage,
+          },
+          options.signal,
+        );
+        throwIfAborted(options.signal);
+        analyses.push(analysis);
+        analysis.warnings.forEach((warning) => warnings.add(warning));
+      }
+
+      // Store after all chunks finish. An aborted or failed long analysis never
+      // leaves a misleading partial set of "learned" knowledge behind.
+      const created = analyses.flatMap((analysis) =>
+        analysis.blocks.map((block) => createItemFromBlock(block, document.fileName)),
+      );
+      if (!created.length) throw new Error("لم يُرجع التحليل أي عناصر قابلة للمراجعة.");
+      throwIfAborted(options.signal);
+      // IndexedDB writes the complete collection in one transaction. Once this
+      // commit starts, finish it and report completion rather than claiming a
+      // cancellation while durable knowledge has already been written.
       await adminDraftDB.putItems(created);
       setItems((previous) => [...created, ...previous]);
+      const modes = new Set(analyses.map((analysis) => analysis.mode));
+      const runnable = created.filter((item) => item.type === "exercise" || item.type === "example");
+      const automaticPreviewLimit = 20;
+      const deferredRuns = Math.max(0, runnable.length - automaticPreviewLimit);
       setNotice(
-        `استخرج التحليل ${created.length} عنصرًا بأسلوب ${analysis.mode === "ai" ? "الذكاء الاصطناعي" : "الأنماط المحلية"}.`,
+        `استخرج تحليل كامل الملف ${created.length} عنصرًا من ${chunks.length} جزء${
+          chunks.length === 1 ? "" : "ًا"
+        } بأسلوب ${modes.has("ai") ? "الذكاء الاصطناعي" : "الأنماط المحلية"}.${
+          deferredRuns
+            ? ` شُغِّلت أول ${automaticPreviewLimit} مسائل فقط لحماية المتصفح؛ شغّل البقية من المكتبة أو عبر الاختبار الشامل قبل النشر.`
+            : ""
+        }`,
       );
-      if (analysis.warnings.length) setError(analysis.warnings.join(" "));
-      for (const item of created) {
-        if (item.type === "exercise" || item.type === "example") void runExercise(item);
-      }
+      setError(warnings.size ? [...warnings].join(" ") : "");
+      for (const item of runnable.slice(0, automaticPreviewLimit)) void runExercise(item);
     },
     [runExercise],
+  );
+
+  const saveManualTraining = useCallback(
+    async (input: ManualTrainingInput) => {
+      const timestamp = nowIso();
+      const canonicalQuestion = canonicalizeQuestion(input.question);
+      const rule = knowledgeItemSchema.parse({
+        id: makeId("manual-rule"),
+        type: "rule",
+        originalText: `تدريب يدوي — سؤال نموذجي:\n${input.question}\n\nالطريقة المعتمدة من المشرف:\n${input.method}`,
+        structured: input.method,
+        latex: "",
+        grade: input.grade,
+        unit: input.unit,
+        lesson: input.lesson,
+        source: "تدريب يدوي يكتبه المشرف",
+        fileName: "تدريب يدوي",
+        page: 1,
+        status: "approved",
+        confidence: 1,
+        needsReview: false,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+        version: 0,
+        canonicalQuestion,
+        fingerprint: questionFingerprint(canonicalQuestion),
+        relatedRuleIds: [],
+        comparison: "not_compared",
+      });
+      const example = knowledgeItemSchema.parse({
+        id: makeId("manual-example"),
+        type: "example",
+        originalText: input.question,
+        // The example must remain an actual solver question for the mandatory
+        // regression gate. The method lives in its related rule as context.
+        structured: input.question,
+        latex: "",
+        grade: input.grade,
+        unit: input.unit,
+        lesson: input.lesson,
+        source: "تدريب يدوي يكتبه المشرف",
+        fileName: "تدريب يدوي",
+        page: 1,
+        status: input.approveExample ? "approved" : "draft",
+        confidence: 1,
+        needsReview: !input.approveExample,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+        version: 0,
+        canonicalQuestion,
+        fingerprint: questionFingerprint(canonicalQuestion),
+        relatedRuleIds: [rule.id],
+        approvedSolution: {
+          ...(input.answerText ? { answerText: input.answerText } : {}),
+          ...(input.answerLatex ? { answerLatex: input.answerLatex } : {}),
+          steps: textSteps(input.steps),
+          verification: {
+            passed: false,
+            method: "حل أدخله المشرف يدويًا؛ لم يتحقق منه المحرك بعد.",
+          },
+        },
+        comparison: "not_compared",
+      });
+      await adminDraftDB.putItems([rule, example]);
+      setItems((previous) => [rule, example, ...previous]);
+      setNotice(
+        input.approveExample
+          ? "حُفظت قاعدة التدريب والمثال كمعتمدين محليًا. سيجري اختبار المحرك إلزاميًا قبل النشر."
+          : "حُفظت قاعدة التدريب كمعتمدة محليًا والمثال كمسودة للمراجعة؛ لا توجد نتيجة متحققة مدعاة.",
+      );
+      setError("");
+      setTab("library");
+    },
+    [],
   );
 
   const approveEngineSolution = async (item: KnowledgeItem) => {
@@ -624,11 +721,11 @@ export default function AdminApp() {
   };
 
   const comprehensiveTest = useCallback(async (): Promise<RegressionOutcome[]> => {
+    // An approved item without an answer is a real regression too; never skip it.
     const testable = items.filter(
       (item) =>
         ["approved", "published"].includes(item.status) &&
-        ["example", "exercise", "correction"].includes(item.type) &&
-        Boolean(item.approvedSolution),
+        ["example", "exercise", "correction"].includes(item.type),
     );
     const controller = new AbortController();
     regressionAbort.current?.abort();
@@ -640,6 +737,16 @@ export default function AdminApp() {
       for (const item of testable) {
         if (controller.signal.aborted) throw new DOMException("أُلغي الاختبار الشامل.", "AbortError");
         const started = performance.now();
+        if (!item.approvedSolution) {
+          outcomes.push({
+            itemId: item.id,
+            passed: false,
+            elapsedMs: 0,
+            message: "العنصر المعتمد لا يحتوي حلًا معتمدًا صالحًا ليُقارن بالمحرك.",
+          });
+          setRegression([...outcomes]);
+          continue;
+        }
         try {
           const answer = await solveLocally(
             item.structured || item.originalText,
@@ -651,8 +758,8 @@ export default function AdminApp() {
             () => undefined,
             controller.signal,
           );
-          const actual = solutionFromAnswer(answer);
-          const passed = compareSolutions(actual, item.approvedSolution) === "matching";
+          const actual = approvedSolutionFromAnswer(answer);
+          const passed = approvedSolutionsMatch(actual, item.approvedSolution);
           outcomes.push({
             itemId: item.id,
             passed,
@@ -671,8 +778,15 @@ export default function AdminApp() {
         }
         setRegression([...outcomes]);
       }
-      if (!testable.length) setNotice("لا توجد أمثلة أو تمارين معتمدة تحتوي حلًا لاختبارها بعد.");
-      else setNotice(`اكتمل اختبار ${testable.length} عنصرًا فعليًا على المحرك الموحد.`);
+      if (!testable.length) setNotice("لا توجد أمثلة أو تمارين أو تصحيحات معتمدة لاختبارها بعد.");
+      else {
+        const failed = outcomes.filter((outcome) => !outcome.passed).length;
+        setNotice(
+          failed
+            ? `اكتمل الاختبار الشامل مع ${failed} إخفاقات؛ سيبقى النشر مقفلاً حتى إصلاحها.`
+            : `اكتمل اختبار ${testable.length} عنصرًا فعليًا على المحرك الموحد دون انحدار.`,
+        );
+      }
       return outcomes;
     } finally {
       if (regressionAbort.current === controller) regressionAbort.current = null;
@@ -680,14 +794,33 @@ export default function AdminApp() {
     }
   }, [items, settings]);
 
-  const publish = async (force = false) => {
+  const publish = async () => {
     if (publishing) return;
     setPublishing(true);
     setError("");
     setPublishMessage("");
     try {
-      const outcomes = force && regression.length ? regression : await comprehensiveTest();
-      const result = await publishKnowledge({ items, settings, regression: outcomes, force });
+      // A fresh complete test is mandatory for every publish; cached reports are never reused.
+      const outcomes = await comprehensiveTest();
+      const failures = outcomes.filter((outcome) => !outcome.passed);
+      if (failures.length) {
+        setPublishFailures(failures);
+        setError("فشل اختبار الانحدار الإلزامي؛ لم يُرسل أي نشر إلى الخادم.");
+        return;
+      }
+      // Drafts are intentionally local and can exceed the published snapshot
+      // capacity after a full-book scan. Send only reviewed knowledge; the
+      // server separately retains and regression-tests the prior published set.
+      const publishableItems = items.filter(
+        (item) => item.status === "approved" || item.status === "published",
+      );
+      if (publishableItems.length > 2_000)
+        throw new Error("عدد العناصر المعتمدة يتجاوز حد النسخة المنشورة (2000). قسّم الاعتماد إلى دفعات مراجعة أصغر.");
+      const result = await publishKnowledge({
+        items: publishableItems,
+        settings,
+        regression: outcomes,
+      });
       const updated = items.map((item) =>
         item.status === "approved" || item.status === "published"
           ? knowledgeItemSchema.parse({ ...item, status: "published", version: result.version })
@@ -697,7 +830,7 @@ export default function AdminApp() {
       setItems(updated);
       setPublishFailures([]);
       setPublishMessage(
-        `تم نشر ${result.itemCount} عنصرًا في النسخة ${result.version} خلال ${Math.round(result.elapsedMs)} مللي ثانية.${result.forcedDespiteRegression ? " نُشرت رغم إخفاقات الانحدار التي قبلتها." : ""}`,
+        `تم نشر ${result.itemCount} عنصرًا في النسخة ${result.version} خلال ${Math.round(result.elapsedMs)} مللي ثانية بعد اجتياز اختبار الانحدار الإلزامي.`,
       );
       await refreshRemote();
     } catch (value) {
@@ -959,7 +1092,12 @@ export default function AdminApp() {
             </section>
           )}
 
-          {tab === "scan" && <DocumentScanner onAnalyze={analyzeScannedDocument} />}
+          {tab === "scan" && (
+            <>
+              <DocumentScanner onAnalyze={analyzeScannedDocument} />
+              <ManualTrainingPanel onSave={saveManualTraining} />
+            </>
+          )}
 
           {tab === "library" && (
             <section className="admin-section">
@@ -1037,8 +1175,11 @@ export default function AdminApp() {
               {publishFailures.length > 0 && (
                 <div className="admin-blocking-card">
                   <AlertTriangle size={20} />
-                  <div><strong>أوقف النشر اختبار الانحدار</strong><ul>{publishFailures.map((failure) => <li key={failure.itemId}>{failure.message}</li>)}</ul></div>
-                  <button className="admin-wrong-button" type="button" disabled={publishing} onClick={() => void publish(true)}>انشر رغم ذلك</button>
+                  <div>
+                    <strong>أوقف اختبار الانحدار النشر</strong>
+                    <p>أصلح كل عنصر أدناه ثم أعد تشغيل النشر؛ لا يوجد تجاوز لهذا الحاجز.</p>
+                    <ul>{publishFailures.map((failure) => <li key={failure.itemId}>{failure.message}</li>)}</ul>
+                  </div>
                 </div>
               )}
               <div className="admin-two-columns">
