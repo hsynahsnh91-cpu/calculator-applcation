@@ -1,0 +1,8 @@
+dist
+deliverables
+licenses
+node_modules
+package-lock.json
+src/assets/ocr
+*.traineddata
+tests/.generated

@@ -10,7 +10,11 @@
     "typecheck": "npm run typecheck:client && npm run typecheck:api",
     "typecheck:client": "tsc --noEmit",
     "typecheck:api": "tsc --noEmit -p tsconfig.api.json",
+    "lint": "eslint src/shared src/ui src/app src/features src/core tests/unit",
+    "format": "prettier --write src/shared src/ui src/app src/features src/core tests/unit eslint.config.js prettier.config.js vitest.config.ts",
+    "format:check": "prettier --check src/shared src/ui src/app src/features src/core tests/unit eslint.config.js prettier.config.js vitest.config.ts",
     "test": "node tests/run.mjs",
+    "test:unit": "vitest run",
     "test:browser": "node tests/browser.mjs",
     "build:offline": "vite build --mode offline"
   },
@@ -37,19 +41,26 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@tailwindcss/vite": "4.1.17",
     "@types/node": "22.19.17",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@vercel/node": "^5.5.22",
     "@vitejs/plugin-react": "5.1.1",
+    "esbuild": "^0.25.12",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "prettier": "^3.9.10",
     "tailwindcss": "4.1.17",
     "typescript": "5.9.3",
+    "typescript-eslint": "^8.71.2",
     "vite": "7.3.2",
     "vite-plugin-singlefile": "2.3.0",
-    "esbuild": "^0.25.12"
+    "vitest": "^3.2.7"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19.0"
   }
 }

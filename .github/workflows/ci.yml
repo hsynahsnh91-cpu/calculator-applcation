@@ -16,15 +16,19 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v4
-      - name: Use Node 20
+      - name: Use Node 20.19
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20.19"
           cache: npm
       - name: Install locked dependencies
         run: npm ci
       - name: TypeScript
         run: npm run typecheck
+      - name: Lint new structure
+        run: npm run lint
+      - name: Vitest (tests/unit)
+        run: npm run test:unit
       - name: Solver and API regression
         run: npm test
       - name: Build cacheable web deployment

@@ -1,0 +1,218 @@
+/* Design tokens for the new shell. Existing chat CSS in src/index.css is unchanged. */
+.ui-root {
+  --ui-bg: #0d1118;
+  --ui-surface: #151e2b;
+  --ui-surface-2: #1c222d;
+  --ui-border: #313a49;
+  --ui-text: #e8ecf2;
+  --ui-muted: #8390a3;
+  --ui-accent: #b6eadc;
+  --ui-accent-text: #122a25;
+  --ui-danger: #fda4af;
+  --ui-danger-bg: #40222b44;
+  --ui-warn: #d8c9a0;
+  --ui-warn-bg: #262317;
+  --ui-ok: #91e6ca;
+  --ui-ok-bg: #28655135;
+  --ui-overlay: #030710d9;
+  --ui-radius: 16px;
+  --ui-font: "Cairo", sans-serif;
+  --ui-mono: "Fira Code", monospace;
+  color: var(--ui-text);
+  font-family: var(--ui-font);
+  direction: rtl;
+}
+
+.ui-ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.ui-mono {
+  font-family: var(--ui-mono);
+}
+
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font: 700 12px var(--ui-font);
+  cursor: pointer;
+}
+
+.ui-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.ui-btn:focus-visible {
+  outline: 2px solid #80dfcf;
+  outline-offset: 3px;
+}
+
+.ui-btn-primary {
+  color: var(--ui-accent-text);
+  background: var(--ui-accent);
+}
+
+.ui-btn-primary:hover:not(:disabled) {
+  background: #d0f7ec;
+}
+
+.ui-btn-secondary {
+  color: #c0cfdd;
+  border-color: #39495d;
+  background: #15202e;
+}
+
+.ui-btn-secondary:hover:not(:disabled) {
+  color: #f5fbfd;
+  border-color: #638076;
+}
+
+.ui-btn-danger {
+  color: #ffcad0;
+  background: #522a3544;
+  border-color: #8f4a5761;
+}
+
+.ui-btn-ghost {
+  color: #b3bfcd;
+  background: transparent;
+}
+
+.ui-btn-sm {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.ui-modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: var(--ui-overlay);
+}
+
+.ui-modal {
+  width: min(100%, 640px);
+  max-height: 88dvh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #334154;
+  border-radius: 23px;
+  background: #131c29;
+  box-shadow: 0 25px 90px #0008;
+  outline: none;
+}
+
+.ui-modal-header,
+.ui-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #293547;
+}
+
+.ui-modal-footer {
+  border-bottom: 0;
+  border-top: 1px solid #293547;
+  justify-content: flex-end;
+}
+
+.ui-modal-header h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ui-modal-body {
+  overflow-y: auto;
+  min-height: 0;
+  padding: 20px;
+}
+
+.ui-toast-host {
+  position: fixed;
+  z-index: 120;
+  inset-inline-end: 16px;
+  inset-block-end: 16px;
+  display: grid;
+  gap: 8px;
+  width: min(360px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+.ui-toast {
+  pointer-events: auto;
+  padding: 12px 14px;
+  border-radius: 13px;
+  border: 1px solid #3d775f7d;
+  background: #173a304d;
+  color: #c9efe1;
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+.ui-toast-error {
+  border-color: #a9505d70;
+  color: #ffd1d5;
+  background: #51273355;
+}
+
+.ui-toast-info {
+  border-color: #648cb96b;
+  color: #d9eafa;
+  background: #1a2d475e;
+}
+
+.ui-skeleton {
+  display: block;
+  border-radius: 10px;
+  background: #1c2633;
+  min-height: 14px;
+}
+
+.ui-empty {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  padding: 22px 18px;
+  border: 1px solid #2d4050;
+  border-radius: 17px;
+  background: #151f2d;
+  color: #8799ad;
+  font-size: 12px;
+  line-height: 2;
+}
+
+.ui-empty h3 {
+  margin: 0;
+  color: #eaf2f6;
+  font-size: 15px;
+}
+
+.ui-empty p {
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-root *,
+  .ui-root *::before,
+  .ui-root *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
