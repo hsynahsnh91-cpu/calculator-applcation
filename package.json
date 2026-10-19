@@ -1,7 +1,7 @@
 {
-  "name": "react-vite-tailwind",
+  "name": "syrian-math-dialog",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,7 +11,8 @@
     "typecheck:client": "tsc --noEmit",
     "typecheck:api": "tsc --noEmit -p tsconfig.api.json",
     "test": "node tests/run.mjs",
-    "test:browser": "node tests/browser.mjs"
+    "test:browser": "node tests/browser.mjs",
+    "build:offline": "vite build --mode offline"
   },
   "dependencies": {
     "@fontsource/cairo": "5.3.0",
@@ -45,6 +46,10 @@
     "tailwindcss": "4.1.17",
     "typescript": "5.9.3",
     "vite": "7.3.2",
-    "vite-plugin-singlefile": "2.3.0"
+    "vite-plugin-singlefile": "2.3.0",
+    "esbuild": "^0.25.12"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

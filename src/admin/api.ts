@@ -78,6 +78,36 @@ export async function adminLogout(): Promise<void> {
   await request("/api/admin-logout", { method: "POST", body: "{}" });
 }
 
+export async function adminLogoutAll(): Promise<void> {
+  await request("/api/admin-logout-all", { method: "POST", body: "{}" });
+}
+
+export interface AdminHealth {
+  status: "ok" | "degraded";
+  redis: { configured: boolean; reachable: boolean };
+  admin: { passwordConfigured: boolean | null; secretConfigured: boolean | null };
+}
+
+export async function getAdminHealth(): Promise<AdminHealth> {
+  const body = await request("/api/health");
+  if (!isRecord(body) || (body.status !== "ok" && body.status !== "degraded") || !isRecord(body.redis) || !isRecord(body.admin))
+    throw new Error("استجابة الحالة التشغيلية غير صالحة.");
+  const passwordConfigured = body.admin.passwordConfigured;
+  const secretConfigured = body.admin.secretConfigured;
+  if (
+    typeof body.redis.configured !== "boolean" ||
+    typeof body.redis.reachable !== "boolean" ||
+    !(typeof passwordConfigured === "boolean" || passwordConfigured === null) ||
+    !(typeof secretConfigured === "boolean" || secretConfigured === null)
+  )
+    throw new Error("تفاصيل الحالة التشغيلية غير صالحة.");
+  return {
+    status: body.status,
+    redis: { configured: body.redis.configured, reachable: body.redis.reachable },
+    admin: { passwordConfigured, secretConfigured },
+  };
+}
+
 export async function analyzeRemote(
   input: {
     text: string;

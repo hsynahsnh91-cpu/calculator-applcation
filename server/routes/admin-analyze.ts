@@ -11,7 +11,7 @@ export default async function handler(
   response: VercelResponse,
 ): Promise<void> {
   if (request.method !== "POST") return methodNotAllowed(response, ["POST"]);
-  if (!requireTrustedOrigin(request, response) || !requireAdmin(request, response)) return;
+  if (!requireTrustedOrigin(request, response) || !(await requireAdmin(request, response))) return;
   let body: unknown;
   try {
     body = await readJsonBody(request);

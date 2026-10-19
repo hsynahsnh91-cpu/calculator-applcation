@@ -15,7 +15,7 @@ export default async function handler(
   response: VercelResponse,
 ): Promise<void> {
   if (request.method !== "GET") return methodNotAllowed(response, ["GET"]);
-  if (!requireAdmin(request, response)) return;
+  if (!(await requireAdmin(request, response))) return;
   try {
     const client = redis();
     if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
@@ -44,8 +44,9 @@ export default async function handler(
         .slice(0, 5),
     });
   } catch (error) {
-    sendJson(response, 503, {
-      error: error instanceof Error ? error.message : "تعذر تجميع إحصاءات اللوحة.",
+    console.error("Admin stats route failed", {
+      errorType: error instanceof Error ? error.name : typeof error,
     });
+    sendJson(response, 503, { error: "تعذر تجميع إحصاءات اللوحة." });
   }
 }

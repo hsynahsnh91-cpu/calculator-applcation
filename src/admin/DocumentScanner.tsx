@@ -15,6 +15,7 @@ import {
   type PdfScanMode,
   type ScannedDocument,
 } from "./scanner";
+import { adminDraftDB, type CachedOcrDocument } from "./indexedDB";
 
 interface ScanJob {
   id: string;
@@ -71,6 +72,7 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
   const [autoAnalyze, setAutoAnalyze] = useState(true);
   const [pdfMode, setPdfMode] = useState<PdfScanMode>("text-first");
   const [attachmentMessage, setAttachmentMessage] = useState("");
+  const [cachedDocuments, setCachedDocuments] = useState<CachedOcrDocument[]>([]);
   const [dragging, setDragging] = useState(false);
   const uploadInput = useRef<HTMLInputElement>(null);
   const cameraInput = useRef<HTMLInputElement>(null);
@@ -94,6 +96,21 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
     };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    void adminDraftDB
+      .listOcrDocuments()
+      .then((documents) => {
+        if (active) setCachedDocuments(documents);
+      })
+      .catch(() => {
+        // OCR cache is an optional local-resume aid; scanning remains usable.
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const patchJob = (id: string, patch: Partial<ScanJob>) => {
     setJobs((previous) =>
       previous.map((job) => (job.id === id ? { ...job, ...patch } : job)),
@@ -107,6 +124,29 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
     // Keep the card active until the worker/network call actually unwinds, so
     // the UI never reports a completed cancellation before resources stop.
     patchJob(id, { label: "جارٍ إلغاء العملية بأمان…" });
+  };
+
+  const restoreCachedDocument = async (id: string) => {
+    const document = await adminDraftDB.getOcrDocument(id);
+    if (!document) return;
+    const restoredId = `restored-${document.id}-${Date.now()}`;
+    setAttachmentMessage(document.attachmentMessage ?? "");
+    setJobs((previous) => [
+      {
+        id: restoredId,
+        fileName: document.fileName,
+        status: "ready",
+        currentPage: document.pages.length,
+        totalPages: document.pages.length,
+        fraction: 1,
+        label: "استُعيد النص المحفوظ محليًا؛ راجعه أو حلّله دون إعادة OCR.",
+        text: document.text,
+        attachmentMessage: document.attachmentMessage ?? "",
+        pdfMode: document.pdfMode ?? "text-first",
+        document,
+      },
+      ...previous,
+    ]);
   };
 
   const analyze = async (
@@ -222,6 +262,13 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
             attachmentMessage: note,
             pdfMode: scanned.pdfMode ?? selectedPdfMode,
           };
+          // Preserve the extracted OCR document independently of network state.
+          // A quota/storage failure never discards the in-memory review result.
+          void adminDraftDB
+            .putOcrDocument(document)
+            .then(() => adminDraftDB.listOcrDocuments())
+            .then(setCachedDocuments)
+            .catch(() => undefined);
           patchJob(id, {
             status: "ready",
             document,
@@ -307,6 +354,21 @@ export function DocumentScanner({ onAnalyze }: DocumentScannerProps) {
           </label>
         </div>
       </div>
+
+      {cachedDocuments.length > 0 && (
+        <details className="admin-ocr-resume">
+          <summary>استعادة نص ممسوح محفوظ محليًا ({cachedDocuments.length})</summary>
+          <p>يمكنك متابعة المراجعة أو التحليل دون رفع الملف أو إعادة OCR. تبقى هذه البيانات على هذا الجهاز فقط.</p>
+          <ul>
+            {cachedDocuments.slice(0, 8).map((cached) => (
+              <li key={cached.id}>
+                <span>{cached.fileName} · {new Date(cached.cachedAt).toLocaleString("ar-SY")}</span>
+                <button type="button" className="admin-secondary-button" onClick={() => void restoreCachedDocument(cached.id)}>استعادة</button>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
 
       <label className="admin-scan-context">
         رسالة مرافقة للملف — مثل الصف والوحدة والهدف التعليمي

@@ -24,11 +24,13 @@ const routeLoaders: Record<string, () => Promise<RouteModule>> = {
   "admin-library": () => import("../server/routes/admin-library.js"),
   "admin-login": () => import("../server/routes/admin-login.js"),
   "admin-logout": () => import("../server/routes/admin-logout.js"),
+  "admin-logout-all": () => import("../server/routes/admin-logout-all.js"),
   "admin-publish": () => import("../server/routes/admin-publish.js"),
   "admin-session": () => import("../server/routes/admin-session.js"),
   "admin-settings": () => import("../server/routes/admin-settings.js"),
   "admin-stats": () => import("../server/routes/admin-stats.js"),
   "admin-versions": () => import("../server/routes/admin-versions.js"),
+  health: () => import("../server/routes/health.js"),
   knowledge: () => import("../server/routes/knowledge.js"),
   "knowledge-event": () => import("../server/routes/knowledge-event.js"),
   "knowledge-failure": () => import("../server/routes/knowledge-failure.js"),
@@ -58,8 +60,13 @@ export default async function handler(
   try {
     const module = await load();
     await module.default(request, response);
-  } catch {
-    // Never expose bundler or infrastructure details to a caller.
+  } catch (error) {
+    // Keep Vercel diagnostics actionable without serializing request data,
+    // credentials, or an error stack back to the browser.
+    console.error("API route failed", {
+      route,
+      errorType: error instanceof Error ? error.name : typeof error,
+    });
     sendJson(response, 503, { error: "تعذر تشغيل خدمة الإدارة الآن." });
   }
 }

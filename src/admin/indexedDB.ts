@@ -1,3 +1,4 @@
+import type { ScannedDocument } from "./scanner";
 import {
   defaultSolverSettings,
   knowledgeItemSchema,
@@ -7,15 +8,23 @@ import {
 } from "./types";
 
 const DB_NAME = "syrian-math-admin";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const ITEMS_STORE = "items";
 const PREFERENCES_STORE = "preferences";
+const OCR_DOCUMENTS_STORE = "ocr-documents";
 const SETTINGS_KEY = "solver-settings";
 const PROMPT_KEY = "engine-prompt";
 
 interface PreferenceRecord {
   key: string;
   value: unknown;
+}
+
+export interface CachedOcrDocument {
+  id: string;
+  fileName: string;
+  document: ScannedDocument;
+  cachedAt: string;
 }
 
 let databasePromise: Promise<IDBDatabase> | null = null;
@@ -51,6 +60,8 @@ function openDatabase(): Promise<IDBDatabase> {
         database.createObjectStore(ITEMS_STORE, { keyPath: "id" });
       if (!database.objectStoreNames.contains(PREFERENCES_STORE))
         database.createObjectStore(PREFERENCES_STORE, { keyPath: "key" });
+      if (!database.objectStoreNames.contains(OCR_DOCUMENTS_STORE))
+        database.createObjectStore(OCR_DOCUMENTS_STORE, { keyPath: "id" });
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () =>
@@ -170,5 +181,56 @@ export const adminDraftDB = {
 
   async savePrompt(prompt: string): Promise<void> {
     await setPreference(PROMPT_KEY, prompt.trim().slice(0, 24_000));
+  },
+
+  /** OCR output is large and private, so cache it locally after first use. */
+  async putOcrDocument(document: ScannedDocument): Promise<void> {
+    const record: CachedOcrDocument = {
+      id: document.id,
+      fileName: document.fileName,
+      document,
+      cachedAt: new Date().toISOString(),
+    };
+    const database = await openDatabase();
+    const transaction = database.transaction(OCR_DOCUMENTS_STORE, "readwrite");
+    transaction.objectStore(OCR_DOCUMENTS_STORE).put(record);
+    await transactionDone(transaction);
+  },
+
+  async listOcrDocuments(): Promise<CachedOcrDocument[]> {
+    const database = await openDatabase();
+    const transaction = database.transaction(OCR_DOCUMENTS_STORE, "readonly");
+    const records = await requestResult(transaction.objectStore(OCR_DOCUMENTS_STORE).getAll());
+    await transactionDone(transaction);
+    return records
+      .filter(
+        (record): record is CachedOcrDocument =>
+          record !== null &&
+          typeof record === "object" &&
+          typeof (record as CachedOcrDocument).id === "string" &&
+          typeof (record as CachedOcrDocument).fileName === "string" &&
+          typeof (record as CachedOcrDocument).cachedAt === "string" &&
+          Boolean((record as CachedOcrDocument).document) &&
+          typeof (record as CachedOcrDocument).document.text === "string",
+      )
+      .sort((first, second) => second.cachedAt.localeCompare(first.cachedAt));
+  },
+
+  async getOcrDocument(id: string): Promise<ScannedDocument | undefined> {
+    const database = await openDatabase();
+    const transaction = database.transaction(OCR_DOCUMENTS_STORE, "readonly");
+    const record = await requestResult(
+      transaction.objectStore(OCR_DOCUMENTS_STORE).get(id),
+    );
+    await transactionDone(transaction);
+    if (
+      record &&
+      typeof record === "object" &&
+      "document" in record &&
+      (record as CachedOcrDocument).document &&
+      typeof (record as CachedOcrDocument).document.text === "string"
+    )
+      return (record as CachedOcrDocument).document;
+    return undefined;
   },
 };

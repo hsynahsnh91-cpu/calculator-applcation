@@ -12,10 +12,14 @@ export function isLowEnd(): boolean {
   return cached;
 }
 
-// Celebration burst that respects both the device capability and the OS
-// "reduce motion" setting. No-op on low-end devices.
+export function prefersReducedMotion(): boolean {
+  return typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+}
+
+// Celebration burst respects both device capability and the OS motion setting.
 export function burst(colors: string[], particles = 14): void {
-  if (isLowEnd()) return;
+  if (isLowEnd() || prefersReducedMotion()) return;
   try {
     confetti({
       particleCount: particles,

@@ -1,6 +1,24 @@
-import pdfWorkerUrl from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
 import { normalizeScannedText } from "./normalization";
-import { prepareImage, recognizeImage, stopOCR } from "../solver/ocr";
+
+type OcrModule = typeof import("../solver/ocr");
+type PdfJsModule = typeof import("pdfjs-dist/legacy/build/pdf.mjs");
+
+let ocrModulePromise: Promise<OcrModule> | undefined;
+let pdfModulePromise: Promise<{ pdfjs: PdfJsModule; workerUrl: string }> | undefined;
+
+function loadOcr(): Promise<OcrModule> {
+  if (!ocrModulePromise) ocrModulePromise = import("../solver/ocr");
+  return ocrModulePromise;
+}
+
+function loadPdf(): Promise<{ pdfjs: PdfJsModule; workerUrl: string }> {
+  if (!pdfModulePromise)
+    pdfModulePromise = Promise.all([
+      import("pdfjs-dist/legacy/build/pdf.mjs"),
+      import("pdfjs-dist/legacy/build/pdf.worker.min.mjs?url"),
+    ]).then(([pdfjs, worker]) => ({ pdfjs, workerUrl: worker.default }));
+  return pdfModulePromise;
+}
 
 export type ScanSource = "pdf-text" | "ocr";
 export type PdfScanMode = "text-first" | "ocr-all-pages";
@@ -91,6 +109,7 @@ async function scanImage(
   onProgress: ProgressListener,
 ): Promise<ScannedDocument> {
   throwIfAborted(signal);
+  const { prepareImage, recognizeImage } = await loadOcr();
   const prepared = await prepareImage(file);
   throwIfAborted(signal);
   const recognized = await recognizeImage(
@@ -124,8 +143,8 @@ async function scanPdf(
 ): Promise<ScannedDocument> {
   if (file.size > 35 * 1024 * 1024)
     throw new Error("حجم PDF أكبر من 35 ميغابايت. قسّمه إلى ملف أصغر أولًا.");
-  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-  pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+  const { pdfjs, workerUrl } = await loadPdf();
+  pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
   throwIfAborted(signal);
   const loadingTask = pdfjs.getDocument({
     data: new Uint8Array(await file.arrayBuffer()),
@@ -206,6 +225,7 @@ async function scanPdf(
         `page-${pageNumber}.png`,
         { type: "image/png" },
       );
+      const { prepareImage, recognizeImage } = await loadOcr();
       const prepared = await prepareImage(image);
       const result = await recognizeImage(
         prepared.blob,
@@ -250,7 +270,9 @@ export async function scanDocument(
   onProgress: ProgressListener,
   options: ScanOptions = {},
 ): Promise<ScannedDocument> {
-  const abortOcr = () => stopOCR();
+  const abortOcr = () => {
+    void ocrModulePromise?.then(({ stopOCR }) => stopOCR());
+  };
   signal.addEventListener("abort", abortOcr, { once: true });
   try {
     if (isPdf(file)) return await scanPdf(file, signal, onProgress, options);

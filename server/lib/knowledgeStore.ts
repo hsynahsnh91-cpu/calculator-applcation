@@ -28,6 +28,14 @@ function asVersion(value: unknown): number | undefined {
   return typeof raw === "number" && Number.isInteger(raw) && raw >= 0 ? raw : undefined;
 }
 
+function summaryFor(snapshot: KnowledgeSnapshot): VersionSummary {
+  return versionSummarySchema.parse({
+    version: snapshot.version,
+    publishedAt: snapshot.publishedAt,
+    itemCount: snapshot.items.length,
+  });
+}
+
 export async function getCurrentVersion(): Promise<number | undefined> {
   const client = redis();
   if (!client) return undefined;
@@ -66,9 +74,9 @@ export interface PublishStoredResult {
 }
 
 /**
- * The snapshot is written under its new immutable version first.  The single
- * SET of `current-version` is the visibility switch, so visitors never see a
- * partly-written version.
+ * The immutable snapshot and its tiny index record are written before the one
+ * current-version visibility switch. Visitors therefore never see a partial
+ * knowledge version, while listVersions reads small summaries only.
  */
 export async function publishSnapshot(
   items: KnowledgeItem[],
@@ -76,7 +84,7 @@ export async function publishSnapshot(
 ): Promise<PublishStoredResult> {
   const client = redis();
   if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
-  const version = await client.incr("syrian-math:knowledge:version-sequence");
+  const version = await client.incr(RedisKey.versionSequence);
   const now = new Date().toISOString();
   const snapshot = knowledgeSnapshotSchema.parse({
     version,
@@ -89,7 +97,9 @@ export async function publishSnapshot(
     throw new Error(
       `حجم نسخة المعرفة ${Math.ceil(bytes / 1024)} كيلوبايت ويتجاوز الحد الآمن ${Math.floor(MAX_SNAPSHOT_BYTES / 1024)} كيلوبايت. قسّم النشر إلى وحدات أصغر.`,
     );
+  const summary = summaryFor(snapshot);
   await client.set(RedisKey.version(version), snapshot);
+  await client.set(RedisKey.versionSummary(version), summary);
   await client.set(RedisKey.currentVersion, version);
   return { snapshot, bytes };
 }
@@ -97,18 +107,23 @@ export async function publishSnapshot(
 export async function listVersions(): Promise<VersionSummary[]> {
   const client = redis();
   if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
-  const current = await client.get<unknown>("syrian-math:knowledge:version-sequence");
-  const last = asVersion(current) ?? 0;
+  const last = asVersion(await client.get<unknown>(RedisKey.versionSequence)) ?? 0;
   const versions: VersionSummary[] = [];
   for (let version = last; version > 0 && versions.length < MAX_VERSION_LIST; version--) {
-    const snapshot = await getSnapshot(version);
-    if (!snapshot) continue;
-    const summary = versionSummarySchema.safeParse({
-      version: snapshot.version,
-      publishedAt: snapshot.publishedAt,
-      itemCount: snapshot.items.length,
-    });
-    if (summary.success) versions.push(summary.data);
+    const summary = versionSummarySchema.safeParse(
+      parseStored<unknown>(await client.get<unknown>(RedisKey.versionSummary(version))),
+    );
+    if (summary.success) {
+      versions.push(summary.data);
+      continue;
+    }
+    // One-time compatibility for snapshots written before summary keys existed.
+    // New deploys never load full snapshots in this listing path.
+    const legacy = await getSnapshot(version);
+    if (!legacy) continue;
+    const migrated = summaryFor(legacy);
+    versions.push(migrated);
+    void client.set(RedisKey.versionSummary(version), migrated).catch(() => undefined);
   }
   return versions;
 }
@@ -135,7 +150,7 @@ export async function getStoredAdminSettings(): Promise<StoredAdminSettings> {
   if (
     value !== null &&
     typeof value === "object" &&
-    ("prompt" in value) &&
+    "prompt" in value &&
     (typeof (value as StoredAdminSettings).prompt === "string" ||
       (value as StoredAdminSettings).prompt === undefined)
   )

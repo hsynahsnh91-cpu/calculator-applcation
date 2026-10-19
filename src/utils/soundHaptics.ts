@@ -1,4 +1,5 @@
 import { localDB } from './localDB';
+import { prefersReducedMotion } from './perf';
 
 // Sound & Haptic Feedback using Web Audio API
 
@@ -156,7 +157,12 @@ class SoundHapticsService {
   }
 
   public vibrate(durationMs: number = 20) {
-    if (!this.hapticsEnabled || typeof navigator === 'undefined' || !navigator.vibrate) return;
+    if (
+      !this.hapticsEnabled ||
+      prefersReducedMotion() ||
+      typeof navigator === 'undefined' ||
+      !navigator.vibrate
+    ) return;
     this.defer(() => {
       try {
         navigator.vibrate(durationMs);

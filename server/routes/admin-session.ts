@@ -8,5 +8,5 @@ export default async function handler(
 ): Promise<void> {
   if (request.method !== "GET") return methodNotAllowed(response, ["GET"]);
   response.setHeader("Cache-Control", "no-store");
-  sendJson(response, 200, { authenticated: isAdminRequest(request) });
+  sendJson(response, 200, { authenticated: await isAdminRequest(request) });
 }

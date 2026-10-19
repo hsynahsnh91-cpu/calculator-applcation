@@ -12,7 +12,7 @@ export default async function handler(
 ): Promise<void> {
   if (!["GET", "DELETE"].includes(request.method ?? ""))
     return methodNotAllowed(response, ["GET", "DELETE"]);
-  if (!requireAdmin(request, response)) return;
+  if (!(await requireAdmin(request, response))) return;
   if (request.method === "DELETE" && !requireTrustedOrigin(request, response)) return;
   try {
     if (request.method === "GET") {
@@ -27,8 +27,9 @@ export default async function handler(
     await removeFailure(parsed.data.fingerprint);
     sendJson(response, 200, { removed: true });
   } catch (error) {
-    sendJson(response, 503, {
-      error: error instanceof Error ? error.message : "تعذر الوصول إلى سجل الإخفاقات.",
+    console.error("Admin failures route failed", {
+      errorType: error instanceof Error ? error.name : typeof error,
     });
+    sendJson(response, 503, { error: "تعذر الوصول إلى سجل الإخفاقات." });
   }
 }

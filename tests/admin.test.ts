@@ -3,6 +3,7 @@ import {
   adminConfigurationError,
   adminPasswordConfigured,
   createAdminToken,
+  passwordMatches,
 } from "../server/lib/auth.js";
 import { resolveRedisConfiguration } from "../server/lib/redis.js";
 import { splitDocumentForAnalysis } from "../src/admin/analysisChunks.js";
@@ -149,7 +150,13 @@ try {
     process.env.ADMIN_PASSWORD = "test-password";
     process.env.ADMIN_SECRET = "x".repeat(32);
     assert.equal(adminPasswordConfigured(), true);
-    assert.match(createAdminToken(), /^v1\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/);
+    assert.match(createAdminToken(), /^v2\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/);
+  });
+
+  test("password comparison accepts the exact secret and rejects a different length via fixed-size hashes", () => {
+    process.env.ADMIN_PASSWORD = "طويلة-ومميزة-123";
+    assert.equal(passwordMatches("طويلة-ومميزة-123"), true);
+    assert.equal(passwordMatches("قصيرة"), false);
   });
 } finally {
   if (originalPassword === undefined) delete process.env.ADMIN_PASSWORD;

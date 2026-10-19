@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin, type PluginOption } from "vite";
 import { viteSingleFile } from "vite-plugin-singlefile";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -25,33 +25,37 @@ function offlineNotices(): { path: string; text: string }[] {
   collect(path.join(__dirname, "licenses"));
   result.push({
     path: "THIRD_PARTY_NOTICES.md",
-    text: fs.readFileSync(
-      path.join(__dirname, "THIRD_PARTY_NOTICES.md"),
-      "utf8",
-    ),
+    text: fs.readFileSync(path.join(__dirname, "THIRD_PARTY_NOTICES.md"), "utf8"),
   });
   return result.sort((first, second) => first.path.localeCompare(second.path));
 }
 
-export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-    {
-      name: "offline-license-notices",
-      apply: "build",
-      transformIndexHtml() {
-        return [
-          {
-            tag: "script",
-            attrs: { type: "application/json", id: "offline-license-notices" },
-            children: JSON.stringify(offlineNotices()).replace(/</g, "\\u003c"),
-            injectTo: "body" as const,
-          },
-        ];
-      },
+/**
+ * Production ships cacheable chunks. `npm run build:offline` deliberately
+ * opts into a self-contained file for file:// and classroom USB use instead.
+ */
+export default defineConfig(({ mode }) => {
+  const offlineSingleFile =
+    mode === "offline" || process.env.CALCULATOR_SINGLE_FILE === "1";
+  const offlineLicensePlugin: Plugin = {
+    name: "offline-license-notices",
+    apply: "build",
+    transformIndexHtml() {
+      return [
+        {
+          tag: "script",
+          attrs: { type: "application/json", id: "offline-license-notices" },
+          children: JSON.stringify(offlineNotices()).replace(/</g, "\\u003c"),
+          injectTo: "body",
+        },
+      ];
     },
-    {
+  };
+  const plugins: PluginOption[] = [react(), tailwindcss()];
+
+  if (offlineSingleFile) {
+    plugins.push(offlineLicensePlugin);
+    const standalonePlugin: Plugin = {
       name: "standalone-script-source",
       apply: "build",
       enforce: "post",
@@ -62,14 +66,29 @@ export default defineConfig({
             chunk.code += "\n//# sourceURL=calculator-inline.js\n";
         }
       },
+    };
+    plugins.push(standalonePlugin, viteSingleFile());
+  }
+
+  return {
+    plugins,
+    build: {
+      rollupOptions: offlineSingleFile
+        ? undefined
+        : {
+            output: {
+              manualChunks: {
+                react: ["react", "react-dom"],
+                math: ["katex", "mathjs", "nerdamer"],
+              },
+            },
+          },
     },
-    viteSingleFile(),
-  ],
-  worker: {
-    format: "iife",
-    rollupOptions: { output: { inlineDynamicImports: true } },
-  },
-  server: { host: "0.0.0.0", allowedHosts: [".e2b.app"] },
-  preview: { host: "0.0.0.0", allowedHosts: [".e2b.app"] },
-  resolve: { alias: { "@": path.resolve(__dirname, "src") } },
+    worker: offlineSingleFile
+      ? { format: "iife", rollupOptions: { output: { inlineDynamicImports: true } } }
+      : { format: "es" },
+    server: { host: "0.0.0.0", allowedHosts: [".e2b.app"] },
+    preview: { host: "0.0.0.0", allowedHosts: [".e2b.app"] },
+    resolve: { alias: { "@": path.resolve(__dirname, "src") } },
+  };
 });
