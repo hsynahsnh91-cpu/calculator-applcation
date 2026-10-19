@@ -1,11 +1,11 @@
-import { copyToClipboard } from '../../utils/cn';
+import { copyToClipboard } from '../../shared/utils/cn';
 import React, { useState } from 'react';
 import { HistoryEntry, AppMode } from '../../types';
-import { localDB } from '../../utils/localDB';
+import { localDB } from '../../app/storage/localDB';
 import { KaTeXDisplay } from '../common/KaTeXDisplay';
 import { RichText } from '../common/Tex';
 import { useModalAccessibility } from '../common/GuideModal';
-import { soundHaptics } from '../../utils/soundHaptics';
+import { soundHaptics } from '../../shared/utils/soundHaptics';
 import { 
   Trash2, 
   Star, 

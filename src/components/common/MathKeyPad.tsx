@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Delete, RotateCcw, Sparkles } from 'lucide-react';
 import { Tex } from './Tex';
-import { soundHaptics } from '../../utils/soundHaptics';
+import { soundHaptics } from '../../shared/utils/soundHaptics';
 
 export interface MathKey {
   tex: string;

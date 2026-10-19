@@ -29,6 +29,19 @@ createRoot(document.getElementById("root")!).render(
   </StrictMode>,
 );
 
+if (!isAdminRoute) {
+  const warm = () => {
+    void import("./core/solver/client").then((module) => {
+      module.warmupSolver();
+    });
+  };
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(warm, { timeout: 2500 });
+  } else {
+    window.setTimeout(warm, 1);
+  }
+}
+
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     void navigator.serviceWorker.register("/sw.js").catch(() => {

@@ -1,4 +1,4 @@
-/** The thirteen local engines. Keep this list identical to src/solver/types.ts. */
+/** The thirteen local engines. Keep this list identical to src/core/solver/types.ts. */
 export const ENGINE_IDS = [
   "mathEngine",
   "equationSolver",

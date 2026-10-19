@@ -1,8 +1,8 @@
-import { copyToClipboard } from '../../utils/cn';
+import { copyToClipboard } from '../../shared/utils/cn';
 import React, { useMemo, useState } from 'react';
 import katex from 'katex';
 import { Copy, Check } from 'lucide-react';
-import { soundHaptics } from '../../utils/soundHaptics';
+import { soundHaptics } from '../../shared/utils/soundHaptics';
 import { cleanMathLatex } from './Tex';
 
 interface KaTeXDisplayProps {

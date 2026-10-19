@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { MathfieldElement } from 'mathlive';
 import 'mathlive/fonts.css';
-import { decodeLatex } from '../../solver/parser';
+import { decodeLatex } from '../../core/solver/parser';
 export { MathfieldElement };
 
 // Fonts are bundled by Vite, including in the standalone HTML build.

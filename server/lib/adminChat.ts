@@ -16,7 +16,7 @@ import {
   verifyRuleNumerically,
   verifySymbolicEqual,
 } from "../../src/brain/verify/index.js";
-import { solvePrompt } from "../../src/solver/orchestrator.js";
+import { solvePrompt } from "../../src/core/solver/orchestrator.js";
 import { untrustedContentWarnings } from "./untrustedContent.js";
 
 const MAX_TOOL_CALLS_PER_ROUND = 4;

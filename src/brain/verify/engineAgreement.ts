@@ -1,4 +1,4 @@
-import type { SolverAnswer } from "../../solver/types";
+import type { SolverAnswer } from "../../core/solver/types";
 import type { VerificationEvidence } from "../semantic/statement";
 
 /**

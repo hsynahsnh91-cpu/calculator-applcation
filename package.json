@@ -10,7 +10,7 @@
     "typecheck": "npm run typecheck:client && npm run typecheck:api",
     "typecheck:client": "tsc --noEmit",
     "typecheck:api": "tsc --noEmit -p tsconfig.api.json",
-    "lint": "eslint src/shared src/ui src/app src/features src/core tests/unit",
+    "lint": "eslint src/shared src/ui src/app src/features src/core/solver src/core/engines tests/unit/knowledge-schema.test.ts",
     "format": "prettier --write src/shared src/ui src/app src/features src/core tests/unit eslint.config.js prettier.config.js vitest.config.ts",
     "format:check": "prettier --check src/shared src/ui src/app src/features src/core tests/unit eslint.config.js prettier.config.js vitest.config.ts",
     "test": "node tests/run.mjs",

@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 import { HelpCircle, X, Sparkles, CheckCircle2, BookOpen } from "lucide-react";
-import { soundHaptics } from "../../utils/soundHaptics";
+import { soundHaptics } from "../../shared/utils/soundHaptics";
 import { RichText } from "./Tex";
 
 // A shared stack avoids nested dialogs handling the same Escape or unlocking the body.

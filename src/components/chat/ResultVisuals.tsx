@@ -6,7 +6,7 @@ import type {
   SolverResult,
   TreeNode,
   Visual,
-} from "../../solver/types";
+} from "../../core/solver/types";
 import { Tex, RichText } from "../common/Tex";
 import { SectionErrorBoundary } from "../common/SectionErrorBoundary";
 export interface ResultViewProps {

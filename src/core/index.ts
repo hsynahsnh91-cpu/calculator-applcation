@@ -1,5 +1,5 @@
 /**
- * Solver, engines, and knowledge client move here in phase 2.
- * Do not import admin or brain from this tree.
+ * Solver, engines, and knowledge client. Engine math is unchanged.
+ * Knowledge still reads admin schemas until those move to src/shared.
  */
 export {};

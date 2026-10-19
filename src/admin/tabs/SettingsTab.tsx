@@ -1,5 +1,5 @@
 import { RotateCcw, Save } from "lucide-react";
-import type { EngineId } from "../../solver/types";
+import type { EngineId } from "../../core/solver/types";
 import type { SolverSettings } from "../types";
 
 export function SettingsTab({

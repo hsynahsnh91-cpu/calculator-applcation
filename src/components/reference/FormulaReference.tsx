@@ -1,9 +1,9 @@
-import { copyToClipboard } from "../../utils/cn";
+import { copyToClipboard } from "../../shared/utils/cn";
 import React, { useState } from "react";
-import { SCIENTIFIC_CONSTANTS } from "../../utils/constants";
+import { SCIENTIFIC_CONSTANTS } from "../../app/content/constants";
 import { KaTeXDisplay } from "../common/KaTeXDisplay";
 import { Tex } from "../common/Tex";
-import { soundHaptics } from "../../utils/soundHaptics";
+import { soundHaptics } from "../../shared/utils/soundHaptics";
 import { Search, BookOpen, Atom, Copy, Check, Hash } from "lucide-react";
 
 interface FormulaItem {

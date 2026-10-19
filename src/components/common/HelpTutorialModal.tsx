@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Sparkles, CheckCircle2, Calculator, Variable, TrendingUp, Activity, Dice5 } from 'lucide-react';
-import { soundHaptics } from '../../utils/soundHaptics';
+import { soundHaptics } from '../../shared/utils/soundHaptics';
 import { useModalAccessibility } from './GuideModal';
 
 interface HelpTutorialModalProps {

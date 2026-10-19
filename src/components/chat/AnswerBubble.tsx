@@ -23,10 +23,10 @@ import {
   ENGINE_LABELS,
   type EngineId,
   type SolverAnswer,
-} from "../../solver/types";
-import { copyToClipboard } from "../../utils/cn";
-import { answerAsText } from "../../solver/composer";
-import type { ProbabilityContext } from "../../solver/probabilityTypes";
+} from "../../core/solver/types";
+import { copyToClipboard } from "../../shared/utils/cn";
+import { answerAsText } from "../../core/solver/composer";
+import type { ProbabilityContext } from "../../core/solver/probabilityTypes";
 import type { ResultViewProps } from "./ResultVisuals";
 const Scientific = lazy(() => import("../scientific/ScientificCalculator"));
 const Equations = lazy(() => import("../equations/EquationSolver"));

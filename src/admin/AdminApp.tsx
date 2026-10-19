@@ -36,8 +36,8 @@ import {
 } from "lucide-react";
 import { z } from "zod";
 import { Tex } from "../components/common/Tex";
-import { ENGINE_LABELS, type EngineId, type SolverAnswer } from "../solver/types";
-import { cancelSolver, solveLocally } from "../solver/client";
+import { ENGINE_LABELS, type EngineId, type SolverAnswer } from "../core/solver/types";
+import { cancelSolver, solveLocally } from "../core/solver/client";
 import {
   adminUiReducer,
   initialAdminUiState,
@@ -66,7 +66,7 @@ import { scanDocument, type ScannedDocument } from "./scanner";
 import {
   approvedSolutionFromAnswer,
   approvedSolutionsMatch,
-} from "../knowledge/regression";
+} from "../core/knowledge/regression";
 import {
   AdminApiError,
   adminLogin,

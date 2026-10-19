@@ -6,18 +6,18 @@ import type {
   ProbabilityComparison,
   UrnModel,
   UrnQuery,
-} from "../../solver/probabilityTypes";
-import { calculateUrn } from "../../utils/probabilityUrn";
+} from "../../core/solver/probabilityTypes";
+import { calculateUrn } from "../../core/engines/probability/probabilityUrn";
 import {
   Rational,
   probability,
   approximate,
-} from "../../utils/probabilityExact";
+} from "../../core/engines/probability/probabilityExact";
 import {
   PROBABILITY_COLORS,
   probabilityColor,
   displayBalls,
-} from "../../utils/probabilityPresentation";
+} from "../../core/engines/probability/probabilityPresentation";
 
 const tabs = [
   ["urn", "السحب"],

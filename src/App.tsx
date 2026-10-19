@@ -35,17 +35,17 @@ import { AnswerBubble } from "./components/chat/AnswerBubble";
 import { ToolModal } from "./components/chat/ToolModal";
 import { SectionErrorBoundary } from "./components/common/SectionErrorBoundary";
 import { RichText } from "./components/common/Tex";
-import { localDB } from "./utils/localDB";
-import { soundHaptics } from "./utils/soundHaptics";
+import { localDB } from "./app/storage/localDB";
+import { soundHaptics } from "./shared/utils/soundHaptics";
 import { useOfflineSpeech } from "./hooks/useOfflineSpeech";
-import { cancelSolver } from "./solver/client";
-import { composeAnswer, answerAsText } from "./solver/composer";
+import { cancelSolver } from "./core/solver/client";
+import { composeAnswer, answerAsText } from "./core/solver/composer";
 import {
   loadKnowledge,
   recordKnowledgeFailure,
   recordKnowledgeSuccess,
   solveWithKnowledge,
-} from "./knowledge/client";
+} from "./core/knowledge/client";
 import {
   emptyContext,
   ENGINE_LABELS,
@@ -53,9 +53,9 @@ import {
   type EngineId,
   type SolverAnswer,
   type SolverContext,
-} from "./solver/types";
+} from "./core/solver/types";
 import type { AngleMode, HistoryEntry } from "./types";
-import type { ProbabilityContext } from "./solver/probabilityTypes";
+import type { ProbabilityContext } from "./core/solver/probabilityTypes";
 import type { NaturalMathFieldHandle } from "./components/common/NaturalMathField";
 const NaturalMathField = lazy(() =>
   import("./components/common/NaturalMathField").then((module) => ({

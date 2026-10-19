@@ -1,4 +1,4 @@
-import { normalizeMathTypography } from "../solver/textbook.js";
+import { normalizeMathTypography } from "../core/solver/textbook.js";
 
 const easternArabicDigits = "٠١٢٣٤٥٦٧٨٩";
 const persianDigits = "۰۱۲۳۴۵۶۷۸۹";

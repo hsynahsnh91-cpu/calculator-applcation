@@ -1,5 +1,5 @@
 import { RichText, Tex } from "./Tex";
-import type { SolutionStep } from "../../solver/types";
+import type { SolutionStep } from "../../core/solver/types";
 export function Step({ step, number }: { step: SolutionStep; number: number }) {
   return (
     <div className="solution-step">

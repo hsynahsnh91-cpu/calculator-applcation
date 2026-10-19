@@ -52,6 +52,20 @@ export default defineConfig(({ mode }) => {
     },
   };
   const plugins: PluginOption[] = [react(), tailwindcss()];
+  if (offlineSingleFile) {
+    plugins.push({
+      name: "inline-solver-worker-offline",
+      enforce: "pre",
+      transform(code, id) {
+        if (!id.replace(/\\/g, "/").endsWith("/src/core/solver/client.ts"))
+          return null;
+        return code.replace(
+          "solver.worker?worker",
+          "solver.worker?worker&inline",
+        );
+      },
+    });
+  }
 
   if (offlineSingleFile) {
     plugins.push(offlineLicensePlugin);
@@ -77,9 +91,15 @@ export default defineConfig(({ mode }) => {
         ? undefined
         : {
             output: {
-              manualChunks: {
-                react: ["react", "react-dom"],
-                math: ["katex", "mathjs", "nerdamer"],
+              manualChunks(id) {
+                if (
+                  id.includes("node_modules/react-dom") ||
+                  id.includes("node_modules/react/")
+                ) {
+                  return "react";
+                }
+                if (id.includes("node_modules/katex")) return "katex";
+                // mathjs and nerdamer stay with the worker / engine chunks.
               },
             },
           },

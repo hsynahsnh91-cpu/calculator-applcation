@@ -1,5 +1,5 @@
 /**
- * One folder per engine family. Files move here in phase 2; import paths
- * change only. Engine logic is not rewritten.
+ * Engine families live in sibling folders. Runners load each family lazily.
+ * Logic is the original engines with updated import paths only.
  */
 export {};

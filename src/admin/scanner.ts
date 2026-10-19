@@ -1,13 +1,13 @@
 import { normalizeScannedText } from "./normalization";
 
-type OcrModule = typeof import("../solver/ocr");
+type OcrModule = typeof import("../core/solver/ocr");
 type PdfJsModule = typeof import("pdfjs-dist/legacy/build/pdf.mjs");
 
 let ocrModulePromise: Promise<OcrModule> | undefined;
 let pdfModulePromise: Promise<{ pdfjs: PdfJsModule; workerUrl: string }> | undefined;
 
 function loadOcr(): Promise<OcrModule> {
-  if (!ocrModulePromise) ocrModulePromise = import("../solver/ocr");
+  if (!ocrModulePromise) ocrModulePromise = import("../core/solver/ocr");
   return ocrModulePromise;
 }
 

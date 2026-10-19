@@ -16,7 +16,7 @@ try {
   ]) {
     const output = new URL(`${name}.mjs`, directory).pathname;
     await build({
-      entryPoints: [new URL(`./${name}.test.ts`, import.meta.url).pathname],
+      entryPoints: [new URL(`./unit/${name}.test.ts`, import.meta.url).pathname],
       outfile: output,
       bundle: true,
       platform: "node",

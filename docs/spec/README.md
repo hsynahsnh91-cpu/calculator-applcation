@@ -13,4 +13,10 @@
 - `tests/unit` و`tests/golden` و`tests/e2e`
 - `docs/perf` لتقارير الحجم لاحقًا
 
-الملفات العاملة اليوم ما زالت في `src/App.tsx` و`src/utils` و`src/solver` و`src/components` و`src/admin`. النقل في المراحل التالية.
+المرحلة 2 نقلت المحركات والمحلل والاختبارات:
+
+- `src/core/solver` و`src/core/engines/*` و`src/core/knowledge`
+- الاختبارات في `tests/unit` مع بقاء المشغّل `tests/run.mjs`
+- `naturalDisplay.ts` صار `naturalDisplayTree.ts` لتفادي تضارب الاسم مع `NaturalDisplay.tsx`
+
+لم تُنقل مكوّنات المحادثة (`src/components/chat` وغيرها) — المرحلة 3.

@@ -7,7 +7,7 @@ import {
   verificationEvidenceSchema,
 } from "../brain/semantic/statement.js";
 import { knowledgeRelationSchema } from "../brain/semantic/relations.js";
-import type { EngineId } from "../solver/types.js";
+import type { EngineId } from "../core/solver/types.js";
 
 /**
  * The admin and API layers share these schemas.  Data is always parsed before

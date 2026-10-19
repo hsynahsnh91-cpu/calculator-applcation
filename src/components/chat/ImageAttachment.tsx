@@ -2,7 +2,7 @@ import { RichText } from "../common/Tex";
 import {
   normalizeMathTypography,
   stripPromptMarkdown,
-} from "../../solver/textbook";
+} from "../../core/solver/textbook";
 import { useEffect, useState } from "react";
 import { Check, Image, LoaderCircle, X } from "lucide-react";
 export function ImageAttachment({
@@ -23,10 +23,10 @@ export function ImageAttachment({
     [used, setUsed] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
-    let engine: typeof import("../../solver/ocr") | null = null;
+    let engine: typeof import("../../core/solver/ocr") | null = null;
     (async () => {
       try {
-        engine = await import("../../solver/ocr");
+        engine = await import("../../core/solver/ocr");
         if (controller.signal.aborted) return;
         const image = await engine.prepareImage(file);
         if (controller.signal.aborted) return;

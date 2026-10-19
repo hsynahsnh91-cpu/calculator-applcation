@@ -1,6 +1,6 @@
-import { approvedSolutionFromAnswer, approvedSolutionsMatch } from "../../knowledge/regression";
+import { approvedSolutionFromAnswer, approvedSolutionsMatch } from "../../core/knowledge/regression";
 import type { ApprovedSolution } from "../../admin/types";
-import type { SolverAnswer } from "../../solver/types";
+import type { SolverAnswer } from "../../core/solver/types";
 import type { VerificationEvidence } from "../semantic/statement";
 
 export interface BookExampleComparison {

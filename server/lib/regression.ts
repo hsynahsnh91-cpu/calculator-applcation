@@ -8,9 +8,9 @@ import {
   approvedSolutionFromAnswer,
   approvedSolutionsMatch,
   isRegressionKnowledgeItem,
-} from "../../src/knowledge/regression.js";
-import { solvePrompt } from "../../src/solver/orchestrator.js";
-import { emptyContext } from "../../src/solver/types.js";
+} from "../../src/core/knowledge/regression.js";
+import { solvePrompt } from "../../src/core/solver/orchestrator.js";
+import { emptyContext } from "../../src/core/solver/types.js";
 import { RedisKey, redis } from "./redis.js";
 
 type RegressionCandidate = Pick<

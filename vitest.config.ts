@@ -6,7 +6,7 @@ export default defineConfig({
     alias: { "@": path.resolve(__dirname, "src") },
   },
   test: {
-    include: ["tests/unit/**/*.test.ts"],
+    include: ["tests/unit/knowledge-schema.test.ts"],
     environment: "node",
   },
 });

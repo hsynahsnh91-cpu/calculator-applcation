@@ -1,6 +1,6 @@
 import React from 'react';
 import { Sparkles, Layers, LucideIcon } from 'lucide-react';
-import { soundHaptics } from '../../utils/soundHaptics';
+import { soundHaptics } from '../../shared/utils/soundHaptics';
 
 export interface WhatOption {
   id: string;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AppMode, AngleMode } from '../../types';
-import { soundHaptics } from '../../utils/soundHaptics';
+import { soundHaptics } from '../../shared/utils/soundHaptics';
 import { 
   Calculator, 
   Variable, 
