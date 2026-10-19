@@ -33,4 +33,11 @@
 - Gemini على الخادم عبر `GEMINI_API_KEY`؛ الطالب لا يستدعي أي ذكاء
 - بوابة النشر الثنائية لم تتغير: متصفح ثم خادم، والعقل لا ينشر
 
-لم تُعد هيكلة مجلد `src/admin` (المرحلة 5).
+المرحلة 5 نقلت واجهة المدير دون حذف تبويب:
+
+- `src/admin/app` القشرة وتسجيل الدخول
+- `src/admin/features/{overview,scan,workspace,practice,library,publish,monitor,settings}`
+- `src/admin/lib` للـAPI والحالة المحلية
+- `types.ts` و`normalization.ts` و`enginePrompt.ts` بقيت في جذر `src/admin` لأن الخادم يستوردها
+- المسح ومساحة العقل وتدرّب تُحمَّل كسولاً
+- بوابة النشر الثنائية لم تتغير؛ الطالب ما زال بلا Gemini/Firebase

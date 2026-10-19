@@ -1,7 +1,7 @@
 import { AlertTriangle, BarChart3, BookOpen, FilePenLine, RotateCcw } from "lucide-react";
-import type { AdminHealth, AdminStatistics } from "../api";
-import type { CurriculumGap } from "../curriculum";
-import type { FailureRecord, KnowledgeItem, KnowledgeSnapshot } from "../types";
+import type { AdminHealth, AdminStatistics } from "../../lib/api";
+import type { CurriculumGap } from "../../lib/curriculum";
+import type { FailureRecord, KnowledgeItem, KnowledgeSnapshot } from "../../types";
 
 export function OverviewTab({
   items,

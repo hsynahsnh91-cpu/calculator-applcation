@@ -1,4 +1,4 @@
-import type { KnowledgeItem } from "./types";
+import type { KnowledgeItem } from "../types";
 
 /**
  * A deliberately small, editable map used only to highlight gaps in the

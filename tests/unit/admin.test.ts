@@ -11,7 +11,7 @@ import {
   parseAdminEmails,
   resolveAiProvider,
 } from "../../server/lib/secrets.js";
-import { splitDocumentForAnalysis } from "../../src/admin/analysisChunks.js";
+import { splitDocumentForAnalysis } from "../../src/admin/lib/analysisChunks.js";
 import { analyzeWithPatterns } from "../../server/lib/analysis.js";
 
 let passed = 0;

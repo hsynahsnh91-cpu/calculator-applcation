@@ -1,6 +1,6 @@
 import { AlertTriangle, CloudUpload, Download, LoaderCircle, RotateCcw, Upload } from "lucide-react";
 import type { ChangeEvent, RefObject } from "react";
-import type { KnowledgeItem, KnowledgeSnapshot, RegressionOutcome, VersionSummary } from "../types";
+import type { KnowledgeItem, KnowledgeSnapshot, RegressionOutcome, VersionSummary } from "../../types";
 
 export function PublishTab({
   items,

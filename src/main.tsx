@@ -5,7 +5,7 @@ import App from "./app/App";
 
 // The administrative console includes OCR, review, and authoring code. Keep it
 // out of the public calculator's initial route and CDN payload.
-const AdminApp = lazy(() => import("./admin/AdminApp"));
+const AdminApp = lazy(() => import("./admin/app/AdminApp"));
 const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
 const isAdminRoute = pathname.toLowerCase() === "/admin";
 

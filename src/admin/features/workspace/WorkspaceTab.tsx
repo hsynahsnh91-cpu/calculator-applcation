@@ -24,26 +24,26 @@ import {
   Trash2,
   Wrench,
 } from "lucide-react";
-import { Tex } from "../../ui/Tex";
-import { parseLatex, printLatexDocument } from "../../brain/latex";
+import { Tex } from "../../../ui/Tex";
+import { parseLatex, printLatexDocument } from "../../../brain/latex";
 import {
   relationLabels,
   relationTypeSchema,
   type RelationType,
-} from "../../brain/semantic/relations";
+} from "../../../brain/semantic/relations";
 import {
   understandingFromEvidence,
   verificationEvidenceSchema,
   type UnderstandingLevel,
   type VerificationEvidence,
-} from "../../brain/semantic/statement";
-import { chatWithAdminBrain } from "../api";
-import { adminDraftDB } from "../indexedDB";
+} from "../../../brain/semantic/statement";
+import { chatWithAdminBrain } from "../../lib/api";
+import { adminDraftDB } from "../../lib/indexedDB";
 import {
   knowledgeItemSchema,
   type AdminChatMessage,
   type KnowledgeItem,
-} from "../types";
+} from "../../types";
 import {
   workspaceSessionSchema,
   type WorkspaceSession,

@@ -1,12 +1,12 @@
-import type { ScannedDocument } from "./scanner";
-import { workspaceSessionSchema, type WorkspaceSession } from "./workspace/types";
+import type { ScannedDocument } from "../features/scan/scanner";
+import { workspaceSessionSchema, type WorkspaceSession } from "../features/workspace/types";
 import {
   defaultSolverSettings,
   knowledgeItemSchema,
   solverSettingsSchema,
   type KnowledgeItem,
   type SolverSettings,
-} from "./types";
+} from "../types";
 
 const DB_NAME = "syrian-math-admin";
 const DB_VERSION = 3;

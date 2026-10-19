@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -8,6 +10,8 @@ import {
   type ChangeEvent,
   type FormEvent,
 } from "react";
+import "./admin.css";
+import { AdminLogin } from "./AdminLogin";
 import {
   AlertTriangle,
   BarChart3,
@@ -21,7 +25,6 @@ import {
   Layers3,
   LibraryBig,
   LoaderCircle,
-  LockKeyhole,
   LogOut,
   Play,
   Plus,
@@ -35,9 +38,9 @@ import {
   X,
 } from "lucide-react";
 import { z } from "zod";
-import { Tex } from "../ui/Tex";
-import { ENGINE_LABELS, type EngineId, type SolverAnswer } from "../core/solver/types";
-import { cancelSolver, solveLocally } from "../core/solver/client";
+import { Tex } from "../../ui/Tex";
+import { ENGINE_LABELS, type EngineId, type SolverAnswer } from "../../core/solver/types";
+import { cancelSolver, solveLocally } from "../../core/solver/client";
 import {
   adminUiReducer,
   initialAdminUiState,
@@ -46,30 +49,39 @@ import {
   type CorrectionTarget,
   type IncomingFeedback,
   type SessionState,
-} from "./adminUiStore";
-import { DEFAULT_ENGINE_PROMPT } from "./enginePrompt";
-import { adminDraftDB } from "./indexedDB";
-import { canonicalizeQuestion, questionFingerprint } from "./normalization";
-import type { DocumentAnalysisOptions } from "./DocumentScanner";
-import type { ManualTrainingInput } from "./ManualTrainingPanel";
-import { PracticeTab } from "./PracticeTab";
-import { LibraryTab } from "./tabs/LibraryTab";
-import { OverviewTab } from "./tabs/OverviewTab";
-import { MonitorTab } from "./tabs/MonitorTab";
-import { PublishTab } from "./tabs/PublishTab";
-import { ScanTab } from "./tabs/ScanTab";
-import { SettingsTab } from "./tabs/SettingsTab";
-import { WorkspaceTab } from "./workspace/WorkspaceTab";
-import { splitDocumentForAnalysis } from "./analysisChunks";
-import { findCurriculumGaps } from "./curriculum";
-import { scanDocument, type ScannedDocument } from "./scanner";
+} from "../lib/adminUiStore";
+import { DEFAULT_ENGINE_PROMPT } from "../enginePrompt";
+import { adminDraftDB } from "../lib/indexedDB";
+import { canonicalizeQuestion, questionFingerprint } from "../normalization";
+import type { DocumentAnalysisOptions } from "../features/scan/DocumentScanner";
+import type { ManualTrainingInput } from "../features/scan/ManualTrainingPanel";
+import { LibraryTab } from "../features/library/LibraryTab";
+import { OverviewTab } from "../features/overview/OverviewTab";
+import { MonitorTab } from "../features/monitor/MonitorTab";
+import { PublishTab } from "../features/publish/PublishTab";
+import { SettingsTab } from "../features/settings/SettingsTab";
+const ScanTab = lazy(() =>
+  import("../features/scan/ScanTab").then((module) => ({ default: module.ScanTab })),
+);
+const WorkspaceTab = lazy(() =>
+  import("../features/workspace/WorkspaceTab").then((module) => ({
+    default: module.WorkspaceTab,
+  })),
+);
+const PracticeTab = lazy(() =>
+  import("../features/practice/PracticeTab").then((module) => ({
+    default: module.PracticeTab,
+  })),
+);
+import { splitDocumentForAnalysis } from "../lib/analysisChunks";
+import { findCurriculumGaps } from "../lib/curriculum";
+import { scanDocument, type ScannedDocument } from "../features/scan/scanner";
 import {
   approvedSolutionFromAnswer,
   approvedSolutionsMatch,
-} from "../core/knowledge/regression";
+} from "../../core/knowledge/regression";
 import {
   AdminApiError,
-  adminLogin,
   adminLogout,
   adminLogoutAll,
   analyzeRemote,
@@ -86,7 +98,7 @@ import {
   saveServerPrompt,
   type AdminHealth,
   type AdminStatistics,
-} from "./api";
+} from "../lib/api";
 import {
   defaultSolverSettings,
   errorAnalysisSchema,
@@ -102,7 +114,7 @@ import {
   type RegressionOutcome,
   type SolverSettings,
   type VersionSummary,
-} from "./types";
+} from "../types";
 
 type ExerciseRun =
   | { state: "idle" }
@@ -254,65 +266,6 @@ function mergeWorkspace(
     if (!local || local.status === "published") map.set(published.id, published);
   });
   return [...map.values()].sort((first, second) => second.updatedAt.localeCompare(first.updatedAt));
-}
-
-function AdminLogin({ onAuthenticated }: { onAuthenticated: () => void }) {
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(() => {
-    if (typeof window === "undefined") return "";
-    return new URLSearchParams(window.location.search).get("auth_error") ?? "";
-  });
-  const [busy, setBusy] = useState(false);
-  const submit = async (event: FormEvent) => {
-    event.preventDefault();
-    if (!password || busy) return;
-    setBusy(true);
-    setError("");
-    try {
-      await adminLogin(password);
-      setPassword("");
-      onAuthenticated();
-    } catch (value) {
-      setError(value instanceof Error ? value.message : "تعذّر تسجيل الدخول.");
-    } finally {
-      setBusy(false);
-    }
-  };
-  return (
-    <main className="admin-login-page" dir="rtl">
-      <section className="admin-login-card">
-        <div className="admin-brand-mark" aria-hidden="true">
-          ∑
-        </div>
-        <p className="admin-eyebrow">لوحة تعليم المحرك</p>
-        <h1>إدارة المعرفة الرياضية السورية</h1>
-        <p>
-          ادخل بحساب Google المصرّح به على الخادم، أو بكلمة مرور الإدارة إن
-          كانت مضبوطة. لا تُخزن الأسرار في المتصفح.
-        </p>
-        <a className="admin-primary-button admin-login-button" href="/api/admin-google">
-          دخول بحساب Google
-        </a>
-        <form onSubmit={(event) => void submit(event)}>
-          <label>
-            كلمة مرور الإدارة
-            <input
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              type="password"
-              autoComplete="current-password"
-            />
-          </label>
-          {error && <p className="admin-error-text" role="alert">{error}</p>}
-          <button className="admin-secondary-button admin-login-button" disabled={busy} type="submit">
-            {busy ? <LoaderCircle className="animate-spin" size={17} /> : <LockKeyhole size={17} />}
-            دخول بكلمة المرور
-          </button>
-        </form>
-        <a href="/" className="admin-back-link">العودة إلى الحاسبة</a>
-      </section>
-    </main>
-  );
 }
 
 function AnswerPreview({ run }: { run: ExerciseRun }) {
@@ -1080,6 +1033,7 @@ export default function AdminApp() {
             </section>
           )}
 
+          <Suspense fallback={<p className="admin-loading">جارٍ فتح هذا القسم…</p>}>
           {tab === "overview" && (
             <OverviewTab
               items={items}
@@ -1207,6 +1161,7 @@ export default function AdminApp() {
               onSavePrompt={() => void savePrompt()}
             />
           )}
+          </Suspense>
         </main>
       </div>
       {editing && <KnowledgeEditor item={editing} onClose={() => setEditing(null)} onSave={async (item) => { await saveItem(item); setEditing(null); setNotice("حُفظ تعديل العنصر في المسودات المحلية."); }} />}

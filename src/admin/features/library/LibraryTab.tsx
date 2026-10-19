@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
 import type { ReactNode } from "react";
-import type { KnowledgeItem, KnowledgeItemType } from "../types";
+import type { KnowledgeItem, KnowledgeItemType } from "../../types";
 
 export function LibraryTab({
   itemCount,

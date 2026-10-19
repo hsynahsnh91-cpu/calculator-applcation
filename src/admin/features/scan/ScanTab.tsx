@@ -1,6 +1,6 @@
-import { DocumentScanner, type DocumentAnalysisOptions } from "../DocumentScanner";
-import { ManualTrainingPanel, type ManualTrainingInput } from "../ManualTrainingPanel";
-import type { ScannedDocument } from "../scanner";
+import { DocumentScanner, type DocumentAnalysisOptions } from "./DocumentScanner";
+import { ManualTrainingPanel, type ManualTrainingInput } from "./ManualTrainingPanel";
+import type { ScannedDocument } from "./scanner";
 
 export function ScanTab({
   onAnalyze,

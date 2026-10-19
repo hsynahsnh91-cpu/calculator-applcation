@@ -15,7 +15,7 @@ import {
   type PdfScanMode,
   type ScannedDocument,
 } from "./scanner";
-import { adminDraftDB, type CachedOcrDocument } from "./indexedDB";
+import { adminDraftDB, type CachedOcrDocument } from "../../lib/indexedDB";
 
 interface ScanJob {
   id: string;

@@ -13,7 +13,7 @@ import {
   type KnowledgeSnapshot,
   type PublishRequest,
   type VersionSummary,
-} from "./types";
+} from "../types";
 
 export class AdminApiError extends Error {
   constructor(

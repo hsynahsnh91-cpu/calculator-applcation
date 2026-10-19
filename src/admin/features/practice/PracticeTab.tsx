@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { CheckCircle2, LoaderCircle, RefreshCw, Sparkles } from "lucide-react";
-import { solveLocally } from "../core/solver/client";
-import { approvedSolutionFromAnswer, approvedSolutionsMatch } from "../core/knowledge/regression";
-import type { KnowledgeItem, SolverSettings } from "./types";
+import { solveLocally } from "../../../core/solver/client";
+import { approvedSolutionFromAnswer, approvedSolutionsMatch } from "../../../core/knowledge/regression";
+import type { KnowledgeItem, SolverSettings } from "../../types";
 
 interface PracticeVariant {
   source: KnowledgeItem;

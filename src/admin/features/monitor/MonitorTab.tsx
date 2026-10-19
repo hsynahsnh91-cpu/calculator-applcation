@@ -1,5 +1,5 @@
 import { LoaderCircle, Play, Trash2, X } from "lucide-react";
-import type { FailureRecord, RegressionOutcome } from "../types";
+import type { FailureRecord, RegressionOutcome } from "../../types";
 
 export function MonitorTab({
   failures,

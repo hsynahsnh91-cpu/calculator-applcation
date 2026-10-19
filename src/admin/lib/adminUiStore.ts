@@ -1,4 +1,4 @@
-import type { KnowledgeItem, KnowledgeItemType, RegressionOutcome } from "./types";
+import type { KnowledgeItem, KnowledgeItemType, RegressionOutcome } from "../types";
 
 export type AdminTab =
   | "overview"

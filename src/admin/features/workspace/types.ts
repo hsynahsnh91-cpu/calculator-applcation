@@ -3,7 +3,7 @@ import {
   adminChatMessageSchema,
   adminChatToolCallSchema,
   adminChatToolResultSchema,
-} from "../types";
+} from "../../types";
 
 export const workspacePageImageSchema = z
   .object({
