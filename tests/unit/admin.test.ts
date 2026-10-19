@@ -13,6 +13,10 @@ import {
 } from "../../server/lib/secrets.js";
 import { splitDocumentForAnalysis } from "../../src/admin/lib/analysisChunks.js";
 import { analyzeWithPatterns } from "../../server/lib/analysis.js";
+import {
+  isPublishedPracticeItem,
+  replaceOneCoefficient,
+} from "../../src/core/knowledge/practiceText.js";
 
 let passed = 0;
 let failed = 0;
@@ -204,6 +208,20 @@ test("Gemini is the default AI provider unless an explicit compatible URL is set
   assert.equal(compat.kind, "openai-compat");
   const missing = resolveAiProvider({});
   assert.equal(missing.kind, "none");
+});
+
+test("practice variants change one visible coefficient and skip a leading zero", () => {
+  assert.equal(replaceOneCoefficient("احسب 2 + 3"), "احسب 3 + 3");
+  assert.equal(replaceOneCoefficient("2x+3=0"), "2x+4=0");
+  assert.equal(replaceOneCoefficient("حل 0 و 4"), "حل 0 و 5");
+  assert.equal(replaceOneCoefficient("جد المشتقة"), undefined);
+});
+
+test("student practice uses published examples only, never drafts", () => {
+  assert.equal(isPublishedPracticeItem({ status: "published", type: "example" }), true);
+  assert.equal(isPublishedPracticeItem({ status: "approved", type: "exercise" }), false);
+  assert.equal(isPublishedPracticeItem({ status: "published", type: "rule" }), false);
+  assert.equal(isPublishedPracticeItem({ status: "draft", type: "example" }), false);
 });
 
 console.log(`\nAdmin API regression: ${passed} passed, ${failed} failed`);

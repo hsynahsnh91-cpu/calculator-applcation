@@ -18,6 +18,7 @@ import {
   LoaderCircle,
   Mic,
   Plus,
+  Sparkles,
   SlidersHorizontal,
   SquarePen,
   Trash2,
@@ -86,9 +87,15 @@ const ImageAttachment = lazy(() =>
 const ProbabilityBoard = lazy(
   () => import("../features/probability/ProbabilityBoard"),
 );
+const PracticeBoard = lazy(() =>
+  import("../features/practice/PracticeBoard").then((module) => ({
+    default: module.PracticeBoard,
+  })),
+);
 type Modal =
   | "math"
   | "probability"
+  | "practice"
   | "reference"
   | "history"
   | "name"
@@ -578,6 +585,11 @@ export default function App() {
                       <span>لوحة الاحتمالات والإحصاء</span>
                       <ChevronLeft size={14} />
                     </button>
+                    <button role="menuitem" onClick={() => open("practice")}>
+                      <Sparkles size={17} />
+                      <span>تدرّب</span>
+                      <span className="menu-tag">محلي</span>
+                    </button>
                     <button role="menuitem" onClick={() => open("reference")}>
                       <BookOpen size={17} />
                       <span>بنك القوانين</span>
@@ -752,21 +764,24 @@ export default function App() {
           title={
             modal === "probability"
               ? "لوحة الاحتمالات والإحصاء"
-              : modal === "math"
-                ? "لوحة المفاتيح الرياضية"
-                : modal === "reference"
-                  ? "بنك القوانين"
-                  : modal === "history"
-                    ? "السجل"
-                    : modal === "name"
-                      ? "كيف أناديك؟"
-                      : "مسح المحادثة"
+              : modal === "practice"
+                ? "تدرّب"
+                : modal === "math"
+                  ? "لوحة المفاتيح الرياضية"
+                  : modal === "reference"
+                    ? "بنك القوانين"
+                    : modal === "history"
+                      ? "السجل"
+                      : modal === "name"
+                        ? "كيف أناديك؟"
+                        : "مسح المحادثة"
           }
           onClose={() => setModal(null)}
           wide={
             modal === "reference" ||
             modal === "history" ||
-            modal === "probability"
+            modal === "probability" ||
+            modal === "practice"
           }
           className={modal === "probability" ? "probability-modal" : ""}
         >
@@ -809,6 +824,30 @@ export default function App() {
                 <ProbabilityBoard
                   context={probabilityDraft}
                   busy={busy}
+                  onInsert={(question) => {
+                    prompt.current?.setValue(question);
+                    setModal(null);
+                  }}
+                  onSolve={(question) => {
+                    setModal(null);
+                    void sendRef.current(question);
+                  }}
+                />
+              )}
+              {modal === "practice" && (
+                <PracticeBoard
+                  angleMode={angle}
+                  conversationSources={turns.flatMap((turn) =>
+                    turn.answer.results.some((result) => result.verification.passed)
+                      ? [
+                          {
+                            id: `c:${turn.id}`,
+                            label: `من المحادثة: ${turn.question.slice(0, 48)}`,
+                            text: turn.question,
+                          },
+                        ]
+                      : [],
+                  )}
                   onInsert={(question) => {
                     prompt.current?.setValue(question);
                     setModal(null);
