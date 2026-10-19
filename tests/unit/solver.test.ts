@@ -16,7 +16,7 @@ import {
 } from "../../src/core/solver/types";
 import { verifyDerivative } from "../../src/core/solver/math";
 import { isConversationTurn } from "../../src/core/solver/validation";
-import { RichText } from "../../src/components/common/Tex";
+import { RichText } from "../../src/ui/Tex";
 import { localDB } from "../../src/app/storage/localDB";
 
 let passed = 0,

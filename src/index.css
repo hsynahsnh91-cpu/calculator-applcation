@@ -2267,3 +2267,36 @@ kbd {
 .admin-ocr-resume p { margin: 0.55rem 0; color: var(--muted, #536174); font-size: 0.9rem; }
 .admin-ocr-resume ul { display: grid; gap: 0.45rem; margin: 0; padding: 0; list-style: none; }
 .admin-ocr-resume li { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; font-size: 0.88rem; }
+
+.conversation-turn {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 280px;
+}
+
+@media print {
+  .composer-zone,
+  .welcome,
+  .starter-prompts,
+  .tools-menu,
+  .question-composer {
+    display: none !important;
+  }
+  .chat-app,
+  .chat-main {
+    background: #fff !important;
+    color: #111 !important;
+    min-height: 0 !important;
+  }
+  body.printing-answer .conversation-turn:not(:has(.is-print-target)) {
+    display: none !important;
+  }
+  .assistant-message,
+  .final-answer,
+  .step-math {
+    break-inside: avoid;
+  }
+  .verified-badge,
+  .knowledge-source-badge {
+    color: #0d4 !important;
+  }
+}

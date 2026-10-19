@@ -21,7 +21,7 @@ import {
   type SolverContext,
 } from "../../src/core/solver/types";
 import { isConversationTurn } from "../../src/core/solver/validation";
-import { RichText } from "../../src/components/common/Tex";
+import { RichText } from "../../src/ui/Tex";
 
 const fixture = JSON.parse(
   readFileSync("tests/fixtures/syrian-complex.json", "utf8"),

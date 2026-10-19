@@ -24,7 +24,7 @@ import {
   Trash2,
   Wrench,
 } from "lucide-react";
-import { Tex } from "../../components/common/Tex";
+import { Tex } from "../../ui/Tex";
 import { parseLatex, printLatexDocument } from "../../brain/latex";
 import {
   relationLabels,

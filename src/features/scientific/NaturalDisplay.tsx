@@ -2,7 +2,7 @@ import React from 'react';
 import { BoxNode, ActiveTarget } from './naturalDisplayTree';
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, CornerDownLeft } from 'lucide-react';
 import { soundHaptics } from '../../shared/utils/soundHaptics';
-import { Tex } from '../../components/common/Tex';
+import { Tex } from '../../ui/Tex';
 
 interface NaturalDisplayProps {
   nodes: BoxNode[];

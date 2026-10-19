@@ -1,6 +1,6 @@
 import { useId, useMemo, useRef, useState, type CSSProperties } from "react";
 import { ArrowUp, Plus, Shuffle, Trash2 } from "lucide-react";
-import { Tex, RichText } from "../common/Tex";
+import { Tex, RichText } from "../../ui/Tex";
 import type {
   ProbabilityContext,
   ProbabilityComparison,

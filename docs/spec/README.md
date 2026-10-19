@@ -19,4 +19,11 @@
 - الاختبارات في `tests/unit` مع بقاء المشغّل `tests/run.mjs`
 - `naturalDisplay.ts` صار `naturalDisplayTree.ts` لتفادي تضارب الاسم مع `NaturalDisplay.tsx`
 
-لم تُنقل مكوّنات المحادثة (`src/components/chat` وغيرها) — المرحلة 3.
+المرحلة 3 نقلت واجهة الطالب:
+
+- `src/app/App.tsx` القشرة
+- `src/features/{chat,ocr,speech,probability,reference,history,scientific,equations,sequences,calculus,integration,geometry,matrices,complex}`
+- `src/ui` للقطع المشتركة (Tex, Step, MathKeyPad, …)
+- محرّكات العائلة تُحمَّل كسولاً من فقاعة الجواب
+
+لم يُمسّ `src/admin` (المرحلة 5). Firebase غير موصول (المرحلة 4).

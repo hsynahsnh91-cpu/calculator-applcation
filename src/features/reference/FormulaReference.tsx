@@ -1,8 +1,8 @@
 import { copyToClipboard } from "../../shared/utils/cn";
 import React, { useState } from "react";
 import { SCIENTIFIC_CONSTANTS } from "../../app/content/constants";
-import { KaTeXDisplay } from "../common/KaTeXDisplay";
-import { Tex } from "../common/Tex";
+import { KaTeXDisplay } from "../../ui/KaTeXDisplay";
+import { Tex } from "../../ui/Tex";
 import { soundHaptics } from "../../shared/utils/soundHaptics";
 import { Search, BookOpen, Atom, Copy, Check, Hash } from "lucide-react";
 

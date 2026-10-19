@@ -30,22 +30,23 @@ import {
 import {
   SmartPrompt,
   type SmartPromptHandle,
-} from "./components/chat/SmartPrompt";
-import { AnswerBubble } from "./components/chat/AnswerBubble";
-import { ToolModal } from "./components/chat/ToolModal";
-import { SectionErrorBoundary } from "./components/common/SectionErrorBoundary";
-import { RichText } from "./components/common/Tex";
-import { localDB } from "./app/storage/localDB";
-import { soundHaptics } from "./shared/utils/soundHaptics";
-import { useOfflineSpeech } from "./hooks/useOfflineSpeech";
-import { cancelSolver } from "./core/solver/client";
-import { composeAnswer, answerAsText } from "./core/solver/composer";
+} from "../features/chat/SmartPrompt";
+import { AnswerBubble } from "../features/chat/AnswerBubble";
+import "../ui/ui.css";
+import { ToolModal } from "../ui/ToolModal";
+import { SectionErrorBoundary } from "../ui/SectionErrorBoundary";
+import { RichText } from "../ui/Tex";
+import { localDB } from "./storage/localDB";
+import { soundHaptics } from "../shared/utils/soundHaptics";
+import { useOfflineSpeech } from "../features/speech/useOfflineSpeech";
+import { cancelSolver } from "../core/solver/client";
+import { composeAnswer, answerAsText } from "../core/solver/composer";
 import {
   loadKnowledge,
   recordKnowledgeFailure,
   recordKnowledgeSuccess,
   solveWithKnowledge,
-} from "./core/knowledge/client";
+} from "../core/knowledge/client";
 import {
   emptyContext,
   ENGINE_LABELS,
@@ -53,37 +54,37 @@ import {
   type EngineId,
   type SolverAnswer,
   type SolverContext,
-} from "./core/solver/types";
-import type { AngleMode, HistoryEntry } from "./types";
-import type { ProbabilityContext } from "./core/solver/probabilityTypes";
-import type { NaturalMathFieldHandle } from "./components/common/NaturalMathField";
+} from "../core/solver/types";
+import type { AngleMode, HistoryEntry } from "../types";
+import type { ProbabilityContext } from "../core/solver/probabilityTypes";
+import type { NaturalMathFieldHandle } from "../ui/NaturalMathField";
 const NaturalMathField = lazy(() =>
-  import("./components/common/NaturalMathField").then((module) => ({
+  import("../ui/NaturalMathField").then((module) => ({
     default: module.NaturalMathField,
   })),
 );
 const MathKeyPad = lazy(() =>
-  import("./components/common/MathKeyPad").then((module) => ({
+  import("../ui/MathKeyPad").then((module) => ({
     default: module.MathKeyPad,
   })),
 );
 const FormulaReference = lazy(() =>
-  import("./components/reference/FormulaReference").then((module) => ({
+  import("../features/reference/FormulaReference").then((module) => ({
     default: module.FormulaReference,
   })),
 );
 const HistoryDrawer = lazy(() =>
-  import("./components/history/HistoryDrawer").then((module) => ({
+  import("../features/history/HistoryDrawer").then((module) => ({
     default: module.HistoryDrawer,
   })),
 );
 const ImageAttachment = lazy(() =>
-  import("./components/chat/ImageAttachment").then((module) => ({
+  import("../features/ocr/ImageAttachment").then((module) => ({
     default: module.ImageAttachment,
   })),
 );
 const ProbabilityBoard = lazy(
-  () => import("./components/probability/ProbabilityBoard"),
+  () => import("../features/probability/ProbabilityBoard"),
 );
 type Modal =
   | "math"
@@ -373,22 +374,18 @@ export default function App() {
     setHistory(localDB.getHistory());
   }, []);
   const sendKnowledgeFeedback = useCallback(
-    (answer: SolverAnswer, isCorrect: boolean) => {
-      try {
-        sessionStorage.setItem(
-          "syrian-math-admin-feedback",
-          JSON.stringify({
-            question: answer.question,
-            answerText: answerAsText(answer),
-            answerLatex: answer.results.map((result) => result.finalLatex).join("\\qquad "),
-            isCorrect,
-            createdAt: new Date().toISOString(),
-          }),
-        );
-      } catch {
-        // The Admin page still opens; it can receive a manual correction.
+    (answer: SolverAnswer, isCorrect: boolean, reason?: string) => {
+      if (isCorrect) {
+        recordKnowledgeSuccess();
+        return;
       }
-      window.location.assign("/Admin");
+      const displayed = answerAsText(answer);
+      recordKnowledgeFailure(
+        answer.question,
+        reason
+          ? `الجواب المعروض: ${displayed} — السبب: ${reason}`
+          : `الجواب المعروض: ${displayed}`,
+      );
     },
     [],
   );

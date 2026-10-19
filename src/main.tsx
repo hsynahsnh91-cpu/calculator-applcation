@@ -1,7 +1,7 @@
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App";
+import App from "./app/App";
 
 // The administrative console includes OCR, review, and authoring code. Keep it
 // out of the public calculator's initial route and CDN payload.

@@ -2,9 +2,9 @@ import { copyToClipboard } from '../../shared/utils/cn';
 import React, { useState } from 'react';
 import { HistoryEntry, AppMode } from '../../types';
 import { localDB } from '../../app/storage/localDB';
-import { KaTeXDisplay } from '../common/KaTeXDisplay';
-import { RichText } from '../common/Tex';
-import { useModalAccessibility } from '../common/GuideModal';
+import { KaTeXDisplay } from '../../ui/KaTeXDisplay';
+import { RichText } from '../../ui/Tex';
+import { useModalAccessibility } from '../../ui/GuideModal';
 import { soundHaptics } from '../../shared/utils/soundHaptics';
 import { 
   Trash2, 

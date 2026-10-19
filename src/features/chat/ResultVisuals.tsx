@@ -7,8 +7,8 @@ import type {
   TreeNode,
   Visual,
 } from "../../core/solver/types";
-import { Tex, RichText } from "../common/Tex";
-import { SectionErrorBoundary } from "../common/SectionErrorBoundary";
+import { Tex, RichText } from "../../ui/Tex";
+import { SectionErrorBoundary } from "../../ui/SectionErrorBoundary";
 export interface ResultViewProps {
   result: SolverResult;
 }

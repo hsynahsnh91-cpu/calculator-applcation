@@ -1,6 +1,6 @@
 import { useId, type ReactNode } from "react";
 import { X } from "lucide-react";
-import { useModalAccessibility } from "../common/GuideModal";
+import { useModalAccessibility } from "./GuideModal";
 export function ToolModal({
   title,
   onClose,

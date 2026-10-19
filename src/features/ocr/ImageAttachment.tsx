@@ -1,4 +1,4 @@
-import { RichText } from "../common/Tex";
+import { RichText } from "../../ui/Tex";
 import {
   normalizeMathTypography,
   stripPromptMarkdown,

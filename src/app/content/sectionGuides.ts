@@ -1,4 +1,4 @@
-import { GuideSection } from '../../components/common/GuideModal';
+import { GuideSection } from '../../ui/GuideModal';
 
 export const GEOMETRY_GUIDE: GuideSection = {
   title: 'الهندسة الفراغية',

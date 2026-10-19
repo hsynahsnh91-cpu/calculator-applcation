@@ -13,12 +13,13 @@ import {
   Copy,
   Info,
   Dices,
+  Printer,
   ThumbsDown,
   ThumbsUp,
 } from "lucide-react";
-import { Tex, RichText } from "../common/Tex";
-import { Step } from "../common/Step";
-import { SectionErrorBoundary } from "../common/SectionErrorBoundary";
+import { Tex, RichText } from "../../ui/Tex";
+import { Step } from "../../ui/Step";
+import { SectionErrorBoundary } from "../../ui/SectionErrorBoundary";
 import {
   ENGINE_LABELS,
   type EngineId,
@@ -94,14 +95,21 @@ export const AnswerBubble = memo(function AnswerBubble({
   answer: SolverAnswer;
   onFollowUp: (text: string) => void;
   onSave: (answer: SolverAnswer) => void;
-  onKnowledgeFeedback?: (answer: SolverAnswer, isCorrect: boolean) => void;
+  onKnowledgeFeedback?: (
+    answer: SolverAnswer,
+    isCorrect: boolean,
+    reason?: string,
+  ) => void;
   onProbability?: (context?: ProbabilityContext) => void;
   saved: boolean;
   animate?: boolean;
 }) {
   const [copied, setCopied] = useState(false),
     [phase, setPhase] = useState(animate ? 0 : 2),
-    [copyError, setCopyError] = useState("");
+    [copyError, setCopyError] = useState(""),
+    [reportOpen, setReportOpen] = useState(false),
+    [reportReason, setReportReason] = useState(""),
+    [reportSent, setReportSent] = useState(false);
   useEffect(() => {
     if (
       !animate ||
@@ -123,6 +131,20 @@ export const AnswerBubble = memo(function AnswerBubble({
       setTimeout(() => setCopied(false), 2000);
     } else
       setCopyError("تعذّر الوصول إلى الحافظة. يمكنك تحديد النص ونسخه يدويًا.");
+  };
+  const printAnswer = () => {
+    const article = document.querySelector(
+      `[data-answer-id="${answer.id}"]`,
+    );
+    article?.classList.add("is-print-target");
+    document.body.classList.add("printing-answer");
+    const done = () => {
+      article?.classList.remove("is-print-target");
+      document.body.classList.remove("printing-answer");
+      window.removeEventListener("afterprint", done);
+    };
+    window.addEventListener("afterprint", done);
+    window.print();
   };
   return (
     <article
@@ -296,10 +318,10 @@ export const AnswerBubble = memo(function AnswerBubble({
                   <button
                     type="button"
                     className="knowledge-feedback-wrong"
-                    onClick={() => onKnowledgeFeedback(answer, false)}
+                    onClick={() => setReportOpen(true)}
                   >
                     <ThumbsDown size={15} />
-                    الحل خطأ
+                    الجواب خاطئ أو ناقص
                   </button>
                 </div>
               )}
@@ -326,6 +348,14 @@ export const AnswerBubble = memo(function AnswerBubble({
                 {copied ? <Check size={15} /> : <Copy size={15} />}
                 <span>{copied ? "تم النسخ" : "نسخ"}</span>
               </button>
+              <button
+                onClick={printAnswer}
+                className="answer-action"
+                aria-label="طباعة الجواب أو حفظه PDF"
+              >
+                <Printer size={15} />
+                <span>طباعة / PDF</span>
+              </button>
               {answer.results.length > 0 && (
                 <button
                   onClick={() => onSave(answer)}
@@ -341,6 +371,44 @@ export const AnswerBubble = memo(function AnswerBubble({
             {copyError && (
               <p role="alert" className="text-xs text-rose-300">
                 {copyError}
+              </p>
+            )}
+            {reportOpen && onKnowledgeFeedback && (
+              <form
+                className="clarification-card"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  onKnowledgeFeedback(answer, false, reportReason.trim());
+                  setReportOpen(false);
+                  setReportSent(true);
+                }}
+              >
+                <p>يُرسل السؤال والجواب المعروض إلى لوحة الإخفاقات بموافقتك.</p>
+                <textarea
+                  className="ocr-review"
+                  rows={2}
+                  value={reportReason}
+                  onChange={(event) => setReportReason(event.target.value)}
+                  placeholder="سبب اختياري"
+                  aria-label="سبب اختياري للبلاغ"
+                />
+                <div className="answer-actions">
+                  <button type="submit" className="primary-button">
+                    إرسال البلاغ
+                  </button>
+                  <button
+                    type="button"
+                    className="answer-action"
+                    onClick={() => setReportOpen(false)}
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </form>
+            )}
+            {reportSent && (
+              <p role="status" className="text-xs text-emerald-300">
+                أُرسل البلاغ. شكرًا لمراجعتك.
               </p>
             )}
             {!!answer.suggestions.length && (

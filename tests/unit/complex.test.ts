@@ -16,8 +16,8 @@ import {
   evaluateScalar,
   verifyPair,
 } from "../../src/core/engines/complex/complexMath";
-import { RichText } from "../../src/components/common/Tex";
-import { ResultVisuals } from "../../src/components/chat/ResultVisuals";
+import { RichText } from "../../src/ui/Tex";
+import { ResultVisuals } from "../../src/features/chat/ResultVisuals";
 import { math } from "../../src/core/solver/math";
 
 let passed = 0,

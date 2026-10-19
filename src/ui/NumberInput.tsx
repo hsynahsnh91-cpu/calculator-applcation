@@ -36,7 +36,6 @@ export const NumberInput: React.FC<NumberInputProps> = ({
     if (parsed !== value && !(text === '' && value === 0) && !(text === '-' && value === 0)) {
       setText(blankOnZero && value === 0 ? '' : String(value));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, blankOnZero]);
 
   const handle = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -13,7 +13,7 @@
 import nerdamer from 'nerdamer';
 import { create, all } from 'mathjs';
 import { normalizeExpr, validateRealIntegralDomain } from '../calculus/calculusEngine.js';
-import { cleanMathLatex } from '../../../components/common/Tex.js';
+import { cleanMathLatex } from '../../../ui/Tex.js';
 import { tex } from '../equations/equationSolver.js';
 import {
   planSeriesIntegrand,

@@ -35,7 +35,7 @@ import {
   X,
 } from "lucide-react";
 import { z } from "zod";
-import { Tex } from "../components/common/Tex";
+import { Tex } from "../ui/Tex";
 import { ENGINE_LABELS, type EngineId, type SolverAnswer } from "../core/solver/types";
 import { cancelSolver, solveLocally } from "../core/solver/client";
 import {

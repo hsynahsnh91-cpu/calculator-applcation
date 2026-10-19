@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { MathfieldElement } from "../common/NaturalMathField";
+import { MathfieldElement } from "../../ui/NaturalMathField";
 export interface SmartPromptHandle {
   value: () => string;
   setValue: (value: string) => void;
