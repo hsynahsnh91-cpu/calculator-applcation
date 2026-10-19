@@ -23,6 +23,7 @@ const routeLoaders: Record<string, () => Promise<RouteModule>> = {
   "admin-chat": () => import("../server/routes/admin-chat.js"),
   "admin-failures": () => import("../server/routes/admin-failures.js"),
   "admin-library": () => import("../server/routes/admin-library.js"),
+  "admin-google": () => import("../server/routes/admin-google.js"),
   "admin-login": () => import("../server/routes/admin-login.js"),
   "admin-logout": () => import("../server/routes/admin-logout.js"),
   "admin-logout-all": () => import("../server/routes/admin-logout-all.js"),

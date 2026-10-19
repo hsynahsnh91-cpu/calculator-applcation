@@ -4,6 +4,9 @@ import {
   publicFailureRequestSchema,
 } from "../../src/admin/types.js";
 import { canonicalizeQuestion, questionFingerprint } from "../../src/admin/normalization.js";
+import { firestoreAvailable } from "../lib/firestore.js";
+import { loadFailure, saveFailure } from "../lib/failures.js";
+import { incrementSolveCounters } from "../lib/knowledgeStore.js";
 import { clientIp, methodNotAllowed, readJsonBody, sendJson } from "../lib/http.js";
 import { consumeRateLimit, RedisKey, redis } from "../lib/redis.js";
 
@@ -26,44 +29,40 @@ export default async function handler(
     sendJson(response, 400, { error: "بيانات الإخفاق غير صالحة." });
     return;
   }
-  const client = redis();
-  if (!client) {
+  const durable = firestoreAvailable() || Boolean(redis());
+  if (!durable) {
     response.status(204).end();
     return;
   }
   try {
-    const rate = await consumeRateLimit(
-      RedisKey.publicFailureRate(clientIp(request)),
-      RATE_LIMIT_PER_MINUTE,
-      60,
-    );
-    if (!rate.allowed) {
-      response.setHeader("Retry-After", String(rate.retryAfterSeconds));
-      sendJson(response, 429, {
-        error: "تجاوز بلاغ الإخفاق الحد المسموح مؤقتًا.",
-        retryAfterSeconds: rate.retryAfterSeconds,
-      });
-      return;
+    if (redis()) {
+      const rate = await consumeRateLimit(
+        RedisKey.publicFailureRate(clientIp(request)),
+        RATE_LIMIT_PER_MINUTE,
+        60,
+      );
+      if (!rate.allowed) {
+        response.setHeader("Retry-After", String(rate.retryAfterSeconds));
+        sendJson(response, 429, {
+          error: "تجاوز بلاغ الإخفاق الحد المسموح مؤقتًا.",
+          retryAfterSeconds: rate.retryAfterSeconds,
+        });
+        return;
+      }
     }
     const canonicalQuestion = canonicalizeQuestion(parsed.data.question);
     const fingerprint = questionFingerprint(canonicalQuestion);
-    const previous = failureRecordSchema.safeParse(
-      await client.get<unknown>(RedisKey.failure(fingerprint)),
-    );
+    const previous = await loadFailure(fingerprint);
     const record = failureRecordSchema.parse({
       fingerprint,
       canonicalQuestion,
       sampleQuestion: parsed.data.question,
-      count: previous.success ? previous.data.count + 1 : 1,
+      count: previous ? previous.count + 1 : 1,
       lastSeenAt: new Date().toISOString(),
       reason: parsed.data.reason,
     });
-    await client.set(RedisKey.failure(fingerprint), record);
-    await client.zadd(RedisKey.failureIndex, {
-      score: Date.now(),
-      member: fingerprint,
-    });
-    await client.incr(RedisKey.solveAttempts);
+    await saveFailure(record);
+    await incrementSolveCounters(false);
     sendJson(response, 202, { accepted: true });
   } catch (error) {
     console.error("Knowledge failure route failed", {

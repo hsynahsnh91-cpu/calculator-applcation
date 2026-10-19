@@ -2,6 +2,11 @@ import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { sendJson } from "./http.js";
 import { RedisKey, redis } from "./redis.js";
+import {
+  firestoreConfigured,
+  googleAuthConfigured,
+  resolveAiProvider,
+} from "./secrets.js";
 
 const COOKIE_NAME = "syrian_math_admin";
 const SESSION_SECONDS = 8 * 60 * 60;
@@ -115,35 +120,47 @@ function numberFromRedis(value: unknown): number {
   return typeof raw === "number" && Number.isInteger(raw) && raw >= 0 ? raw : 0;
 }
 
+function appendCookie(response: VercelResponse, value: string): void {
+  const current = response.getHeader("Set-Cookie");
+  if (!current) response.setHeader("Set-Cookie", value);
+  else if (Array.isArray(current)) response.setHeader("Set-Cookie", [...current.map(String), value]);
+  else response.setHeader("Set-Cookie", [String(current), value]);
+}
+
 export async function issueAdminSession(now = Date.now()): Promise<string> {
   const client = redis();
-  if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
-  const generation = numberFromRedis(
-    await client.get<unknown>(RedisKey.adminSessionGeneration),
-  );
+  const generation = client
+    ? numberFromRedis(await client.get<unknown>(RedisKey.adminSessionGeneration))
+    : 0;
   const sessionId = randomUUID();
   const token = createAdminToken(now, sessionId, generation);
-  await client.set(RedisKey.adminSession(sessionId), String(generation), {
-    ex: SESSION_SECONDS,
-  });
+  if (client) {
+    await client.set(RedisKey.adminSession(sessionId), String(generation), {
+      ex: SESSION_SECONDS,
+    });
+  }
   return token;
 }
 
 export function setAdminCookie(response: VercelResponse, token: string): void {
-  response.setHeader(
-    "Set-Cookie",
-    `${COOKIE_NAME}=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${SESSION_SECONDS}`,
+  // Lax is required so a top-level Google OAuth redirect can store the session.
+  appendCookie(
+    response,
+    `${COOKIE_NAME}=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_SECONDS}`,
   );
 }
 
 export function clearAdminCookie(response: VercelResponse): void {
-  response.setHeader(
-    "Set-Cookie",
-    `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`,
+  appendCookie(
+    response,
+    `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`,
   );
 }
 
-/** Requires both a valid HMAC and a non-revoked Redis session identifier. */
+/**
+ * Redis sessions stay fail-closed when Redis is configured. Without Redis,
+ * a valid unexpired HMAC cookie is enough so Google login can work on Firestore-only hosts.
+ */
 export async function isAdminRequest(request: VercelRequest): Promise<boolean> {
   try {
     const raw = tokenFromRequest(request);
@@ -151,7 +168,7 @@ export async function isAdminRequest(request: VercelRequest): Promise<boolean> {
     const payload = parseAdminToken(raw);
     if (!payload) return false;
     const client = redis();
-    if (!client) return false;
+    if (!client) return true;
     const [storedGeneration, activeGeneration] = await client
       .pipeline()
       .get<unknown>(RedisKey.adminSession(payload.sessionId))
@@ -176,8 +193,7 @@ export async function revokeCurrentAdminSession(request: VercelRequest): Promise
 /** Incrementing a generation invalidates every saved session immediately. */
 export async function revokeAllAdminSessions(): Promise<void> {
   const client = redis();
-  if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
-  await client.incr(RedisKey.adminSessionGeneration);
+  if (client) await client.incr(RedisKey.adminSessionGeneration);
 }
 
 export async function requireAdmin(
@@ -212,9 +228,10 @@ export function requireTrustedOrigin(
 }
 
 export function adminConfigurationError(): string | undefined {
-  if (!process.env.ADMIN_PASSWORD)
-    return "لم يُضبط ADMIN_PASSWORD في إعدادات Vercel بعد.";
-  return adminSecretConfigurationError();
+  const secretError = adminSecretConfigurationError();
+  if (secretError) return secretError;
+  if (process.env.ADMIN_PASSWORD) return undefined;
+  return "لم يُضبط ADMIN_PASSWORD في إعدادات Vercel بعد.";
 }
 
 export function adminPasswordConfigured(): boolean {
@@ -225,10 +242,16 @@ export function adminPasswordConfigured(): boolean {
 export function adminEnvironmentStatus(): {
   passwordConfigured: boolean;
   secretConfigured: boolean;
+  googleAuthConfigured: boolean;
+  geminiConfigured: boolean;
+  firestoreConfigured: boolean;
 } {
   return {
     passwordConfigured: Boolean(process.env.ADMIN_PASSWORD),
     secretConfigured: adminSecretConfigurationError() === undefined,
+    googleAuthConfigured: googleAuthConfigured(),
+    geminiConfigured: resolveAiProvider().kind !== "none",
+    firestoreConfigured: firestoreConfigured(),
   };
 }
 

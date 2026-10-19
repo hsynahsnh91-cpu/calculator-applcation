@@ -7,7 +7,33 @@ import {
   type VersionSummary,
   versionSummarySchema,
 } from "../../src/admin/types.js";
+import {
+  firestoreAvailable,
+  firestoreGet,
+  firestoreMaxBytes,
+  firestoreSet,
+} from "./firestore.js";
 import { RedisKey, redis } from "./redis.js";
+
+const FIRESTORE_META = "knowledge/meta";
+const firestoreVersionPath = (version: number): string => `knowledge_versions/${version}`;
+const firestoreSummaryPath = (version: number): string => `knowledge_summaries/${version}`;
+
+interface StoredAdminSettings {
+  prompt?: string;
+}
+
+interface FirestoreMeta {
+  currentVersion?: number;
+  versionSequence?: number;
+  settings?: StoredAdminSettings;
+  solveAttempts?: number;
+  solveSuccesses?: number;
+}
+
+async function firestoreMeta(): Promise<FirestoreMeta> {
+  return (await firestoreGet<FirestoreMeta>(FIRESTORE_META)) ?? {};
+}
 
 const MAX_SNAPSHOT_BYTES = 2_000_000;
 const MAX_VERSION_LIST = 100;
@@ -37,12 +63,22 @@ function summaryFor(snapshot: KnowledgeSnapshot): VersionSummary {
 }
 
 export async function getCurrentVersion(): Promise<number | undefined> {
+  if (firestoreAvailable()) {
+    const meta = await firestoreMeta();
+    return asVersion(meta.currentVersion);
+  }
   const client = redis();
   if (!client) return undefined;
   return asVersion(await client.get<unknown>(RedisKey.currentVersion));
 }
 
 export async function getSnapshot(version: number): Promise<KnowledgeSnapshot | undefined> {
+  if (firestoreAvailable()) {
+    const parsed = knowledgeSnapshotSchema.safeParse(
+      await firestoreGet<unknown>(firestoreVersionPath(version)),
+    );
+    return parsed.success ? parsed.data : undefined;
+  }
   const client = redis();
   if (!client) return undefined;
   const parsed = knowledgeSnapshotSchema.safeParse(
@@ -100,10 +136,17 @@ export async function publishSnapshot(
   items: KnowledgeItem[],
   settings: SolverSettings,
 ): Promise<PublishStoredResult> {
-  const client = redis();
-  if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
-  const version = await client.incr(RedisKey.versionSequence);
   const now = new Date().toISOString();
+  const nextVersion = async (): Promise<number> => {
+    if (firestoreAvailable()) {
+      const meta = await firestoreMeta();
+      return (asVersion(meta.versionSequence) ?? 0) + 1;
+    }
+    const client = redis();
+    if (!client) throw new Error("لا توجد قاعدة معرفة مربوطة (Firestore أو Redis).");
+    return client.incr(RedisKey.versionSequence);
+  };
+  const version = await nextVersion();
   const snapshot = knowledgeSnapshotSchema.parse({
     version,
     publishedAt: now,
@@ -112,11 +155,25 @@ export async function publishSnapshot(
   });
   validatePublishedRelations(snapshot.items);
   const bytes = Buffer.byteLength(JSON.stringify(snapshot), "utf8");
-  if (bytes > MAX_SNAPSHOT_BYTES)
+  const limit = firestoreAvailable() ? firestoreMaxBytes() : MAX_SNAPSHOT_BYTES;
+  if (bytes > limit)
     throw new Error(
-      `حجم نسخة المعرفة ${Math.ceil(bytes / 1024)} كيلوبايت ويتجاوز الحد الآمن ${Math.floor(MAX_SNAPSHOT_BYTES / 1024)} كيلوبايت. قسّم النشر إلى وحدات أصغر.`,
+      `حجم نسخة المعرفة ${Math.ceil(bytes / 1024)} كيلوبايت ويتجاوز الحد الآمن ${Math.floor(limit / 1024)} كيلوبايت. قسّم النشر إلى وحدات أصغر.`,
     );
   const summary = summaryFor(snapshot);
+  if (firestoreAvailable()) {
+    const meta = await firestoreMeta();
+    await firestoreSet(firestoreVersionPath(version), snapshot);
+    await firestoreSet(firestoreSummaryPath(version), summary);
+    await firestoreSet(FIRESTORE_META, {
+      ...meta,
+      currentVersion: version,
+      versionSequence: version,
+    });
+    return { snapshot, bytes };
+  }
+  const client = redis();
+  if (!client) throw new Error("لا توجد قاعدة معرفة مربوطة (Firestore أو Redis).");
   await client.set(RedisKey.version(version), snapshot);
   await client.set(RedisKey.versionSummary(version), summary);
   await client.set(RedisKey.currentVersion, version);
@@ -124,8 +181,28 @@ export async function publishSnapshot(
 }
 
 export async function listVersions(): Promise<VersionSummary[]> {
+  if (firestoreAvailable()) {
+    const meta = await firestoreMeta();
+    const last = asVersion(meta.versionSequence) ?? asVersion(meta.currentVersion) ?? 0;
+    const versions: VersionSummary[] = [];
+    for (let version = last; version > 0 && versions.length < MAX_VERSION_LIST; version--) {
+      const summary = versionSummarySchema.safeParse(
+        await firestoreGet<unknown>(firestoreSummaryPath(version)),
+      );
+      if (summary.success) {
+        versions.push(summary.data);
+        continue;
+      }
+      const legacy = await getSnapshot(version);
+      if (!legacy) continue;
+      const migrated = summaryFor(legacy);
+      versions.push(migrated);
+      void firestoreSet(firestoreSummaryPath(version), migrated).catch(() => undefined);
+    }
+    return versions;
+  }
   const client = redis();
-  if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
+  if (!client) throw new Error("لا توجد قاعدة معرفة مربوطة (Firestore أو Redis).");
   const last = asVersion(await client.get<unknown>(RedisKey.versionSequence)) ?? 0;
   const versions: VersionSummary[] = [];
   for (let version = last; version > 0 && versions.length < MAX_VERSION_LIST; version--) {
@@ -148,21 +225,26 @@ export async function listVersions(): Promise<VersionSummary[]> {
 }
 
 export async function rollbackToVersion(version: number): Promise<KnowledgeSnapshot> {
-  const client = redis();
-  if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
   const snapshot = await getSnapshot(version);
   if (!snapshot) throw new Error("لم تُعثر على النسخة المطلوبة للتراجع.");
+  if (firestoreAvailable()) {
+    const meta = await firestoreMeta();
+    await firestoreSet(FIRESTORE_META, { ...meta, currentVersion: version });
+    return snapshot;
+  }
+  const client = redis();
+  if (!client) throw new Error("لا توجد قاعدة معرفة مربوطة (Firestore أو Redis).");
   await client.set(RedisKey.currentVersion, version);
   return snapshot;
 }
 
-interface StoredAdminSettings {
-  prompt?: string;
-}
-
 export async function getStoredAdminSettings(): Promise<StoredAdminSettings> {
+  if (firestoreAvailable()) {
+    const meta = await firestoreMeta();
+    return meta.settings ?? {};
+  }
   const client = redis();
-  if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
+  if (!client) throw new Error("لا توجد قاعدة معرفة مربوطة (Firestore أو Redis).");
   const value = parseStored<unknown>(
     await client.get<unknown>(RedisKey.adminSettings),
   );
@@ -177,10 +259,52 @@ export async function getStoredAdminSettings(): Promise<StoredAdminSettings> {
   return {};
 }
 
-export async function setStoredAdminSettings(value: StoredAdminSettings): Promise<void> {
+export async function getSolveCounters(): Promise<{ attempts: number; successes: number }> {
+  if (firestoreAvailable()) {
+    const meta = await firestoreMeta();
+    return {
+      attempts: asVersion(meta.solveAttempts) ?? 0,
+      successes: asVersion(meta.solveSuccesses) ?? 0,
+    };
+  }
   const client = redis();
-  if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
+  if (!client) return { attempts: 0, successes: 0 };
+  const [attemptsRaw, successesRaw] = await Promise.all([
+    client.get<unknown>(RedisKey.solveAttempts),
+    client.get<unknown>(RedisKey.solveSuccesses),
+  ]);
+  return {
+    attempts: asVersion(attemptsRaw) ?? 0,
+    successes: asVersion(successesRaw) ?? 0,
+  };
+}
+
+export async function incrementSolveCounters(success: boolean): Promise<void> {
+  if (firestoreAvailable()) {
+    const meta = await firestoreMeta();
+    await firestoreSet(FIRESTORE_META, {
+      ...meta,
+      solveAttempts: (asVersion(meta.solveAttempts) ?? 0) + 1,
+      solveSuccesses: (asVersion(meta.solveSuccesses) ?? 0) + (success ? 1 : 0),
+    });
+    return;
+  }
+  const client = redis();
+  if (!client) return;
+  await client.incr(RedisKey.solveAttempts);
+  if (success) await client.incr(RedisKey.solveSuccesses);
+}
+
+export async function setStoredAdminSettings(value: StoredAdminSettings): Promise<void> {
   const prompt = value.prompt?.trim();
   if (prompt && prompt.length > 24_000) throw new Error("البرومبت أطول من الحد المسموح.");
-  await client.set(RedisKey.adminSettings, prompt ? { prompt } : {});
+  const stored = prompt ? { prompt } : {};
+  if (firestoreAvailable()) {
+    const meta = await firestoreMeta();
+    await firestoreSet(FIRESTORE_META, { ...meta, settings: stored });
+    return;
+  }
+  const client = redis();
+  if (!client) throw new Error("لا توجد قاعدة معرفة مربوطة (Firestore أو Redis).");
+  await client.set(RedisKey.adminSettings, stored);
 }

@@ -6,6 +6,11 @@ import {
   passwordMatches,
 } from "../../server/lib/auth.js";
 import { resolveRedisConfiguration } from "../../server/lib/redis.js";
+import {
+  isAllowlistedAdminEmail,
+  parseAdminEmails,
+  resolveAiProvider,
+} from "../../server/lib/secrets.js";
 import { splitDocumentForAnalysis } from "../../src/admin/analysisChunks.js";
 import { analyzeWithPatterns } from "../../server/lib/analysis.js";
 
@@ -174,6 +179,32 @@ try {
   if (originalSecret === undefined) delete process.env.ADMIN_SECRET;
   else process.env.ADMIN_SECRET = originalSecret;
 }
+
+test("ADMIN_EMAILS are parsed as a case-insensitive allow-list and never require a hardcoded address", () => {
+  const emails = parseAdminEmails(" Owner@School.example , other@example.com\nowner@school.example");
+  assert.deepEqual(emails, ["owner@school.example", "other@example.com"]);
+  assert.equal(isAllowlistedAdminEmail("OWNER@school.example", emails), true);
+  assert.equal(isAllowlistedAdminEmail("stranger@example.com", emails), false);
+});
+
+test("Gemini is the default AI provider unless an explicit compatible URL is set", () => {
+  const gemini = resolveAiProvider({
+    GEMINI_API_KEY: "server-only-key",
+    GEMINI_MODEL: "gemini-2.5-flash",
+    AI_API_KEY: "legacy-key",
+    AI_MODEL: "gpt-x",
+  });
+  assert.equal(gemini.kind, "gemini");
+  assert.equal(gemini.model, "gemini-2.5-flash");
+  const compat = resolveAiProvider({
+    AI_API_KEY: "legacy-key",
+    AI_MODEL: "gpt-x",
+    AI_API_URL: "https://example.invalid/v1/chat/completions",
+  });
+  assert.equal(compat.kind, "openai-compat");
+  const missing = resolveAiProvider({});
+  assert.equal(missing.kind, "none");
+});
 
 console.log(`\nAdmin API regression: ${passed} passed, ${failed} failed`);
 if (failed) process.exitCode = 1;

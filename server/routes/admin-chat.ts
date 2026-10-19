@@ -29,14 +29,18 @@ export default async function handler(
   }
 
   try {
-    const rate = await consumeRateLimit(RedisKey.adminChatRate(clientIp(request)), 30, 5 * 60);
-    if (!rate.allowed) {
-      response.setHeader("Retry-After", String(rate.retryAfterSeconds));
-      sendJson(response, 429, {
-        error: "تجاوزت محادثة الإدارة حد الطلبات المؤقت. انتظر ثم أعد المحاولة.",
-        retryAfterSeconds: rate.retryAfterSeconds,
-      });
-      return;
+    try {
+      const rate = await consumeRateLimit(RedisKey.adminChatRate(clientIp(request)), 30, 5 * 60);
+      if (!rate.allowed) {
+        response.setHeader("Retry-After", String(rate.retryAfterSeconds));
+        sendJson(response, 429, {
+          error: "تجاوزت محادثة الإدارة حد الطلبات المؤقت. انتظر ثم أعد المحاولة.",
+          retryAfterSeconds: rate.retryAfterSeconds,
+        });
+        return;
+      }
+    } catch {
+      // Authenticated admin chat still runs when Redis is absent (Firestore-only).
     }
     sendJson(response, 200, await respondToAdminChat(parsed.data));
   } catch (error) {

@@ -17,6 +17,8 @@ import {
   verifySymbolicEqual,
 } from "../../src/brain/verify/index.js";
 import { solvePrompt } from "../../src/core/solver/orchestrator.js";
+import { requestChatCompletion, type ChatMessage } from "./ai.js";
+import { aiModel, geminiApiKey, resolveAiProvider } from "./secrets.js";
 import { untrustedContentWarnings } from "./untrustedContent.js";
 
 const MAX_TOOL_CALLS_PER_ROUND = 4;
@@ -139,32 +141,11 @@ type ProviderToolCall = {
   function?: { name?: string; arguments?: string };
 };
 
-type ProviderMessage = {
-  content?: string | null;
-  tool_calls?: ProviderToolCall[];
-};
+type ProviderMessage = ChatMessage;
 
 function boundedJson(value: unknown, limit = 18_000): string {
   const encoded = JSON.stringify(value);
   return encoded.length <= limit ? encoded : `${encoded.slice(0, limit)}…`;
-}
-
-function parseProviderMessage(value: unknown): ProviderMessage | undefined {
-  if (!value || typeof value !== "object" || !("choices" in value) || !Array.isArray(value.choices))
-    return undefined;
-  const first = value.choices[0];
-  if (!first || typeof first !== "object" || !("message" in first)) return undefined;
-  const message = first.message;
-  if (!message || typeof message !== "object") return undefined;
-  const content = "content" in message && typeof message.content === "string" ? message.content : undefined;
-  const rawToolCalls: unknown[] | undefined =
-    "tool_calls" in message && Array.isArray(message.tool_calls)
-      ? (message.tool_calls as unknown[])
-      : undefined;
-  const toolCalls = rawToolCalls?.filter(
-    (call: unknown): call is ProviderToolCall => Boolean(call && typeof call === "object"),
-  );
-  return { content, ...(toolCalls ? { tool_calls: toolCalls } : {}) };
 }
 
 function callId(round: number, index: number): string {
@@ -324,26 +305,11 @@ async function respondLocally(request: AdminChatRequest, warnings: string[] = []
 }
 
 async function requestAI(messages: unknown[], timeoutMs = AI_TIMEOUT_MS): Promise<ProviderMessage> {
-  const apiKey = process.env.AI_API_KEY?.trim();
-  const model = process.env.AI_MODEL?.trim();
-  if (!apiKey || !model) throw new Error("إعداد AI غير مكتمل.");
-  const endpoint = process.env.AI_API_URL?.trim() || "https://api.openai.com/v1/chat/completions";
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), Math.max(1_000, Math.min(AI_TIMEOUT_MS, timeoutMs)));
-  try {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      signal: controller.signal,
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model, temperature: 0, messages, tools: toolDefinitions, tool_choice: "auto" }),
-    });
-    if (!response.ok) throw new Error(`رفض مزود الذكاء الطلب (${response.status}).`);
-    const parsed = parseProviderMessage(await response.json());
-    if (!parsed) throw new Error("لم يُرجع مزود الذكاء رسالة صالحة.");
-    return parsed;
-  } finally {
-    clearTimeout(timer);
-  }
+  return requestChatCompletion(
+    messages,
+    toolDefinitions,
+    Math.max(1_000, Math.min(AI_TIMEOUT_MS, timeoutMs)),
+  );
 }
 
 function providerHistory(request: AdminChatRequest): Array<Record<string, unknown>> {
@@ -365,8 +331,7 @@ function providerHistory(request: AdminChatRequest): Array<Record<string, unknow
  * a fixed whitelist; the browser receives only a bounded, auditable trace.
  */
 export async function respondToAdminChat(request: AdminChatRequest): Promise<AdminChatResponse> {
-  const apiKey = process.env.AI_API_KEY?.trim();
-  const model = process.env.AI_MODEL?.trim();
+  const provider = resolveAiProvider();
   const safetyWarnings = untrustedContentWarnings([request.context?.selectedText]);
   if (request.clarificationRounds >= 3)
     return adminChatResponseSchema.parse({
@@ -380,10 +345,12 @@ export async function respondToAdminChat(request: AdminChatRequest): Promise<Adm
       waitingForClarification: true,
       warnings: [...safetyWarnings, "أوقف الخادم جولة التوضيح الرابعة وفق بروتوكول عدم التخمين."],
     });
-  if (!apiKey || !model)
+  if (provider.kind === "none")
     return respondLocally(request, [
       ...safetyWarnings,
-      ...(apiKey && !model ? ["AI_API_KEY موجود لكن AI_MODEL غير مضبوط، لذا استُخدم الوضع المحلي."] : []),
+      ...(geminiApiKey() && !aiModel()
+        ? ["مفتاح Gemini موجود لكن اسم النموذج غير مضبوط، لذا استُخدم الوضع المحلي."]
+        : []),
     ]);
 
   const messages = providerHistory(request);

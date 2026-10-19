@@ -38,6 +38,9 @@ export function OverviewTab({
       <div className="admin-health-card" aria-label="حالة الخدمات الإدارية">
         <div><b>ADMIN_PASSWORD</b><span className={health?.admin.passwordConfigured ? "is-ok" : "is-bad"}>{health?.admin.passwordConfigured ? "مضبوط" : "غير متاح"}</span></div>
         <div><b>ADMIN_SECRET</b><span className={health?.admin.secretConfigured ? "is-ok" : "is-bad"}>{health?.admin.secretConfigured ? "مضبوط وآمن" : "غير متاح"}</span></div>
+        <div><b>Google</b><span className={health?.admin.googleAuthConfigured ? "is-ok" : "is-bad"}>{health?.admin.googleAuthConfigured ? "دخول البريد مسموح" : "غير مضبوط"}</span></div>
+        <div><b>Gemini</b><span className={health?.admin.geminiConfigured ? "is-ok" : "is-bad"}>{health?.admin.geminiConfigured ? "مضبوط على الخادم" : "وضع محلي"}</span></div>
+        <div><b>Firestore</b><span className={health?.admin.firestoreConfigured ? "is-ok" : "is-bad"}>{health?.admin.firestoreConfigured ? "مضبوط" : "غير مضبوط"}</span></div>
         <div><b>Redis</b><span className={health?.redis.reachable ? "is-ok" : "is-bad"}>{health?.redis.reachable ? "متصل" : health?.redis.configured ? "غير قابل للوصول" : "غير مضبوط"}</span></div>
         <button type="button" className="admin-secondary-button" onClick={onRefresh}><RotateCcw size={14} /> فحص الحالة</button>
       </div>

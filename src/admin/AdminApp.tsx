@@ -258,7 +258,10 @@ function mergeWorkspace(
 
 function AdminLogin({ onAuthenticated }: { onAuthenticated: () => void }) {
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("auth_error") ?? "";
+  });
   const [busy, setBusy] = useState(false);
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -284,9 +287,12 @@ function AdminLogin({ onAuthenticated }: { onAuthenticated: () => void }) {
         <p className="admin-eyebrow">لوحة تعليم المحرك</p>
         <h1>إدارة المعرفة الرياضية السورية</h1>
         <p>
-          أدخل كلمة مرور الإدارة. لا تُخزن كلمة المرور في المتصفح، وتُنشأ جلسة
-          محمية في كوكي آمن على الخادم.
+          ادخل بحساب Google المصرّح به على الخادم، أو بكلمة مرور الإدارة إن
+          كانت مضبوطة. لا تُخزن الأسرار في المتصفح.
         </p>
+        <a className="admin-primary-button admin-login-button" href="/api/admin-google">
+          دخول بحساب Google
+        </a>
         <form onSubmit={(event) => void submit(event)}>
           <label>
             كلمة مرور الإدارة
@@ -295,14 +301,12 @@ function AdminLogin({ onAuthenticated }: { onAuthenticated: () => void }) {
               onChange={(event) => setPassword(event.target.value)}
               type="password"
               autoComplete="current-password"
-              required
-              autoFocus
             />
           </label>
           {error && <p className="admin-error-text" role="alert">{error}</p>}
-          <button className="admin-primary-button admin-login-button" disabled={busy} type="submit">
+          <button className="admin-secondary-button admin-login-button" disabled={busy} type="submit">
             {busy ? <LoaderCircle className="animate-spin" size={17} /> : <LockKeyhole size={17} />}
-            دخول آمن
+            دخول بكلمة المرور
           </button>
         </form>
         <a href="/" className="admin-back-link">العودة إلى الحاسبة</a>

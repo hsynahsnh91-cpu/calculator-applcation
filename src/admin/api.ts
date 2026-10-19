@@ -89,7 +89,13 @@ export async function adminLogoutAll(): Promise<void> {
 export interface AdminHealth {
   status: "ok" | "degraded";
   redis: { configured: boolean; reachable: boolean };
-  admin: { passwordConfigured: boolean | null; secretConfigured: boolean | null };
+  admin: {
+    passwordConfigured: boolean | null;
+    secretConfigured: boolean | null;
+    googleAuthConfigured?: boolean | null;
+    geminiConfigured?: boolean | null;
+    firestoreConfigured?: boolean | null;
+  };
 }
 
 export async function getAdminHealth(): Promise<AdminHealth> {

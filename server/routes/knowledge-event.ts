@@ -1,5 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
+import { firestoreAvailable } from "../lib/firestore.js";
+import { incrementSolveCounters } from "../lib/knowledgeStore.js";
 import { clientIp, methodNotAllowed, readJsonBody, sendJson } from "../lib/http.js";
 import { consumeRateLimit, RedisKey, redis } from "../lib/redis.js";
 
@@ -18,26 +20,26 @@ export default async function handler(
       sendJson(response, 400, { error: "حدث الحل غير صالح." });
       return;
     }
-    const client = redis();
-    if (!client) {
+    if (!firestoreAvailable() && !redis()) {
       response.status(204).end();
       return;
     }
-    const rate = await consumeRateLimit(
-      RedisKey.publicEventRate(clientIp(request)),
-      RATE_LIMIT_PER_MINUTE,
-      60,
-    );
-    if (!rate.allowed) {
-      response.setHeader("Retry-After", String(rate.retryAfterSeconds));
-      sendJson(response, 429, {
-        error: "تجاوز حدث الحل الحد المسموح مؤقتًا.",
-        retryAfterSeconds: rate.retryAfterSeconds,
-      });
-      return;
+    if (redis()) {
+      const rate = await consumeRateLimit(
+        RedisKey.publicEventRate(clientIp(request)),
+        RATE_LIMIT_PER_MINUTE,
+        60,
+      );
+      if (!rate.allowed) {
+        response.setHeader("Retry-After", String(rate.retryAfterSeconds));
+        sendJson(response, 429, {
+          error: "تجاوز حدث الحل الحد المسموح مؤقتًا.",
+          retryAfterSeconds: rate.retryAfterSeconds,
+        });
+        return;
+      }
     }
-    await client.incr(RedisKey.solveAttempts);
-    if (parsed.data.solved) await client.incr(RedisKey.solveSuccesses);
+    await incrementSolveCounters(parsed.data.solved);
     sendJson(response, 202, { accepted: true });
   } catch (error) {
     console.error("Knowledge event route failed", {

@@ -188,8 +188,12 @@ test("admin chat has a real local fallback and caps browser tool rounds at four"
   );
   const oldKey = process.env.AI_API_KEY;
   const oldModel = process.env.AI_MODEL;
+  const oldGeminiKey = process.env.GEMINI_API_KEY;
+  const oldGeminiModel = process.env.GEMINI_MODEL;
   delete process.env.AI_API_KEY;
   delete process.env.AI_MODEL;
+  delete process.env.GEMINI_API_KEY;
+  delete process.env.GEMINI_MODEL;
   try {
     const response = await respondToAdminChat(adminChatRequestSchema.parse(request));
     assert.equal(response.mode, "local");
@@ -205,6 +209,10 @@ test("admin chat has a real local fallback and caps browser tool rounds at four"
     else process.env.AI_API_KEY = oldKey;
     if (oldModel === undefined) delete process.env.AI_MODEL;
     else process.env.AI_MODEL = oldModel;
+    if (oldGeminiKey === undefined) delete process.env.GEMINI_API_KEY;
+    else process.env.GEMINI_API_KEY = oldGeminiKey;
+    if (oldGeminiModel === undefined) delete process.env.GEMINI_MODEL;
+    else process.env.GEMINI_MODEL = oldGeminiModel;
   }
 });
 
