@@ -1,0 +1,20 @@
+{
+  "name": "حوار رياضي — رياضياتك",
+  "short_name": "حوار رياضي",
+  "description": "حاسبة ومساعد رياضيات عربي يعمل محليًا ويدعم المراجعة دون اتصال.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0d1118",
+  "theme_color": "#0d1118",
+  "icons": [
+    {
+      "src": "/icons/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

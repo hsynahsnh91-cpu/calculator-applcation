@@ -13,7 +13,7 @@ export default async function handler(
   response: VercelResponse,
 ): Promise<void> {
   if (request.method !== "GET") return methodNotAllowed(response, ["GET"]);
-  if (!requireAdmin(request, response)) return;
+  if (!(await requireAdmin(request, response))) return;
   try {
     const snapshot = await getCurrentSnapshot();
     sendJson(response, 200, { snapshot: snapshot ?? null });

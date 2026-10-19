@@ -27,11 +27,21 @@ export function cleanMathLatex(s: string): string {
 }
 
 // Inline math renderer that is isolated from the surrounding RTL (Arabic) text
+function accessibleMathLabel(math: string): string {
+  return cleanMathLatex(math)
+    .replace(/\\([a-zA-Z]+)/g, "$1")
+    .replace(/[{}]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 320) || "صيغة رياضية";
+}
+
 export const Tex: React.FC<{
   math: string;
   className?: string;
   display?: boolean;
-}> = ({ math, className = "", display = false }) => {
+  ariaLabel?: string;
+}> = ({ math, className = "", display = false, ariaLabel }) => {
   const html = useMemo(() => {
     try {
       const sanitized = cleanMathLatex(math);
@@ -58,6 +68,8 @@ export const Tex: React.FC<{
   return (
     <span
       dir="ltr"
+      role="img"
+      aria-label={ariaLabel ?? accessibleMathLabel(math)}
       className={`${display ? "block overflow-x-auto max-w-full py-1" : "inline-block align-middle max-w-full overflow-x-auto"} ${className}`}
       style={{ unicodeBidi: "isolate", direction: "ltr" }}
       dangerouslySetInnerHTML={{ __html: html }}

@@ -5,7 +5,7 @@ import {
 } from "../../src/admin/types.js";
 import { canonicalizeQuestion, questionFingerprint } from "../../src/admin/normalization.js";
 import { clientIp, methodNotAllowed, readJsonBody, sendJson } from "../lib/http.js";
-import { RedisKey, redis } from "../lib/redis.js";
+import { consumeRateLimit, RedisKey, redis } from "../lib/redis.js";
 
 const RATE_LIMIT_PER_MINUTE = 20;
 
@@ -32,12 +32,17 @@ export default async function handler(
     return;
   }
   try {
-    const ip = clientIp(request);
-    const rateKey = RedisKey.publicFailureRate(ip);
-    const rate = await client.incr(rateKey);
-    if (rate === 1) await client.expire(rateKey, 60);
-    if (rate > RATE_LIMIT_PER_MINUTE) {
-      response.status(204).end();
+    const rate = await consumeRateLimit(
+      RedisKey.publicFailureRate(clientIp(request)),
+      RATE_LIMIT_PER_MINUTE,
+      60,
+    );
+    if (!rate.allowed) {
+      response.setHeader("Retry-After", String(rate.retryAfterSeconds));
+      sendJson(response, 429, {
+        error: "تجاوز بلاغ الإخفاق الحد المسموح مؤقتًا.",
+        retryAfterSeconds: rate.retryAfterSeconds,
+      });
       return;
     }
     const canonicalQuestion = canonicalizeQuestion(parsed.data.question);
@@ -60,7 +65,10 @@ export default async function handler(
     });
     await client.incr(RedisKey.solveAttempts);
     sendJson(response, 202, { accepted: true });
-  } catch {
+  } catch (error) {
+    console.error("Knowledge failure route failed", {
+      errorType: error instanceof Error ? error.name : typeof error,
+    });
     response.status(204).end();
   }
 }

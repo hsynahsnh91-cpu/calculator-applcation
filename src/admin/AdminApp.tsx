@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
   type ChangeEvent,
@@ -10,12 +11,11 @@ import {
 import {
   AlertTriangle,
   BarChart3,
-  BookOpen,
+  BrainCircuit,
   Check,
   CheckCircle2,
   CircleHelp,
   CloudUpload,
-  Download,
   FilePenLine,
   Gauge,
   Layers3,
@@ -27,9 +27,9 @@ import {
   Plus,
   RotateCcw,
   Save,
-  Search,
   Settings2,
   ShieldCheck,
+  Sparkles,
   Trash2,
   Upload,
   X,
@@ -38,14 +38,28 @@ import { z } from "zod";
 import { Tex } from "../components/common/Tex";
 import { ENGINE_LABELS, type EngineId, type SolverAnswer } from "../solver/types";
 import { cancelSolver, solveLocally } from "../solver/client";
+import {
+  adminUiReducer,
+  initialAdminUiState,
+  type AdminTab,
+  type AdminUiState,
+  type CorrectionTarget,
+  type IncomingFeedback,
+  type SessionState,
+} from "./adminUiStore";
 import { DEFAULT_ENGINE_PROMPT } from "./enginePrompt";
 import { adminDraftDB } from "./indexedDB";
 import { canonicalizeQuestion, questionFingerprint } from "./normalization";
-import {
-  DocumentScanner,
-  type DocumentAnalysisOptions,
-} from "./DocumentScanner";
-import { ManualTrainingPanel, type ManualTrainingInput } from "./ManualTrainingPanel";
+import type { DocumentAnalysisOptions } from "./DocumentScanner";
+import type { ManualTrainingInput } from "./ManualTrainingPanel";
+import { PracticeTab } from "./PracticeTab";
+import { LibraryTab } from "./tabs/LibraryTab";
+import { OverviewTab } from "./tabs/OverviewTab";
+import { MonitorTab } from "./tabs/MonitorTab";
+import { PublishTab } from "./tabs/PublishTab";
+import { ScanTab } from "./tabs/ScanTab";
+import { SettingsTab } from "./tabs/SettingsTab";
+import { WorkspaceTab } from "./workspace/WorkspaceTab";
 import { splitDocumentForAnalysis } from "./analysisChunks";
 import { findCurriculumGaps } from "./curriculum";
 import { scanDocument, type ScannedDocument } from "./scanner";
@@ -57,8 +71,10 @@ import {
   AdminApiError,
   adminLogin,
   adminLogout,
+  adminLogoutAll,
   analyzeRemote,
   checkAdminSession,
+  getAdminHealth,
   getAdminStatistics,
   getFailures,
   getServerPrompt,
@@ -68,6 +84,7 @@ import {
   removeFailure,
   rollbackVersion,
   saveServerPrompt,
+  type AdminHealth,
   type AdminStatistics,
 } from "./api";
 import {
@@ -87,27 +104,11 @@ import {
   type VersionSummary,
 } from "./types";
 
-type AdminTab = "overview" | "scan" | "library" | "publish" | "monitor" | "settings";
-type SessionState = "checking" | "anonymous" | "authenticated";
-
 type ExerciseRun =
   | { state: "idle" }
   | { state: "running" }
   | { state: "complete"; answer: SolverAnswer; solution?: ApprovedSolution }
   | { state: "error"; message: string };
-
-interface CorrectionTarget {
-  item: KnowledgeItem;
-  wrongSolution?: ApprovedSolution;
-}
-
-interface IncomingFeedback {
-  question: string;
-  answerText: string;
-  answerLatex: string;
-  isCorrect: boolean;
-  createdAt: string;
-}
 
 const itemTypeLabels: Record<KnowledgeItemType, string> = {
   rule: "قاعدة",
@@ -126,6 +127,8 @@ const statusLabels: Record<KnowledgeItem["status"], string> = {
 const tabs: { id: AdminTab; label: string; icon: typeof Gauge }[] = [
   { id: "overview", label: "نظرة عامة", icon: Gauge },
   { id: "scan", label: "مسح وتحليل", icon: CloudUpload },
+  { id: "workspace", label: "مساحة العقل", icon: BrainCircuit },
+  { id: "practice", label: "تدرّب", icon: Sparkles },
   { id: "library", label: "المكتبة", icon: LibraryBig },
   { id: "publish", label: "النشر والنسخ", icon: Layers3 },
   { id: "monitor", label: "المتابعة والاختبار", icon: BarChart3 },
@@ -346,32 +349,37 @@ function AnswerPreview({ run }: { run: ExerciseRun }) {
 }
 
 export default function AdminApp() {
-  const [session, setSession] = useState<SessionState>("checking");
-  const [tab, setTab] = useState<AdminTab>("overview");
+  const [ui, dispatchUi] = useReducer(adminUiReducer, initialAdminUiState);
+  const patchUi = useCallback((patch: Partial<AdminUiState>) => dispatchUi({ patch }), []);
+  const { session, tab, notice, error, workspaceBusy, correctionTarget, incomingFeedback, libraryQuery, libraryType, libraryStatus, libraryGrade, libraryUnit, editing, regressionBusy, publishing, publishFailures, publishMessage } = ui;
+  const setSession = (value: SessionState) => patchUi({ session: value });
+  const setTab = (value: AdminTab) => patchUi({ tab: value });
+  const setNotice = (value: string) => patchUi({ notice: value });
+  const setError = (value: string) => patchUi({ error: value });
+  const setWorkspaceBusy = (value: boolean) => patchUi({ workspaceBusy: value });
+  const setCorrectionTarget = (value: CorrectionTarget | null) => patchUi({ correctionTarget: value });
+  const setIncomingFeedback = (value: IncomingFeedback | null) => patchUi({ incomingFeedback: value });
+  const setLibraryQuery = (value: string) => patchUi({ libraryQuery: value });
+  const setLibraryType = (value: KnowledgeItemType | "all") => patchUi({ libraryType: value });
+  const setLibraryStatus = (value: KnowledgeItem["status"] | "all") => patchUi({ libraryStatus: value });
+  const setLibraryGrade = (value: string) => patchUi({ libraryGrade: value });
+  const setLibraryUnit = (value: string) => patchUi({ libraryUnit: value });
+  const setEditing = (value: KnowledgeItem | null) => patchUi({ editing: value });
+  const setRegressionBusy = (value: boolean) => patchUi({ regressionBusy: value });
+  const setPublishing = (value: boolean) => patchUi({ publishing: value });
+  const setPublishFailures = (value: RegressionOutcome[]) => patchUi({ publishFailures: value });
+  const setPublishMessage = (value: string) => patchUi({ publishMessage: value });
+
   const [items, setItems] = useState<KnowledgeItem[]>([]);
   const [settings, setSettings] = useState<SolverSettings>({ ...defaultSolverSettings });
   const [prompt, setPrompt] = useState(DEFAULT_ENGINE_PROMPT);
   const [published, setPublished] = useState<KnowledgeSnapshot | null>(null);
   const [versions, setVersions] = useState<VersionSummary[]>([]);
   const [stats, setStats] = useState<AdminStatistics | null>(null);
+  const [health, setHealth] = useState<AdminHealth | null>(null);
   const [failures, setFailures] = useState<FailureRecord[]>([]);
   const [runs, setRuns] = useState<Record<string, ExerciseRun>>({});
-  const [notice, setNotice] = useState("");
-  const [error, setError] = useState("");
-  const [workspaceBusy, setWorkspaceBusy] = useState(false);
-  const [correctionTarget, setCorrectionTarget] = useState<CorrectionTarget | null>(null);
-  const [incomingFeedback, setIncomingFeedback] = useState<IncomingFeedback | null>(null);
-  const [libraryQuery, setLibraryQuery] = useState("");
-  const [libraryType, setLibraryType] = useState<KnowledgeItemType | "all">("all");
-  const [libraryStatus, setLibraryStatus] = useState<KnowledgeItem["status"] | "all">("all");
-  const [libraryGrade, setLibraryGrade] = useState("all");
-  const [libraryUnit, setLibraryUnit] = useState("all");
-  const [editing, setEditing] = useState<KnowledgeItem | null>(null);
   const [regression, setRegression] = useState<RegressionOutcome[]>([]);
-  const [regressionBusy, setRegressionBusy] = useState(false);
-  const [publishing, setPublishing] = useState(false);
-  const [publishFailures, setPublishFailures] = useState<RegressionOutcome[]>([]);
-  const [publishMessage, setPublishMessage] = useState("");
   const backupInput = useRef<HTMLInputElement>(null);
   const regressionAbort = useRef<AbortController | null>(null);
 
@@ -389,11 +397,12 @@ export default function AdminApp() {
   }, []);
 
   const refreshRemote = useCallback(async () => {
-    const [remoteResult, versionsResult, statsResult, failuresResult] = await Promise.allSettled([
+    const [remoteResult, versionsResult, statsResult, failuresResult, healthResult] = await Promise.allSettled([
       publishedLibrary(),
       getVersions(),
       getAdminStatistics(),
       getFailures(),
+      getAdminHealth(),
     ]);
     if (remoteResult.status === "fulfilled") {
       setPublished(remoteResult.value);
@@ -403,6 +412,7 @@ export default function AdminApp() {
     if (versionsResult.status === "fulfilled") setVersions(versionsResult.value);
     if (statsResult.status === "fulfilled") setStats(statsResult.value);
     if (failuresResult.status === "fulfilled") setFailures(failuresResult.value);
+    if (healthResult.status === "fulfilled") setHealth(healthResult.value);
   }, []);
 
   const loadWorkspace = useCallback(async () => {
@@ -1010,6 +1020,16 @@ export default function AdminApp() {
           <button
             className="admin-secondary-button"
             type="button"
+            onClick={() => {
+              if (!window.confirm("إنهاء كل جلسات الإدارة على جميع الأجهزة؟")) return;
+              void adminLogoutAll().finally(() => setSession("anonymous"));
+            }}
+          >
+            <LogOut size={15} /> خروج من كل الأجهزة
+          </button>
+          <button
+            className="admin-secondary-button"
+            type="button"
             onClick={() => void adminLogout().finally(() => setSession("anonymous"))}
           >
             <LogOut size={15} /> خروج
@@ -1057,65 +1077,48 @@ export default function AdminApp() {
           )}
 
           {tab === "overview" && (
-            <section className="admin-section">
-              <div className="admin-section-heading">
-                <div>
-                  <p className="admin-eyebrow">النسخة الحالية {published ? `#${published.version}` : "غير منشورة"}</p>
-                  <h1>مرحبًا في لوحة التعليم الذكي</h1>
-                  <p>استخدم المسح ثم راجع النتائج واعتمدها قبل النشر. لا يُعرض للطلاب إلا ما نُشر بنجاح.</p>
-                </div>
-              </div>
-              <div className="admin-stat-grid">
-                <article><BookOpen size={21} /><strong>{Math.max(stats?.approvedItems ?? 0, items.filter((item) => item.status !== "draft").length)}</strong><span>عنصر منشور/معتمد</span></article>
-                <article><FilePenLine size={21} /><strong>{Math.max(stats?.corrections ?? 0, items.filter((item) => item.type === "correction" && item.status !== "draft").length)}</strong><span>تصحيح معتمد</span></article>
-                <article><BarChart3 size={21} /><strong>{stats?.solveRate === null || stats?.solveRate === undefined ? "—" : `${Math.round(stats.solveRate * 100)}٪`}</strong><span>نسبة الأسئلة المحلولة</span></article>
-                <article><AlertTriangle size={21} /><strong>{failures.length}</strong><span>أسئلة فاشلة مسجلة</span></article>
-              </div>
-              <div className="admin-two-columns">
-                <article className="admin-panel-card">
-                  <h2>أكثر الأقسام احتياجًا للتعليم</h2>
-                  {stats?.mostFailingSections.length ? (
-                    <ol className="admin-ranked-list">
-                      {stats.mostFailingSections.map((entry) => <li key={entry.section}><span>{entry.section}</span><b>{entry.count}</b></li>)}
-                    </ol>
-                  ) : <p className="admin-empty-state">لا توجد بيانات حل كافية بعد؛ لا تُعرض نسبة أو قسم مخمّن.</p>}
-                </article>
-                <article className="admin-panel-card">
-                  <h2>اقتراحات تغطية المنهاج</h2>
-                  {gaps.length ? (
-                    <ul className="admin-gap-list">
-                      {gaps.slice(0, 12).map((gap) => <li key={`${gap.grade}-${gap.topic}`}><span>{gap.grade}</span>{gap.topic}</li>)}
-                    </ul>
-                  ) : <p className="admin-empty-state">أضف عناصر ذات صف ووحدة لتظهر فجوات تغطية ذات معنى.</p>}
-                </article>
-              </div>
-            </section>
+            <OverviewTab
+              items={items}
+              published={published}
+              stats={stats}
+              failures={failures}
+              health={health}
+              gaps={gaps}
+              onRefresh={() => void refreshRemote()}
+            />
           )}
 
-          {tab === "scan" && (
-            <>
-              <DocumentScanner onAnalyze={analyzeScannedDocument} />
-              <ManualTrainingPanel onSave={saveManualTraining} />
-            </>
+          {tab === "scan" && <ScanTab onAnalyze={analyzeScannedDocument} onSaveManualTraining={saveManualTraining} />}
+
+          {tab === "workspace" && (
+            <WorkspaceTab
+              items={items}
+              onSaveItem={saveItem}
+              onNotice={setNotice}
+            />
           )}
+
+          {tab === "practice" && <PracticeTab items={items} settings={settings} />}
 
           {tab === "library" && (
-            <section className="admin-section">
-              <div className="admin-section-heading">
-                <div>
-                  <p className="admin-eyebrow">{items.length} عنصر في مساحة العمل</p>
-                  <h1>المكتبة المعرفية والمراجعة</h1>
-                  <p>عدّل أو احذف أي مسودة. العناصر المنشورة في Redis تصبح مسودة عند تعديلها ثم تحتاج نشر نسخة جديدة.</p>
-                </div>
-              </div>
-              <div className="admin-library-filters">
-                <label className="admin-search"><Search size={17} /><input placeholder="ابحث في النص أو الدرس…" value={libraryQuery} onChange={(event) => setLibraryQuery(event.target.value)} /></label>
-                <select value={libraryType} onChange={(event) => setLibraryType(event.target.value as KnowledgeItemType | "all")}><option value="all">كل الأنواع</option>{Object.entries(itemTypeLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select>
-                <select value={libraryStatus} onChange={(event) => setLibraryStatus(event.target.value as KnowledgeItem["status"] | "all")}><option value="all">كل الحالات</option>{Object.entries(statusLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select>
-                <select value={libraryGrade} onChange={(event) => { setLibraryGrade(event.target.value); setLibraryUnit("all"); }}><option value="all">كل الصفوف</option>{grades.map((grade) => <option key={grade}>{grade}</option>)}</select>
-                <select value={libraryUnit} onChange={(event) => setLibraryUnit(event.target.value)}><option value="all">كل الوحدات</option>{units.map((unit) => <option key={unit}>{unit}</option>)}</select>
-              </div>
-              <p className="admin-result-count">{filteredItems.length} نتيجة مطابقة</p>
+            <LibraryTab
+              itemCount={items.length}
+              resultCount={filteredItems.length}
+              query={libraryQuery}
+              type={libraryType}
+              status={libraryStatus}
+              grade={libraryGrade}
+              unit={libraryUnit}
+              grades={grades}
+              units={units}
+              itemTypeLabels={itemTypeLabels}
+              statusLabels={statusLabels}
+              onQuery={setLibraryQuery}
+              onType={setLibraryType}
+              onStatus={setLibraryStatus}
+              onGrade={(value) => { setLibraryGrade(value); setLibraryUnit("all"); }}
+              onUnit={setLibraryUnit}
+            >
               <div className="admin-library-list">
                 {filteredItems.map((item) => {
                   const run = runs[item.id] ?? { state: "idle" as const };
@@ -1127,9 +1130,13 @@ export default function AdminApp() {
                         {item.needsReview && <span className="admin-review-tag">يحتاج مراجعة</span>}
                         {item.comparison === "matching" && <span className="admin-match-tag">حل الكتاب مطابق</span>}
                         {item.comparison === "needs_review" && <span className="admin-review-tag">حل الكتاب يحتاج مراجعة</span>}
+                        {item.relations.length > 0 && <span className="admin-type-tag">{item.relations.length} علاقات دلالية</span>}
+                        {item.evidence.some((entry) => entry.passed) && <span className="admin-match-tag">دليل تحقق مسجل</span>}
+                        {item.learningLog.length > 0 && <span className="admin-type-tag">سجل تعلم {item.learningLog.length}</span>}
                       </div>
                       <h2>{item.lesson}</h2>
                       <p className="admin-item-context">{item.grade} · {item.unit} · {item.source} · ص{item.page}</p>
+                      <p className="admin-source-reference"><b>مرجع المصدر:</b> الكتاب/المصدر {item.source} · الجزء/الملف {item.fileName} · الصفحة {item.page}</p>
                       <p className="admin-item-text">{item.originalText}</p>
                       {(item.type === "exercise" || item.type === "example") && <AnswerPreview run={run} />}
                       <div className="admin-card-actions">
@@ -1150,115 +1157,51 @@ export default function AdminApp() {
                 })}
                 {!filteredItems.length && <p className="admin-empty-state">لا توجد عناصر مطابقة للتصفية الحالية.</p>}
               </div>
-            </section>
+            </LibraryTab>
           )}
 
           {tab === "publish" && (
-            <section className="admin-section">
-              <div className="admin-section-heading">
-                <div>
-                  <p className="admin-eyebrow">نشر ذري دون ملفات عامة</p>
-                  <h1>نشر التعليم وإدارة النسخ</h1>
-                  <p>يفحص النشر المخطط والحجم، ثم يختبر الأمثلة السابقة محليًا على المحرك قبل تبديل مؤشر النسخة في Redis.</p>
-                </div>
-              </div>
-              <div className="admin-publish-card">
-                <div>
-                  <strong>{items.filter((item) => ["approved", "published"].includes(item.status)).length}</strong>
-                  <span>عنصر جاهز للنشر</span>
-                </div>
-                <button className="admin-primary-button" type="button" disabled={publishing || regressionBusy} onClick={() => void publish()}>
-                  {publishing ? <LoaderCircle className="animate-spin" size={17} /> : <CloudUpload size={17} />} نشر التعليم
-                </button>
-              </div>
-              {publishMessage && <p className="admin-success-text">{publishMessage}</p>}
-              {publishFailures.length > 0 && (
-                <div className="admin-blocking-card">
-                  <AlertTriangle size={20} />
-                  <div>
-                    <strong>أوقف اختبار الانحدار النشر</strong>
-                    <p>أصلح كل عنصر أدناه ثم أعد تشغيل النشر؛ لا يوجد تجاوز لهذا الحاجز.</p>
-                    <ul>{publishFailures.map((failure) => <li key={failure.itemId}>{failure.message}</li>)}</ul>
-                  </div>
-                </div>
-              )}
-              <div className="admin-two-columns">
-                <article className="admin-panel-card">
-                  <h2>النسخ المنشورة</h2>
-                  <ul className="admin-version-list">
-                    {versions.map((version) => (
-                      <li key={version.version}>
-                        <div><b>النسخة {version.version}</b><span>{new Date(version.publishedAt).toLocaleString("ar-SY")} · {version.itemCount} عنصر</span></div>
-                        <button type="button" className="admin-secondary-button" disabled={published?.version === version.version} onClick={() => void rollback(version.version)}><RotateCcw size={14} /> تراجع</button>
-                      </li>
-                    ))}
-                    {!versions.length && <li className="admin-empty-state">لا توجد نسخة منشورة بعد.</li>}
-                  </ul>
-                </article>
-                <article className="admin-panel-card">
-                  <h2>نسخة احتياطية ثانوية</h2>
-                  <p>التصدير والاستيراد اختياريان لمسودات هذا الجهاز فقط، وليس جزءًا من النشر ولا يتطلب إعادة نشر الموقع.</p>
-                  <div className="admin-inline-actions">
-                    <button type="button" className="admin-secondary-button" onClick={exportBackup}><Download size={15} /> تصدير احتياطي</button>
-                    <button type="button" className="admin-secondary-button" onClick={() => backupInput.current?.click()}><Upload size={15} /> استيراد احتياطي</button>
-                  </div>
-                  <input ref={backupInput} type="file" className="hidden" accept="application/json,.json" onChange={(event) => void importBackup(event)} />
-                </article>
-              </div>
-            </section>
+            <PublishTab
+              items={items}
+              versions={versions}
+              published={published}
+              publishing={publishing}
+              regressionBusy={regressionBusy}
+              publishMessage={publishMessage}
+              publishFailures={publishFailures}
+              backupInput={backupInput}
+              onPublish={() => void publish()}
+              onRollback={(version) => void rollback(version)}
+              onExport={exportBackup}
+              onImport={(event) => void importBackup(event)}
+              onRequestImport={() => backupInput.current?.click()}
+            />
           )}
 
           {tab === "monitor" && (
-            <section className="admin-section">
-              <div className="admin-section-heading">
-                <div><p className="admin-eyebrow">تشخيص حقيقي لا تخمين</p><h1>سجل الإخفاقات والاختبار الشامل</h1><p>تُسجّل الإخفاقات العامة بشكل مجمّع في Redis، ثم يمكنك تحويل أي سؤال إلى مسودة تعليمية.</p></div>
-                <div className="admin-inline-actions">
-                  {regressionBusy ? <button className="admin-wrong-button" type="button" onClick={() => regressionAbort.current?.abort()}><X size={15} /> إلغاء الاختبار</button> : <button className="admin-primary-button" type="button" onClick={() => void comprehensiveTest()}><Play size={16} /> اختبار شامل</button>}
-                </div>
-              </div>
-              <div className="admin-two-columns">
-                <article className="admin-panel-card">
-                  <h2>الأسئلة التي فشل فيها المحرك</h2>
-                  <ul className="admin-failure-list">
-                    {failures.map((failure) => <li key={failure.fingerprint}><div><b>{failure.sampleQuestion}</b><span>تكرّر {failure.count} مرة · {failure.reason}</span></div><div className="admin-inline-actions"><button type="button" className="admin-secondary-button" onClick={() => teachFailure(failure)}>علّمه الآن</button><button type="button" className="admin-icon-button" title="حذف من السجل" onClick={() => void removeFailure(failure.fingerprint).then(() => setFailures((old) => old.filter((value) => value.fingerprint !== failure.fingerprint)))}><Trash2 size={15} /></button></div></li>)}
-                    {!failures.length && <li className="admin-empty-state">لا توجد إخفاقات مسجلة بعد.</li>}
-                  </ul>
-                </article>
-                <article className="admin-panel-card">
-                  <h2>نتيجة الاختبار الشامل</h2>
-                  {regressionBusy && <p className="admin-muted"><LoaderCircle className="animate-spin inline" size={14} /> تشغيل الأمثلة بالتتابع…</p>}
-                  <ul className="admin-regression-list">
-                    {regression.map((outcome) => <li key={outcome.itemId} className={outcome.passed ? "is-passed" : "is-failed"}><span>{outcome.passed ? "نجح" : "فشل"}</span><p>{outcome.message}</p><b>{outcome.elapsedMs}ms</b></li>)}
-                    {!regression.length && !regressionBusy && <li className="admin-empty-state">اضغط «اختبار شامل» لتشغيل كل مثال معتمد فعليًا.</li>}
-                  </ul>
-                </article>
-              </div>
-            </section>
+            <MonitorTab
+              failures={failures}
+              regression={regression}
+              regressionBusy={regressionBusy}
+              onStartRegression={() => void comprehensiveTest()}
+              onCancelRegression={() => regressionAbort.current?.abort()}
+              onTeachFailure={teachFailure}
+              onRemoveFailure={(fingerprint) => {
+                void removeFailure(fingerprint).then(() => setFailures((old) => old.filter((value) => value.fingerprint !== fingerprint)));
+              }}
+            />
           )}
 
           {tab === "settings" && (
-            <section className="admin-section">
-              <div className="admin-section-heading"><div><p className="admin-eyebrow">إعدادات لا تغيّر المحركات نفسها</p><h1>الضبط والبرومبت</h1><p>إيقاف أي قسم يمنع تشغيله بوضوح ولا يولد جوابًا بديلًا. انشر نسخة لتعميم الإعدادات على الزوار.</p></div></div>
-              <article className="admin-panel-card admin-settings-card">
-                <h2>أقسام المحرك</h2>
-                <div className="admin-engine-grid">
-                  {(Object.keys(ENGINE_LABELS) as EngineId[]).map((engine) => (
-                    <label key={engine} className="admin-engine-toggle"><input type="checkbox" checked={!settings.disabledEngines.includes(engine)} onChange={(event) => {
-                      const disabledEngines = event.target.checked ? settings.disabledEngines.filter((value) => value !== engine) : [...settings.disabledEngines, engine];
-                      void saveSettings({ ...settings, disabledEngines });
-                    }} /><span>{ENGINE_LABELS[engine]}</span><i>{settings.disabledEngines.includes(engine) ? "معطّل" : "مفعّل"}</i></label>
-                  ))}
-                </div>
-                <div className="admin-number-settings">
-                  <label>حد الثقة للمطابقة التقريبية<input type="number" min="0.85" max="0.999" step="0.001" value={settings.matchThreshold} onChange={(event) => void saveSettings({ ...settings, matchThreshold: Number(event.target.value) })} /></label>
-                  <label>مهلة الحل (مللي ثانية)<input type="number" min="2000" max="60000" step="1000" value={settings.timeoutMs} onChange={(event) => void saveSettings({ ...settings, timeoutMs: Number(event.target.value) })} /></label>
-                </div>
-              </article>
-              <article className="admin-panel-card admin-prompt-card">
-                <div className="admin-prompt-heading"><div><h2>برومبت التحليل الذكي</h2><p>يبقى المفتاح في الخادم؛ هذه الصياغة فقط هي القابلة للتحرير.</p></div><div className="admin-inline-actions"><button type="button" className="admin-secondary-button" onClick={() => setPrompt(DEFAULT_ENGINE_PROMPT)}><RotateCcw size={15} /> استعادة الافتراضي</button><button type="button" className="admin-primary-button" onClick={() => void savePrompt()}><Save size={15} /> حفظ البرومبت</button></div></div>
-                <textarea value={prompt} rows={18} dir="rtl" onChange={(event) => setPrompt(event.target.value)} />
-              </article>
-            </section>
+            <SettingsTab
+              settings={settings}
+              prompt={prompt}
+              engineLabels={ENGINE_LABELS}
+              onSaveSettings={(next) => void saveSettings(next)}
+              onPromptChange={setPrompt}
+              onRestorePrompt={() => setPrompt(DEFAULT_ENGINE_PROMPT)}
+              onSavePrompt={() => void savePrompt()}
+            />
           )}
         </main>
       </div>

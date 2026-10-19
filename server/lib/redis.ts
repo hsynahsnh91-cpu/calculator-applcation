@@ -25,7 +25,6 @@ function valueFrom(environment: Environment, name: string): string | undefined {
 function isSafeRestUrl(value: string): boolean {
   try {
     const url = new URL(value);
-    // Redis credentials must never be sent over an unencrypted endpoint.
     return url.protocol === "https:" && Boolean(url.hostname);
   } catch {
     return false;
@@ -38,11 +37,7 @@ interface CredentialCandidate {
   token?: string;
 }
 
-/**
- * Resolve complete URL/token pairs together. Selecting each environment
- * variable independently can accidentally combine a stale UPSTASH value with
- * a current Vercel KV value, which produces an opaque authentication failure.
- */
+/** Resolve complete URL/token pairs together, never a mixed stale pair. */
 export function resolveRedisConfiguration(
   environment: Environment = process.env,
 ): RedisConfiguration {
@@ -81,8 +76,8 @@ export function resolveRedisConfiguration(
         "إعداد Redis غير مكتمل: اضبط زوجًا كاملًا فقط من UPSTASH_REDIS_REST_URL وUPSTASH_REDIS_REST_TOKEN، أو من KV_REST_API_URL وKV_REST_API_TOKEN.",
     };
 
-  const hasInvalidUrl = candidates.some(
-    (candidate) => Boolean(candidate.url && candidate.token && !isSafeRestUrl(candidate.url)),
+  const hasInvalidUrl = candidates.some((candidate) =>
+    Boolean(candidate.url && candidate.token && !isSafeRestUrl(candidate.url)),
   );
   if (hasInvalidUrl)
     return {
@@ -94,7 +89,7 @@ export function resolveRedisConfiguration(
   return {
     available: false,
     message:
-      "يلزم ربط Redis قبل فتح الإدارة كي يعمل حد محاولات الدخول بأمان.",
+      "يلزم ربط Redis قبل فتح الإدارة كي يعمل حد محاولات الدخول والجلسات بأمان.",
   };
 }
 
@@ -126,7 +121,7 @@ export function redis(): Redis | null {
   return cachedRedis;
 }
 
-/** A safe message for an administrator; it never exposes a URL or token. */
+/** A safe message for an administrator; never exposes a URL or token. */
 export function redisConfigurationMessage(): string | undefined {
   const configuration = configuredRedis();
   return configuration.available ? undefined : configuration.message;
@@ -138,34 +133,61 @@ export function redisIsRequired(): boolean {
 
 export const RedisKey = {
   currentVersion: "syrian-math:knowledge:current-version",
+  versionSequence: "syrian-math:knowledge:version-sequence",
   version: (version: number): string => `syrian-math:knowledge:version:${version}`,
+  versionSummary: (version: number): string =>
+    `syrian-math:knowledge:version-summary:${version}`,
   versionIndex: "syrian-math:knowledge:versions",
   loginAttempts: (ip: string): string => `syrian-math:admin:login:${ip}`,
+  adminSession: (sessionId: string): string =>
+    `syrian-math:admin:session:${sessionId}`,
+  adminSessionGeneration: "syrian-math:admin:session-generation",
   failure: (fingerprint: string): string => `syrian-math:knowledge:failure:${fingerprint}`,
   failureIndex: "syrian-math:knowledge:failure-index",
   publicFailureRate: (ip: string): string => `syrian-math:knowledge:failure-rate:${ip}`,
+  publicEventRate: (ip: string): string => `syrian-math:knowledge:event-rate:${ip}`,
   solveRate: (ip: string): string => `syrian-math:knowledge:solve-rate:${ip}`,
+  adminChatRate: (ip: string): string => `syrian-math:admin:chat-rate:${ip}`,
   solveAttempts: "syrian-math:stats:solve-attempts",
   solveSuccesses: "syrian-math:stats:solve-successes",
   adminSettings: "syrian-math:admin:settings",
+  regressionFingerprint: (fingerprint: string): string =>
+    `syrian-math:regression:passed:${fingerprint}`,
 } as const;
+
+export interface RateLimitResult {
+  allowed: boolean;
+  retryAfterSeconds: number;
+  count: number;
+}
+
+/** Atomic fixed-window limiter shared by unauthenticated write endpoints. */
+export async function consumeRateLimit(
+  key: string,
+  limit: number,
+  windowSeconds: number,
+): Promise<RateLimitResult> {
+  const client = redis();
+  if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
+  const [count, , ttl] = await client
+    .multi()
+    .incr(key)
+    .expire(key, windowSeconds, "NX")
+    .ttl(key)
+    .exec();
+  return {
+    allowed: count <= limit,
+    count,
+    retryAfterSeconds: Math.max(0, ttl),
+  };
+}
 
 export async function failedLoginAttempt(ip: string): Promise<{
   blocked: boolean;
   retryAfterSeconds: number;
 }> {
-  const client = redis();
-  if (!client) throw new Error("قاعدة Redis غير مربوطة بعد.");
-  const key = RedisKey.loginAttempts(ip);
-  // One atomic transaction avoids three separate REST round-trips and keeps
-  // the initial 15-minute window intact even under concurrent failed attempts.
-  const [count, , ttl] = await client
-    .multi()
-    .incr(key)
-    .expire(key, 15 * 60, "NX")
-    .ttl(key)
-    .exec();
-  return { blocked: count >= 5, retryAfterSeconds: Math.max(0, ttl) };
+  const result = await consumeRateLimit(RedisKey.loginAttempts(ip), 5, 15 * 60);
+  return { blocked: result.count >= 5, retryAfterSeconds: result.retryAfterSeconds };
 }
 
 export async function loginBlocked(ip: string): Promise<{

@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
 import {
   adminConfigurationError,
-  createAdminToken,
+  issueAdminSession,
   passwordMatches,
   requireTrustedOrigin,
   setAdminCookie,
@@ -68,7 +68,7 @@ export default async function handler(
       return;
     }
     await clearFailedLoginAttempts(ip);
-    setAdminCookie(response, createAdminToken());
+    setAdminCookie(response, await issueAdminSession());
     sendJson(response, 200, { authenticated: true, expiresInSeconds: 8 * 60 * 60 });
   } catch (error) {
     // Do not expose provider details or credentials, but retain a non-secret

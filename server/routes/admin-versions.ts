@@ -12,7 +12,7 @@ export default async function handler(
 ): Promise<void> {
   if (!["GET", "POST"].includes(request.method ?? ""))
     return methodNotAllowed(response, ["GET", "POST"]);
-  if (!requireAdmin(request, response)) return;
+  if (!(await requireAdmin(request, response))) return;
   if (request.method === "POST" && !requireTrustedOrigin(request, response)) return;
   try {
     if (request.method === "GET") {
@@ -31,8 +31,9 @@ export default async function handler(
       publishedAt: snapshot.publishedAt,
     });
   } catch (error) {
-    sendJson(response, 503, {
-      error: error instanceof Error ? error.message : "تعذر التراجع إلى النسخة المطلوبة.",
+    console.error("Admin versions route failed", {
+      errorType: error instanceof Error ? error.name : typeof error,
     });
+    sendJson(response, 503, { error: "تعذر التراجع إلى النسخة المطلوبة." });
   }
 }

@@ -93,7 +93,7 @@ export default async function handler(
   response: VercelResponse,
 ): Promise<void> {
   if (request.method !== "POST") return methodNotAllowed(response, ["POST"]);
-  if (!requireTrustedOrigin(request, response) || !requireAdmin(request, response)) return;
+  if (!requireTrustedOrigin(request, response) || !(await requireAdmin(request, response))) return;
   const started = Date.now();
   try {
     const parsed = publishRequestSchema.safeParse(await readJsonBody(request));
@@ -145,8 +145,9 @@ export default async function handler(
       testedItemCount: expected.length,
     });
   } catch (error) {
-    sendJson(response, 503, {
-      error: error instanceof Error ? error.message : "تعذّر النشر ولم تتغير النسخة الحالية.",
+    console.error("Admin publish route failed", {
+      errorType: error instanceof Error ? error.name : typeof error,
     });
+    sendJson(response, 503, { error: "تعذّر النشر ولم تتغير النسخة الحالية." });
   }
 }
