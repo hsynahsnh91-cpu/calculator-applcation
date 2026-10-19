@@ -1,9 +1,13 @@
 import {
+  adminChatRequestSchema,
+  adminChatResponseSchema,
   analysisResponseSchema,
   failureRecordSchema,
   knowledgeSnapshotSchema,
   publishRequestSchema,
   versionSummarySchema,
+  type AdminChatRequest,
+  type AdminChatResponse,
   type AnalysisResponse,
   type FailureRecord,
   type KnowledgeSnapshot,
@@ -123,6 +127,15 @@ export async function analyzeRemote(
     signal,
   });
   return analysisResponseSchema.parse(body);
+}
+
+/** Calls the authenticated server route; browser code never receives an AI credential. */
+export async function chatWithAdminBrain(input: AdminChatRequest): Promise<AdminChatResponse> {
+  const body = await request("/api/admin-chat", {
+    method: "POST",
+    body: JSON.stringify(adminChatRequestSchema.parse(input)),
+  });
+  return adminChatResponseSchema.parse(body);
 }
 
 export async function publishedLibrary(): Promise<KnowledgeSnapshot | null> {

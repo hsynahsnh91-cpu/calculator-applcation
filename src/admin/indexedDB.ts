@@ -1,4 +1,5 @@
 import type { ScannedDocument } from "./scanner";
+import { workspaceSessionSchema, type WorkspaceSession } from "./workspace/types";
 import {
   defaultSolverSettings,
   knowledgeItemSchema,
@@ -8,10 +9,11 @@ import {
 } from "./types";
 
 const DB_NAME = "syrian-math-admin";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 const ITEMS_STORE = "items";
 const PREFERENCES_STORE = "preferences";
 const OCR_DOCUMENTS_STORE = "ocr-documents";
+const WORKSPACE_SESSIONS_STORE = "workspace-sessions";
 const SETTINGS_KEY = "solver-settings";
 const PROMPT_KEY = "engine-prompt";
 
@@ -62,6 +64,8 @@ function openDatabase(): Promise<IDBDatabase> {
         database.createObjectStore(PREFERENCES_STORE, { keyPath: "key" });
       if (!database.objectStoreNames.contains(OCR_DOCUMENTS_STORE))
         database.createObjectStore(OCR_DOCUMENTS_STORE, { keyPath: "id" });
+      if (!database.objectStoreNames.contains(WORKSPACE_SESSIONS_STORE))
+        database.createObjectStore(WORKSPACE_SESSIONS_STORE, { keyPath: "id" });
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () =>
@@ -232,5 +236,33 @@ export const adminDraftDB = {
     )
       return (record as CachedOcrDocument).document;
     return undefined;
+  },
+
+  /** Chat sessions and optional page imagery stay strictly on the administrator's device. */
+  async getWorkspaceSessions(): Promise<WorkspaceSession[]> {
+    const database = await openDatabase();
+    const transaction = database.transaction(WORKSPACE_SESSIONS_STORE, "readonly");
+    const values = await requestResult(transaction.objectStore(WORKSPACE_SESSIONS_STORE).getAll());
+    await transactionDone(transaction);
+    return values
+      .map((value) => workspaceSessionSchema.safeParse(value))
+      .filter((result) => result.success)
+      .map((result) => result.data)
+      .sort((first, second) => second.updatedAt.localeCompare(first.updatedAt));
+  },
+
+  async putWorkspaceSession(session: WorkspaceSession): Promise<void> {
+    const parsed = workspaceSessionSchema.parse(session);
+    const database = await openDatabase();
+    const transaction = database.transaction(WORKSPACE_SESSIONS_STORE, "readwrite");
+    transaction.objectStore(WORKSPACE_SESSIONS_STORE).put(parsed);
+    await transactionDone(transaction);
+  },
+
+  async deleteWorkspaceSession(id: string): Promise<void> {
+    const database = await openDatabase();
+    const transaction = database.transaction(WORKSPACE_SESSIONS_STORE, "readwrite");
+    transaction.objectStore(WORKSPACE_SESSIONS_STORE).delete(id);
+    await transactionDone(transaction);
   },
 };

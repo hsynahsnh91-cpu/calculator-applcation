@@ -11,6 +11,7 @@ import {
 import {
   AlertTriangle,
   BarChart3,
+  BrainCircuit,
   Check,
   CheckCircle2,
   CircleHelp,
@@ -58,6 +59,7 @@ import { MonitorTab } from "./tabs/MonitorTab";
 import { PublishTab } from "./tabs/PublishTab";
 import { ScanTab } from "./tabs/ScanTab";
 import { SettingsTab } from "./tabs/SettingsTab";
+import { WorkspaceTab } from "./workspace/WorkspaceTab";
 import { splitDocumentForAnalysis } from "./analysisChunks";
 import { findCurriculumGaps } from "./curriculum";
 import { scanDocument, type ScannedDocument } from "./scanner";
@@ -125,6 +127,7 @@ const statusLabels: Record<KnowledgeItem["status"], string> = {
 const tabs: { id: AdminTab; label: string; icon: typeof Gauge }[] = [
   { id: "overview", label: "نظرة عامة", icon: Gauge },
   { id: "scan", label: "مسح وتحليل", icon: CloudUpload },
+  { id: "workspace", label: "مساحة العقل", icon: BrainCircuit },
   { id: "practice", label: "تدرّب", icon: Sparkles },
   { id: "library", label: "المكتبة", icon: LibraryBig },
   { id: "publish", label: "النشر والنسخ", icon: Layers3 },
@@ -1087,6 +1090,14 @@ export default function AdminApp() {
 
           {tab === "scan" && <ScanTab onAnalyze={analyzeScannedDocument} onSaveManualTraining={saveManualTraining} />}
 
+          {tab === "workspace" && (
+            <WorkspaceTab
+              items={items}
+              onSaveItem={saveItem}
+              onNotice={setNotice}
+            />
+          )}
+
           {tab === "practice" && <PracticeTab items={items} settings={settings} />}
 
           {tab === "library" && (
@@ -1119,6 +1130,9 @@ export default function AdminApp() {
                         {item.needsReview && <span className="admin-review-tag">يحتاج مراجعة</span>}
                         {item.comparison === "matching" && <span className="admin-match-tag">حل الكتاب مطابق</span>}
                         {item.comparison === "needs_review" && <span className="admin-review-tag">حل الكتاب يحتاج مراجعة</span>}
+                        {item.relations.length > 0 && <span className="admin-type-tag">{item.relations.length} علاقات دلالية</span>}
+                        {item.evidence.some((entry) => entry.passed) && <span className="admin-match-tag">دليل تحقق مسجل</span>}
+                        {item.learningLog.length > 0 && <span className="admin-type-tag">سجل تعلم {item.learningLog.length}</span>}
                       </div>
                       <h2>{item.lesson}</h2>
                       <p className="admin-item-context">{item.grade} · {item.unit} · {item.source} · ص{item.page}</p>

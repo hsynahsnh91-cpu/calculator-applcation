@@ -1,4 +1,12 @@
 import { z } from "zod";
+import {
+  learningLogEntrySchema,
+  learningSourceSchema,
+  mathematicalStatementSchema,
+  understandingLevelSchema,
+  verificationEvidenceSchema,
+} from "../brain/semantic/statement.js";
+import { knowledgeRelationSchema } from "../brain/semantic/relations.js";
 import type { EngineId } from "../solver/types.js";
 
 /**
@@ -103,6 +111,13 @@ export const knowledgeItemSchema = z
     canonicalQuestion: z.string().trim().max(30_000),
     fingerprint: z.string().trim().min(6).max(160),
     relatedRuleIds: z.array(z.string().trim().min(1).max(160)).max(80).default([]),
+    /** Optional semantic data defaults safely when reading old published versions. */
+    mathematicalStatement: mathematicalStatementSchema.optional(),
+    relations: z.array(knowledgeRelationSchema).max(80).default([]),
+    understanding: understandingLevelSchema.default("not_understood"),
+    evidence: z.array(verificationEvidenceSchema).max(40).default([]),
+    learningLog: z.array(learningLogEntrySchema).max(80).default([]),
+    learningSource: learningSourceSchema.optional(),
     approvedSolution: approvedSolutionSchema.optional(),
     bookSolution: approvedSolutionSchema.optional(),
     comparison: z.enum(["matching", "needs_review", "not_compared"]).default("not_compared"),
@@ -191,6 +206,92 @@ export const analyzeRequestSchema = z
   })
   .strict();
 export type AnalyzeRequest = z.infer<typeof analyzeRequestSchema>;
+
+export const adminChatMessageRoleSchema = z.enum(["user", "assistant"]);
+export type AdminChatMessageRole = z.infer<typeof adminChatMessageRoleSchema>;
+
+/** Browser-provided history deliberately excludes tool messages and credentials. */
+export const adminChatMessageSchema = z
+  .object({
+    id: z.string().trim().min(8).max(160),
+    role: adminChatMessageRoleSchema,
+    content: z.string().trim().min(1).max(16_000),
+    createdAt: z.string().datetime(),
+  })
+  .strict();
+export type AdminChatMessage = z.infer<typeof adminChatMessageSchema>;
+
+export const adminChatContextSchema = z
+  .object({
+    selectedText: z.string().trim().max(24_000).optional(),
+    sourceName: z.string().trim().max(500).optional(),
+    page: z.number().int().min(1).max(20_000).optional(),
+  })
+  .strict();
+export type AdminChatContext = z.infer<typeof adminChatContextSchema>;
+
+export const adminChatToolNameSchema = z.enum([
+  "parse_latex",
+  "convert_latex",
+  "verify_symbolic",
+  "verify_numeric",
+  "solve_with_engine",
+]);
+export type AdminChatToolName = z.infer<typeof adminChatToolNameSchema>;
+
+export const adminChatToolCallSchema = z
+  .object({
+    id: z.string().trim().min(1).max(160),
+    name: adminChatToolNameSchema,
+    input: z.record(z.string().trim().max(120), z.unknown()),
+  })
+  .strict();
+export type AdminChatToolCall = z.infer<typeof adminChatToolCallSchema>;
+
+export const adminChatToolResultSchema = z
+  .object({
+    callId: z.string().trim().min(1).max(160),
+    name: adminChatToolNameSchema,
+    ok: z.boolean(),
+    output: z.unknown(),
+  })
+  .strict();
+export type AdminChatToolResult = z.infer<typeof adminChatToolResultSchema>;
+
+export const adminChatRequestSchema = z
+  .object({
+    sessionId: z.string().trim().min(8).max(160),
+    messages: z.array(adminChatMessageSchema).min(1).max(40),
+    context: adminChatContextSchema.optional(),
+    /** Both browser and server cap the assistant's tool loop at four rounds. */
+    maxToolRounds: z.number().int().min(1).max(4).default(4),
+    /** Browser-persisted counter; the server refuses a fourth clarification loop. */
+    clarificationRounds: z.number().int().min(0).max(3).default(0),
+  })
+  .strict()
+  .refine(
+    (value) => value.messages.some((message) => message.role === "user"),
+    "يجب أن تحتوي المحادثة على رسالة مدير واحدة على الأقل.",
+  )
+  .refine(
+    (value) => value.messages.reduce((total, message) => total + message.content.length, 0) <= 60_000,
+    "سجل المحادثة أكبر من الحد الآمن للإرسال.",
+  );
+export type AdminChatRequest = z.infer<typeof adminChatRequestSchema>;
+
+export const adminChatResponseSchema = z
+  .object({
+    mode: z.enum(["ai", "local"]),
+    message: z.string().trim().min(1).max(20_000),
+    toolCalls: z.array(adminChatToolCallSchema).max(16).default([]),
+    toolResults: z.array(adminChatToolResultSchema).max(16).default([]),
+    toolRounds: z.number().int().min(0).max(4),
+    clarificationRounds: z.number().int().min(0).max(3).default(0),
+    waitingForClarification: z.boolean().default(false),
+    warnings: z.array(z.string().trim().min(1).max(1_000)).max(20).default([]),
+  })
+  .strict();
+export type AdminChatResponse = z.infer<typeof adminChatResponseSchema>;
 
 export const regressionOutcomeSchema = z
   .object({

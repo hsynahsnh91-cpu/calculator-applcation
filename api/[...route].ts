@@ -20,6 +20,7 @@ type RouteModule = { default: RouteHandler };
  */
 const routeLoaders: Record<string, () => Promise<RouteModule>> = {
   "admin-analyze": () => import("../server/routes/admin-analyze.js"),
+  "admin-chat": () => import("../server/routes/admin-chat.js"),
   "admin-failures": () => import("../server/routes/admin-failures.js"),
   "admin-library": () => import("../server/routes/admin-library.js"),
   "admin-login": () => import("../server/routes/admin-login.js"),

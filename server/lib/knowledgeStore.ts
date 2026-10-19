@@ -57,15 +57,33 @@ export async function getCurrentSnapshot(): Promise<KnowledgeSnapshot | undefine
   return version === undefined ? undefined : getSnapshot(version);
 }
 
-function publishedItems(items: KnowledgeItem[], version: number, now: string): KnowledgeItem[] {
+export function preparePublishedItems(items: KnowledgeItem[], version: number, now: string): KnowledgeItem[] {
   return items
     .filter((item) => item.status === "approved" || item.status === "published")
     .map((item) => ({
       ...item,
+      // A source kind may remain useful to students; opaque local pointers may
+      // reveal an admin session/message relationship and never cross this gate.
+      ...(item.learningSource ? { learningSource: { kind: item.learningSource.kind } } : {}),
       status: "published" as const,
       version,
       updatedAt: now,
     }));
+}
+
+/** Published relations must point to the same immutable snapshot, never drafts or chats. */
+export function validatePublishedRelations(items: KnowledgeItem[]): void {
+  const ids = new Set(items.map((item) => item.id));
+  for (const item of items) {
+    for (const relation of item.relations) {
+      if (relation.targetId === item.id)
+        throw new Error(`لا يجوز أن تشير علاقة المعرفة ${item.id} إلى العنصر نفسه.`);
+      if (!ids.has(relation.targetId))
+        throw new Error(
+          `العلاقة في ${item.id} تشير إلى عنصر غير منشور (${relation.targetId})؛ اعتمد الهدف أو احذف العلاقة قبل النشر.`,
+        );
+    }
+  }
 }
 
 export interface PublishStoredResult {
@@ -89,9 +107,10 @@ export async function publishSnapshot(
   const snapshot = knowledgeSnapshotSchema.parse({
     version,
     publishedAt: now,
-    items: publishedItems(items, version, now),
+    items: preparePublishedItems(items, version, now),
     settings: solverSettingsSchema.parse(settings),
   });
+  validatePublishedRelations(snapshot.items);
   const bytes = Buffer.byteLength(JSON.stringify(snapshot), "utf8");
   if (bytes > MAX_SNAPSHOT_BYTES)
     throw new Error(

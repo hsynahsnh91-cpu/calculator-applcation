@@ -10,6 +10,7 @@ import {
 } from "../../src/admin/types.js";
 import { normalizeScannedText, toLatexHint } from "../../src/admin/normalization.js";
 import { getStoredAdminSettings } from "./knowledgeStore.js";
+import { untrustedContentWarnings } from "./untrustedContent.js";
 
 const aiPayloadSchema = z
   .object({
@@ -98,6 +99,7 @@ export function analyzeWithPatterns(request: AnalyzeRequest): AnalysisResponse {
     blocks,
     warnings: [
       "لم يُضبط AI_API_KEY؛ استُخدم تصنيف بالأنماط فقط. راجع الصياغة والبيانات الوصفية قبل الاعتماد.",
+      ...untrustedContentWarnings([request.text, request.attachmentMessage]),
     ],
   });
 }
@@ -213,7 +215,10 @@ async function analyzeWithAI(request: AnalyzeRequest): Promise<AnalysisResponse>
       return analysisResponseSchema.parse({
         mode: "ai",
         blocks: parsed.data.blocks,
-        warnings: parsed.data.warnings ?? [],
+        warnings: [
+          ...(parsed.data.warnings ?? []),
+          ...untrustedContentWarnings([request.text, request.attachmentMessage]),
+        ].slice(0, 20),
       });
     } catch (error) {
       lastError = timedOut

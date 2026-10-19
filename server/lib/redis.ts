@@ -147,6 +147,7 @@ export const RedisKey = {
   publicFailureRate: (ip: string): string => `syrian-math:knowledge:failure-rate:${ip}`,
   publicEventRate: (ip: string): string => `syrian-math:knowledge:event-rate:${ip}`,
   solveRate: (ip: string): string => `syrian-math:knowledge:solve-rate:${ip}`,
+  adminChatRate: (ip: string): string => `syrian-math:admin:chat-rate:${ip}`,
   solveAttempts: "syrian-math:stats:solve-attempts",
   solveSuccesses: "syrian-math:stats:solve-successes",
   adminSettings: "syrian-math:admin:settings",

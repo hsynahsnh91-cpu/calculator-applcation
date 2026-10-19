@@ -3,6 +3,7 @@ import type { KnowledgeItem, KnowledgeItemType, RegressionOutcome } from "./type
 export type AdminTab =
   | "overview"
   | "scan"
+  | "workspace"
   | "practice"
   | "library"
   | "publish"
